@@ -3,17 +3,22 @@ import type { ViewProps } from '../components/common';
 import { exportCollection, parseBackup } from '../lib/collection';
 import { DEFAULT_DATA_URL, getDataUrl, setDataUrl, type SyncResult } from '../lib/data';
 import type { Collection } from '../lib/types';
+import { clearWikiCache, isWikiEnabled, setWikiEnabled } from '../lib/images';
+import { WIKI_SOURCES } from '../lib/wiki';
 
 export function SettingsView({
   db,
   index,
   collection,
+  customImages,
   sync,
   onSync,
   onReplace,
-}: ViewProps & { sync: SyncResult; onSync: () => void; onReplace: (c: Collection) => void }) {
+}: ViewProps & { sync: SyncResult; onSync: () => void; onReplace: (c: Collection, imgs: Record<string, { url: string; page?: string; source?: string }> | null) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState(getDataUrl());
+  const [wiki, setWiki] = useState(isWikiEnabled());
+  const [cleared, setCleared] = useState(false);
   const marked = Object.keys(collection.cards).length;
   const orphans = Object.keys(collection.cards).filter((id) => !index.byId.has(id)).length;
 
@@ -85,6 +90,38 @@ export function SettingsView({
       </section>
 
       <section className="panel">
+        <h2>Prévias dos photocards</h2>
+        <p className="muted small">
+          Ao abrir um álbum, o app procura imagens de photocards nas wikis ({WIKI_SOURCES.map((s) => s.name).join(', ')}) e
+          guarda o resultado por 7 dias. Imagens marcadas com ≈ são aproximadas (mesmo membro e álbum, versão não
+          confirmada). Você pode trocar qualquer imagem no modo “🔍 Ver”. {Object.keys(customImages).length} imagens
+          escolhidas por você.
+        </p>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={wiki}
+            onChange={(e) => {
+              setWikiEnabled(e.target.checked);
+              setWiki(e.target.checked);
+            }}
+          />
+          Buscar prévias automaticamente nas wikis
+        </label>
+        <div className="row" style={{ marginTop: '0.8rem' }}>
+          <button
+            className="btn"
+            onClick={() => {
+              clearWikiCache();
+              setCleared(true);
+            }}
+          >
+            {cleared ? 'Cache limpo ✓' : 'Limpar cache de imagens'}
+          </button>
+        </div>
+      </section>
+
+      <section className="panel">
         <h2>Backup da coleção</h2>
         <p className="muted small">
           Sua coleção fica salva apenas neste navegador ({marked} photocards marcados). Exporte um backup para levar
@@ -92,7 +129,7 @@ export function SettingsView({
           {orphans > 0 && ` ${orphans} marcações se referem a cards que não existem mais na base atual e foram mantidas.`}
         </p>
         <div className="row">
-          <button className="btn primary" onClick={() => exportCollection(collection)}>
+          <button className="btn primary" onClick={() => exportCollection(collection, customImages)}>
             Exportar backup
           </button>
           <button className="btn" onClick={() => fileRef.current?.click()}>
@@ -108,9 +145,9 @@ export function SettingsView({
               e.target.value = '';
               if (!f) return;
               try {
-                const c = await parseBackup(f);
+                const { collection: c, customImages: imgs } = await parseBackup(f);
                 if (confirm(`Substituir a coleção atual por ${Object.keys(c.cards).length} marcações do backup?`))
-                  onReplace(c);
+                  onReplace(c, imgs);
               } catch (err) {
                 alert(err instanceof Error ? err.message : 'Erro ao importar');
               }

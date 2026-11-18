@@ -63,9 +63,17 @@ export function useCollection() {
   return { collection, setStatus, setQty, replace };
 }
 
-export function exportCollection(c: Collection) {
+type CustomImages = Record<string, { url: string; page?: string; source?: string }>;
+
+export function exportCollection(c: Collection, customImages: CustomImages = {}) {
   const blob = new Blob(
-    [JSON.stringify({ app: 'skz-pocadex', appVersion: __APP_VERSION__, exportedAt: new Date().toISOString(), ...c }, null, 2)],
+    [
+      JSON.stringify(
+        { app: 'skz-pocadex', appVersion: __APP_VERSION__, exportedAt: new Date().toISOString(), ...c, customImages },
+        null,
+        2,
+      ),
+    ],
     { type: 'application/json' },
   );
   const a = document.createElement('a');
@@ -75,7 +83,7 @@ export function exportCollection(c: Collection) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
-export async function parseBackup(file: File): Promise<Collection> {
+export async function parseBackup(file: File): Promise<{ collection: Collection; customImages: CustomImages | null }> {
   const json = JSON.parse(await file.text());
   if (!json || typeof json.cards !== 'object') throw new Error('Arquivo de backup inválido');
   const cards: Collection['cards'] = {};
@@ -84,7 +92,9 @@ export async function parseBackup(file: File): Promise<Collection> {
       cards[id] = { s: e.s, t: e.t ?? Date.now(), ...(e.q ? { q: e.q } : {}) };
     }
   }
-  return { version: 1, cards };
+  const customImages: CustomImages | null =
+    json.customImages && typeof json.customImages === 'object' ? (json.customImages as CustomImages) : null;
+  return { collection: { version: 1, cards }, customImages };
 }
 
 export const STATUS_LABEL: Record<CardStatus, string> = {

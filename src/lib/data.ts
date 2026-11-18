@@ -1,4 +1,4 @@
-import type { Database, Photocard, Release } from './types';
+import type { Database } from './types';
 
 export const SUPPORTED_SCHEMA = 1;
 const CACHE_KEY = 'pocadex:db';
@@ -84,62 +84,8 @@ export async function syncDatabase(): Promise<SyncResult> {
   }
 }
 
-// ---------- Expansão das regras em photocards ----------
-
-const DEFAULT_PER_MEMBER = 1;
-
-export function releaseMembers(db: Database, r: Release): string[] {
-  return r.members ?? db.members.filter((m) => !m.former).map((m) => m.id);
-}
-
-export function expandRelease(db: Database, r: Release): Photocard[] {
-  const cards: Photocard[] = [];
-  const members = releaseMembers(db, r);
-  for (const set of r.sets) {
-    const versions: (string | null)[] = set.versions?.length ? set.versions : [null];
-    const setMembers = set.members ?? members;
-    const per = set.perMember ?? DEFAULT_PER_MEMBER;
-    for (const version of versions) {
-      const vKey = version ? slug(version) : '_';
-      for (const memberId of setMembers) {
-        for (let i = 1; i <= per; i++) {
-          cards.push({
-            id: `${r.id}:${set.id}:${vKey}:${memberId}:${i}`,
-            releaseId: r.id,
-            setId: set.id,
-            setName: set.name,
-            version,
-            memberId,
-            label: per > 1 ? `#${i}` : '',
-            index: i,
-          });
-        }
-      }
-      for (const extra of set.extras ?? []) {
-        cards.push({
-          id: `${r.id}:${set.id}:${vKey}:x-${extra.id}:1`,
-          releaseId: r.id,
-          setId: set.id,
-          setName: set.name,
-          version,
-          memberId: extra.members?.length === 1 ? extra.members[0] : 'group',
-          label: extra.label,
-          index: 1,
-        });
-      }
-    }
-  }
-  return cards;
-}
-
-export function slug(s: string): string {
-  return s
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9぀-ヿ一-鿿가-힯]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
+// Expansão das regras em photocards (compartilhada com os scripts)
+export { expandRelease, releaseMembers, slug } from './expand';
 
 export const TYPE_LABEL: Record<string, string> = {
   mini: 'Mini álbum',

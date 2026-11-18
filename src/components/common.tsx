@@ -1,5 +1,6 @@
 import type { CardIndex } from '../App';
-import type { CardStatus, Collection, Database, Member, Photocard } from '../lib/types';
+import { useState } from 'react';
+import type { CardImage, CardStatus, Collection, Database, Member, Photocard } from '../lib/types';
 import { STATUS_LABEL } from '../lib/collection';
 
 export interface ViewProps {
@@ -8,6 +9,8 @@ export interface ViewProps {
   collection: Collection;
   setStatus: (ids: string[], status: CardStatus | null) => void;
   setQty: (id: string, q: number) => void;
+  customImages: Record<string, { url: string; page?: string; source?: string }>;
+  setCustomImage: (cardId: string, img: { url: string; page?: string; source?: string } | null) => void;
 }
 
 export interface Counts {
@@ -59,7 +62,9 @@ export function PhotocardTile({
   qty,
   onClick,
   showRelease,
+  image,
 }: {
+  image?: CardImage;
   card: Photocard;
   member?: Member;
   status?: CardStatus;
@@ -68,6 +73,8 @@ export function PhotocardTile({
   showRelease?: string;
 }) {
   const m = member ?? GROUP;
+  const [broken, setBroken] = useState<string | null>(null);
+  const img = image && broken !== image.thumb ? image : undefined;
   const initials = m.id === 'group' ? 'SKZ' : m.name.split(/[\s.]+/).map((p) => p[0]).join('').slice(0, 2);
   return (
     <button
@@ -77,8 +84,23 @@ export function PhotocardTile({
       onClick={onClick}
       title={`${m.name}${card.version ? ` · ${card.version}` : ''}${card.label ? ` · ${card.label}` : ''}${status ? ` — ${STATUS_LABEL[status]}` : ''}`}
     >
-      <div className="pc-art">
-        <span className="pc-initials">{initials}</span>
+      <div className={img ? 'pc-art has-img' : 'pc-art'}>
+        {img ? (
+          <img
+            src={img.thumb}
+            alt=""
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={() => setBroken(img.thumb)}
+          />
+        ) : (
+          <span className="pc-initials">{initials}</span>
+        )}
+        {img?.kind === 'wiki' && img.confidence === 'member' && (
+          <span className="pc-approx" title="Prévia aproximada: imagem do membro neste álbum, versão não confirmada">
+            ≈
+          </span>
+        )}
         {card.label && <span className="pc-num">{card.label}</span>}
         {status && <span className={`pc-badge ${status}`}>{status === 'owned' ? '✓' : status === 'transit' ? '✈' : '♥'}</span>}
         {qty && qty > 1 ? <span className="pc-qty">×{qty}</span> : null}

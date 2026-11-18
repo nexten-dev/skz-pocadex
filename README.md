@@ -4,9 +4,21 @@ Web app para organizar a coleção de photocards do **Stray Kids**: veja todos o
 
 > Projeto de fã, sem afiliação com a JYP Entertainment.
 
-**Versão atual:** 0.1.0 — veja o [CHANGELOG](CHANGELOG.md).
+**Versão atual:** 0.2.0 — veja o [CHANGELOG](CHANGELOG.md).
 
-## Rodando localmente
+## Rodando no Windows (jeito mais fácil)
+
+Dê dois cliques em **`iniciar.bat`**. Ele:
+
+1. verifica se o Node.js 20+ está instalado e, se não estiver, oferece instalar o Node.js LTS via `winget` (o instalador oficial do Windows);
+2. instala as dependências do projeto (só na primeira vez ou quando houver atualização);
+3. gera o app e abre `http://localhost:4173` no navegador.
+
+Para encerrar, feche a janela preta. Para o modo de desenvolvimento, que recarrega sozinho quando você edita o código, rode `iniciar.bat dev` no terminal.
+
+> Se o Windows não tiver `winget`, o script abre a página de download do Node.js. Instale e execute o `iniciar.bat` de novo.
+
+## Rodando manualmente (Windows, macOS ou Linux)
 
 ```bash
 npm install
@@ -48,6 +60,30 @@ Cada lançamento tem `sets` de photocards. Um set descreve regras e o app gera o
 
 O ID de cada card é `release:set:versão:membro:n`. **Não renomeie `id`s já publicados**: a coleção dos usuários é salva por esses IDs.
 
+## Prévias dos photocards
+
+As imagens vêm de três fontes, nesta ordem de prioridade:
+
+1. **Escolhida por você**, no modo “🔍 Ver” de um álbum (fica só no seu aparelho e vai junto no backup).
+2. **Base de dados do app**: campo `images` de cada lançamento no `photocards.json`, chaveado pelo ID do card:
+   ```jsonc
+   "images": {
+     "maxident:std:go:felix:1": { "url": "https://…/arquivo.png", "page": "https://…/wiki/File:…", "source": "Stray Kids Wiki" }
+   }
+   ```
+3. **Busca automática nas wikis** ([Stray Kids Wiki](https://stray-kids.fandom.com) e [Kpop Wiki](https://kpop.fandom.com)), feita pelo navegador quando você abre um álbum. Ele procura arquivos com “photocard”/“PC” e o nome do álbum, e identifica o membro e a versão pelo nome do arquivo. Quando só o membro bate, a prévia aparece com **≈**.
+
+Para gravar na base as prévias encontradas nas wikis (assim todos recebem pela atualização automática):
+
+```bash
+npm run images:fetch -- --dry      # só mostra o que encontraria
+npm run images:fetch               # grava as correspondências exatas
+npm run images:fetch -- maxident   # só um lançamento
+npm run data:bump                  # depois de conferir no app
+```
+
+As imagens são exibidas direto das wikis (não são copiadas para o projeto) e cada card tem link para a página de origem.
+
 ## Versionamento
 
 - **App:** SemVer em `package.json` (`0.1.0`), exibido no rodapé. Cada versão ganha uma tag git `vX.Y.Z` e uma entrada no CHANGELOG.
@@ -60,6 +96,6 @@ Há um workflow do GitHub Actions (`.github/workflows/deploy.yml`) que publica n
 ## Próximos passos sugeridos
 
 - Conferir cada lançamento com templates oficiais e marcar `verified: true`.
-- Imagens dos photocards, POBs de lojas, lucky draws e photocards de fanmeeting/turnê.
+- POBs de lojas, lucky draws e photocards de fanmeeting/turnê.
 - Sincronização da coleção entre aparelhos (login).
 - PWA instalável e com suporte offline completo.

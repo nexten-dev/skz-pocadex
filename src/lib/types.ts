@@ -57,6 +57,16 @@ export interface Release {
   /** true quando a lista de cards foi conferida com fontes oficiais/templates. */
   verified?: boolean;
   notes?: string;
+  /** Imagens de prévia por ID de card (URL ou objeto com origem). */
+  images?: Record<string, string | DbImage>;
+}
+
+export interface DbImage {
+  url: string;
+  thumb?: string;
+  /** Página de origem (ex.: página do arquivo na wiki). */
+  page?: string;
+  source?: string;
 }
 
 export interface Database {
@@ -79,6 +89,17 @@ export interface Photocard {
   memberId: string; // id do membro ou "group"
   label: string;
   index: number;
+}
+
+export interface CardImage {
+  url: string;
+  thumb: string;
+  page?: string;
+  source?: string;
+  /** custom = escolhida pelo usuário, db = da base oficial do app, wiki = encontrada automaticamente */
+  kind: 'custom' | 'db' | 'wiki';
+  /** Para kind=wiki: exact = membro+versão batem; member = só o membro (aproximada). */
+  confidence?: 'exact' | 'member';
 }
 
 // ---- Coleção do usuário (localStorage) ----

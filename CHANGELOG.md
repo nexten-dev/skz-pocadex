@@ -5,6 +5,21 @@ Todas as mudanças relevantes do app. Segue [Versionamento Semântico](https://s
 
 A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.DD.N`), independente da versão do app.
 
+## [0.2.0] — 2026-11-18
+
+### Adicionado
+- **`iniciar.bat`** para Windows: verifica o Node.js (versão 20 ou mais nova), oferece instalar o Node.js LTS via `winget` se faltar, instala as dependências na primeira execução (ou quando o `package-lock.json` muda), gera o build e abre o app no navegador. Use `iniciar.bat dev` para o modo de desenvolvimento.
+- **Prévias dos photocards**: ao abrir um álbum, o app procura imagens de photocards na Stray Kids Wiki e na Kpop Wiki (Fandom) e mostra nos cards. O resultado fica em cache por 7 dias.
+  - Prioridade da imagem: escolhida por você → base de dados do app → encontrada na wiki.
+  - Cards com **≈** usam prévia aproximada: mesmo membro e álbum, mas a versão não está confirmada no nome do arquivo.
+- Modo **🔍 Ver** na página do álbum: abre o card em tamanho grande, com status, **quantidade de repetidos**, link para a origem da imagem e opção de escolher outra imagem da wiki ou colar um link próprio.
+- Configurações: ligar/desligar a busca nas wikis e limpar o cache de imagens.
+- O backup agora inclui as imagens escolhidas por você.
+- Campo `images` na base de dados e script `npm run images:fetch`, que procura as prévias nas wikis e as grava no `photocards.json` para todos os usuários.
+
+### Corrigido
+- No celular, a barra de modos de marcação não cabia na tela.
+
 ## [0.1.0] — 2026-11-18
 
 ### Adicionado

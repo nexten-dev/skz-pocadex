@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { expandRelease, syncDatabase, type SyncResult } from './lib/data';
 import { useCollection } from './lib/collection';
+import { useCustomImages } from './lib/images';
 import type { Database, Photocard } from './lib/types';
 import { HomeView } from './views/HomeView';
 import { ReleaseView } from './views/ReleaseView';
@@ -47,6 +48,7 @@ export function App() {
   const [sync, setSync] = useState<SyncResult | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const { collection, setStatus, setQty, replace } = useCollection();
+  const { custom: customImages, setImage: setCustomImage, replaceAll: replaceImages } = useCustomImages();
 
   const runSync = useCallback(async (manual = false) => {
     const result = await syncDatabase();
@@ -92,7 +94,7 @@ export function App() {
     );
   } else {
     const [page, param] = route;
-    const props = { db, index, collection, setStatus, setQty };
+    const props = { db, index, collection, setStatus, setQty, customImages, setCustomImage };
     if (page === 'release' && param) content = <ReleaseView {...props} releaseId={decodeURIComponent(param)} />;
     else if (page === 'stats') content = <StatsView {...props} />;
     else if (page === 'settings')
@@ -101,8 +103,9 @@ export function App() {
           {...props}
           sync={sync}
           onSync={() => runSync(true)}
-          onReplace={(c) => {
+          onReplace={(c, imgs) => {
             replace(c);
+            if (imgs) replaceImages(imgs);
             setToast('Backup importado');
           }}
         />

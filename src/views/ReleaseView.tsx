@@ -3,8 +3,10 @@ import { countCards, memberMap, PhotocardTile, Progress, type ViewProps } from '
 import { STATUS_LABEL } from '../lib/collection';
 import { formatDate, releaseMembers, TYPE_LABEL } from '../lib/data';
 import type { CardStatus, Photocard } from '../lib/types';
+import { useReleaseImages } from '../lib/images';
+import { CardDetail } from '../components/CardDetail';
 
-type Mode = CardStatus | 'clear';
+type Mode = CardStatus | 'clear' | 'view';
 type StatusFilter = 'all' | 'missing' | CardStatus;
 
 const MODES: { id: Mode; label: string }[] = [
@@ -12,16 +14,29 @@ const MODES: { id: Mode; label: string }[] = [
   { id: 'transit', label: '✈ A caminho' },
   { id: 'wish', label: '♥ Quero' },
   { id: 'clear', label: '✕ Limpar' },
+  { id: 'view', label: '🔍 Ver' },
 ];
 
-export function ReleaseView({ db, index, collection, setStatus, releaseId }: ViewProps & { releaseId: string }) {
+export function ReleaseView({
+  db,
+  index,
+  collection,
+  setStatus,
+  setQty,
+  customImages,
+  setCustomImage,
+  releaseId,
+}: ViewProps & { releaseId: string }) {
   const release = db.releases.find((r) => r.id === releaseId);
   const [mode, setMode] = useState<Mode>('owned');
   const [member, setMember] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [openCard, setOpenCard] = useState<string | null>(null);
   const members = memberMap(db);
 
   const cards = index.byRelease.get(releaseId) ?? [];
+  const memberIds = useMemo(() => (release ? releaseMembers(db, release) : []), [db, release]);
+  const { images, candidates, state: imgState, reload } = useReleaseImages(release, cards, memberIds, customImages);
   const counts = useMemo(() => countCards(cards, collection), [cards, collection]);
 
   const visible = useMemo(
@@ -66,18 +81,22 @@ export function ReleaseView({ db, index, collection, setStatus, releaseId }: Vie
   }
 
   const apply = (c: Photocard) => {
+    if (mode === 'view') return setOpenCard(c.id);
     const current = collection.cards[c.id]?.s;
     if (mode === 'clear' || current === mode) setStatus([c.id], null);
     else setStatus([c.id], mode);
   };
 
   const applyAll = (list: Photocard[]) => {
+    if (mode === 'view') return;
     const target = mode === 'clear' ? null : mode;
     const label = target ? STATUS_LABEL[target] : 'sem marcação';
     if (confirm(`Marcar ${list.length} photocards como "${label}"?`)) setStatus(list.map((c) => c.id), target);
   };
 
-  const relMembers = releaseMembers(db, release);
+  const relMembers = memberIds;
+  const detailCard = openCard ? index.byId.get(openCard) : undefined;
+  const imgCount = images.size;
 
   return (
     <>
@@ -99,6 +118,20 @@ export function ReleaseView({ db, index, collection, setStatus, releaseId }: Vie
             <p className="small muted">Versões do álbum: {release.albumVersions.join(', ')}</p>
           )}
           {release.notes && <p className="small">{release.notes}</p>}
+          <p className="small muted img-status">
+            {imgState === 'loading' && 'Procurando prévias nas wikis…'}
+            {imgState === 'done' &&
+              (imgCount > 0
+                ? `${imgCount} de ${cards.length} cards com prévia. Use “🔍 Ver” para ver em tamanho grande ou trocar a imagem.`
+                : 'Nenhuma prévia encontrada nas wikis para este álbum.')}
+            {imgState === 'error' && 'Não foi possível consultar as wikis agora.'}
+            {imgState === 'off' && 'Busca de prévias nas wikis desativada (Configurações).'}{' '}
+            {(imgState === 'done' || imgState === 'error') && (
+              <button className="linklike" onClick={reload}>
+                buscar de novo
+              </button>
+            )}
+          </p>
         </div>
         <div className="hero-progress">
           <Progress counts={counts} />
@@ -170,6 +203,7 @@ export function ReleaseView({ db, index, collection, setStatus, releaseId }: Vie
                   member={members.get(c.memberId)}
                   status={collection.cards[c.id]?.s}
                   qty={collection.cards[c.id]?.q}
+                  image={images.get(c.id)}
                   onClick={() => apply(c)}
                 />
               ))}
@@ -178,6 +212,22 @@ export function ReleaseView({ db, index, collection, setStatus, releaseId }: Vie
         );
       })}
       {groups.length === 0 && <p className="center muted">Nenhum photocard com esses filtros.</p>}
+      {detailCard && (
+        <CardDetail
+          card={detailCard}
+          release={release}
+          member={members.get(detailCard.memberId)}
+          image={images.get(detailCard.id)}
+          candidates={candidates}
+          status={collection.cards[detailCard.id]?.s}
+          qty={collection.cards[detailCard.id]?.q}
+          setNote={release.sets.find((x) => x.id === detailCard.setId)?.note}
+          onStatus={(st) => setStatus([detailCard.id], st)}
+          onQty={(q) => setQty(detailCard.id, q)}
+          onImage={(img) => setCustomImage(detailCard.id, img)}
+          onClose={() => setOpenCard(null)}
+        />
+      )}
     </>
   );
 }
