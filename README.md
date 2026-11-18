@@ -4,7 +4,7 @@ Web app para organizar a coleção de photocards do **Stray Kids**: veja todos o
 
 > Projeto de fã, sem afiliação com a JYP Entertainment.
 
-**Versão atual:** 0.4.2
+**Versão atual:** 0.5.0
 
 **App online:** https://nexten-dev.github.io/skz-pocadex/ · **Downloads:** [Releases](https://github.com/nexten-dev/skz-pocadex/releases) — veja o [CHANGELOG](CHANGELOG.md).
 
@@ -81,29 +81,24 @@ Na base, cada set pode ter:
 }
 ```
 
-## Prévias dos photocards
+## Status dos itens
 
-As imagens vêm de três fontes, nesta ordem de prioridade:
+| Status | Significado |
+|---|---|
+| ✓ Tenho | Está na sua coleção |
+| 🛒 Comprado → 🔒 Garantido → 📮 Enviado para Proxy → ✈️ Frete Inter → 💰 Taxa RF → 🏠 Dispo Frete Casa → 🚚 Enviado | Etapas da compra até chegar (“a caminho”) |
+| ♥ Quero | Lista de desejos |
+| 🚫 Não quero | Fica fora do progresso e do “faltando” |
 
-1. **Escolhida por você**, no modo “🔍 Ver” de um álbum (fica só no seu aparelho e vai junto no backup).
-2. **Base de dados do app**: campo `images` de cada lançamento no `photocards.json`, chaveado pelo ID do card:
-   ```jsonc
-   "images": {
-     "maxident:std:go:felix:1": { "url": "https://…/arquivo.png", "page": "https://…/wiki/File:…", "source": "Stray Kids Wiki" }
-   }
-   ```
-3. **Busca automática nas wikis** ([Stray Kids Wiki](https://stray-kids.fandom.com) e [Kpop Wiki](https://kpop.fandom.com)), feita pelo navegador quando você abre um álbum. Ele procura arquivos com “photocard”/“PC” e o nome do álbum, e identifica o membro e a versão pelo nome do arquivo. Quando só o membro bate, a prévia aparece com **≈**.
+## Imagens
 
-Para gravar na base as prévias encontradas nas wikis (assim todos recebem pela atualização automática):
+As imagens vêm da [Stray Kids Wiki](https://stray-kids.fandom.com) e ficam gravadas na base (`release.media`):
 
-```bash
-npm run images:fetch -- --dry      # só mostra o que encontraria
-npm run images:fetch               # grava as correspondências exatas
-npm run images:fetch -- maxident   # só um lançamento
-npm run data:bump                  # depois de conferir no app
-```
+- **Prévias das versões**: a imagem oficial do conteúdo de cada versão do álbum (“Album Preview”).
+- **Fotos de divulgação dos membros**: o teaser de cada membro na era, usado no fundo dos cards (📷). As wikis não têm fotos individuais dos photocards.
+- Imagens escolhidas pelo usuário (modo “🔍 Ver”) têm prioridade e ficam só no aparelho dele.
 
-As imagens são exibidas direto das wikis (não são copiadas para o projeto) e cada card tem link para a página de origem.
+A coleta roda no GitHub Actions, que tem acesso às wikis: workflow **“Prévias das wikis”**, toda segunda-feira, ou manualmente em *Actions → Prévias das wikis → Run workflow* (modos `diagnostico`, `testar`, `gravar`). Localmente: `npm run images:fetch -- --dry --verbose`.
 
 ## Publicar uma versão (3 pacotes)
 

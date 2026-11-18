@@ -80,6 +80,31 @@ export interface Release {
   notes?: string;
   /** Imagens de prévia por ID de card (URL ou objeto com origem). */
   images?: Record<string, string | DbImage>;
+  /** Nome da página na wiki, quando diferente do título. */
+  wikiPage?: string;
+  /** Imagens coletadas das wikis (scripts/fetch-images.mjs). */
+  media?: ReleaseMedia;
+}
+
+export interface MediaImage {
+  url: string;
+  thumb?: string;
+  page?: string;
+  title?: string;
+  source?: string;
+}
+
+export interface ReleaseMedia {
+  source?: string;
+  /** Página da galeria do álbum na wiki. */
+  gallery?: string;
+  totalImages?: number;
+  cover?: MediaImage | null;
+  /** Prévias oficiais do conteúdo de cada versão do álbum. */
+  previews?: (MediaImage & { label: string; keys?: string[] })[];
+  /** Uma foto de divulgação de cada membro na era do álbum. */
+  members?: Record<string, MediaImage>;
+  updatedAt?: string;
 }
 
 export interface DbImage {
@@ -121,15 +146,16 @@ export interface CardImage {
   thumb: string;
   page?: string;
   source?: string;
-  /** custom = escolhida pelo usuário, db = da base oficial do app, wiki = encontrada automaticamente */
-  kind: 'custom' | 'db' | 'wiki';
-  /** Para kind=wiki: exact = membro+versão batem; member = só o membro (aproximada). */
-  confidence?: 'exact' | 'member';
+  /** custom = escolhida pelo usuário; db = imagem do próprio card; concept = foto de divulgação do membro na era */
+  kind: 'custom' | 'db' | 'concept';
 }
 
 // ---- Coleção do usuário (localStorage) ----
 
-export type CardStatus = 'owned' | 'transit' | 'wish';
+/** Etapas da compra até o card chegar (ver src/lib/status.ts). */
+export type TransitStatus = 'bought' | 'secured' | 'proxy' | 'intl' | 'tax' | 'homeready' | 'shipped';
+
+export type CardStatus = 'owned' | 'wish' | 'notwant' | TransitStatus;
 
 export interface CollectionEntry {
   s: CardStatus;

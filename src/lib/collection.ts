@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { CardStatus, Collection } from './types';
+import { normalizeStatus, STATUS_INFO } from './status';
 
 const KEY = 'pocadex:collection';
 
@@ -8,12 +9,29 @@ function load(): Collection {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Collection;
-      if (parsed && parsed.cards) return parsed;
+      if (parsed && parsed.cards) return migrate(parsed);
     }
   } catch {
     /* ignore */
   }
   return { version: 1, cards: {} };
+}
+
+/** Converte status de versões antigas (ex.: "transit" → "bought"). */
+function migrate(c: Collection): Collection {
+  let changed = false;
+  const cards = { ...c.cards };
+  for (const [id, e] of Object.entries(cards)) {
+    const s = normalizeStatus(e?.s);
+    if (!s) {
+      delete cards[id];
+      changed = true;
+    } else if (s !== e.s) {
+      cards[id] = { ...e, s };
+      changed = true;
+    }
+  }
+  return changed ? { ...c, cards } : c;
 }
 
 function save(c: Collection) {
@@ -88,17 +106,14 @@ export async function parseBackup(file: File): Promise<{ collection: Collection;
   if (!json || typeof json.cards !== 'object') throw new Error('Arquivo de backup inválido');
   const cards: Collection['cards'] = {};
   for (const [id, e] of Object.entries(json.cards as Record<string, { s?: string; q?: number; t?: number }>)) {
-    if (e && (e.s === 'owned' || e.s === 'transit' || e.s === 'wish')) {
-      cards[id] = { s: e.s, t: e.t ?? Date.now(), ...(e.q ? { q: e.q } : {}) };
-    }
+    const s = normalizeStatus(e?.s);
+    if (s) cards[id] = { s, t: e.t ?? Date.now(), ...(e.q ? { q: e.q } : {}) };
   }
   const customImages: CustomImages | null =
     json.customImages && typeof json.customImages === 'object' ? (json.customImages as CustomImages) : null;
   return { collection: { version: 1, cards }, customImages };
 }
 
-export const STATUS_LABEL: Record<CardStatus, string> = {
-  owned: 'Tenho',
-  transit: 'A caminho',
-  wish: 'Quero',
-};
+export const STATUS_LABEL = Object.fromEntries(
+  Object.values(STATUS_INFO).map((s) => [s.id, s.label]),
+) as Record<CardStatus, string>;

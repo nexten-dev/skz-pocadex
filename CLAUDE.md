@@ -10,7 +10,8 @@ Web app (PWA) para organizar a coleção de photocards do **Stray Kids**: lista 
 - Vite + React 19 + TypeScript, sem backend. Dados do usuário em `localStorage`.
 - `public/data/photocards.json` — **a base de dados** (catálogo). O app baixa esse arquivo a cada abertura (sem cache) e guarda uma cópia para uso offline.
 - `src/lib/expand.js` — gera os cards a partir das regras de cada set (JS puro, compartilhado com os scripts).
-- `src/lib/wiki.js` — busca de prévias nas wikis (Fandom) direto do navegador; também usado por `scripts/fetch-images.mjs`.
+- `src/lib/status.ts` — status dos itens: `owned`, etapas a caminho (`bought`→`secured`→`proxy`→`intl`→`tax`→`homeready`→`shipped`), `wish`, `notwant`. “Não quero” não conta no progresso. O antigo `transit` é migrado para `bought`.
+- `src/lib/wiki.js` — coleta de imagens da Stray Kids Wiki (galeria `<Álbum>/Gallery`: “Album Preview” das versões + teaser de cada membro). Usado só por `scripts/fetch-images.mjs`, que roda no GitHub Actions (workflow `images.yml`, semanal + manual). As wikis **não têm fotos individuais de photocards**. O app só lê `release.media` da base.
 - `src/lib/categories.ts` — categorias de itens (photocard, inclusion, pob, luckydraw, popup, event) e o seletor “Mostrar” (padrão: só photocards).
 - `src/lib/pwa.ts` + `public/sw.js` + `public/manifest.webmanifest` — app instalável/offline. O build grava a versão no `sw.js`.
 - `iniciar.bat` — inicializador Windows para o código-fonte (verifica/instala Node via winget, `npm ci`, build, abre o navegador).
@@ -62,5 +63,6 @@ No GitHub (`nexten-dev/skz-pocadex`), o workflow `.github/workflows/release.yml`
 
 ## Limitações do ambiente de nuvem do Claude
 
-- As wikis (fandom.com), Wikipedia e sites de lojas costumam estar bloqueados na rede da sessão; a pesquisa foi feita por buscas. Testes de busca de imagens usam respostas simuladas.
+- As wikis (fandom.com), Wikipedia e sites de lojas estão bloqueados na rede da sessão. Para acessar as wikis, use o workflow `images.yml` (as máquinas do GitHub têm acesso): dispare com `gh api repos/nexten-dev/skz-pocadex/actions/workflows/images.yml/dispatches -X POST -f ref=<branch> -f 'inputs[modo]=diagnostico|testar|gravar' -f 'inputs[lancamentos]=<ids>'` e leia o log do job pela API. Artefatos do Actions não podem ser baixados da sessão.
+- Para testar mudanças antes de publicar, use um branch (o deploy só roda na `main`).
 - O ambiente é temporário: sempre entregue o pacote **Source** ao usuário ou envie ao GitHub antes de encerrar.

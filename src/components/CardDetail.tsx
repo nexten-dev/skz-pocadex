@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { CardImage, CardStatus, Member, Photocard, Release } from '../lib/types';
-import type { ImageCandidate } from '../lib/wiki';
-import { STATUS_LABEL } from '../lib/collection';
+import { isTransit, nextStatus, STATUS_INFO, TRANSIT_STEPS } from '../lib/status';
 import { CATEGORY_BY_ID } from '../lib/categories';
 
 interface Props {
@@ -9,7 +8,8 @@ interface Props {
   release: Release;
   member?: Member;
   image?: CardImage;
-  candidates: ImageCandidate[];
+  /** Imagens do lançamento que o usuário pode escolher (fotos de divulgação e prévias). */
+  candidates: { url: string; thumb?: string; page?: string; source?: string; title?: string; label: string; memberId?: string }[];
   status?: CardStatus;
   qty?: number;
   setNote?: string;
@@ -19,7 +19,7 @@ interface Props {
   onClose: () => void;
 }
 
-const STATUSES: CardStatus[] = ['owned', 'transit', 'wish'];
+const MAIN: CardStatus[] = ['owned', 'wish', 'notwant'];
 
 export function CardDetail({ card, release, member, image, candidates, status, qty, setNote, onStatus, onQty, onImage, onClose }: Props) {
   const [picking, setPicking] = useState(false);
@@ -39,8 +39,8 @@ export function CardDetail({ card, release, member, image, candidates, status, q
   useEffect(() => setBroken(false), [image?.url]);
 
   const name = member?.name ?? (card.label || 'Grupo');
-  const forMember = candidates.filter((c) => c.member === card.memberId);
-  const others = candidates.filter((c) => c.member !== card.memberId);
+  const forMember = candidates.filter((c) => c.memberId === card.memberId);
+  const others = candidates.filter((c) => c.memberId !== card.memberId);
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -87,15 +87,47 @@ export function CardDetail({ card, release, member, image, candidates, status, q
             {setNote && <p className="small muted">{setNote}</p>}
 
             <div className="status-buttons">
-              {STATUSES.map((s) => (
+              {MAIN.map((s) => (
                 <button
                   key={s}
-                  className={`btn status-${s} ${status === s ? 'on' : ''}`}
+                  className={`btn status-${STATUS_INFO[s].tone} ${status === s ? 'on' : ''}`}
                   onClick={() => onStatus(status === s ? null : s)}
                 >
-                  {s === 'owned' ? '✓' : s === 'transit' ? '✈' : '♥'} {STATUS_LABEL[s]}
+                  {STATUS_INFO[s].icon} {STATUS_INFO[s].label}
                 </button>
               ))}
+            </div>
+
+            <div className="transit-box">
+              <div className="transit-head">
+                <span className="small">
+                  <strong>🚚 A caminho</strong>
+                  {isTransit(status) && <span className="muted"> · etapa {STATUS_INFO[status].step} de 7</span>}
+                </span>
+                {isTransit(status) && (
+                  <button className="btn small primary" onClick={() => onStatus(nextStatus(status))}>
+                    Avançar → {STATUS_INFO[nextStatus(status)].label}
+                  </button>
+                )}
+              </div>
+              <ol className="stepper">
+                {TRANSIT_STEPS.map((t) => {
+                  const cur = isTransit(status) ? STATUS_INFO[status].step ?? 0 : 0;
+                  const state = t.step! < cur ? 'done' : t.step === cur ? 'current' : '';
+                  return (
+                    <li key={t.id}>
+                      <button
+                        className={`step ${state}`}
+                        title={t.description}
+                        onClick={() => onStatus(status === t.id ? null : t.id)}
+                      >
+                        <span className="step-icon">{state === 'done' ? '✓' : t.icon}</span>
+                        <span className="step-label">{t.label}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
             </div>
 
             {status === 'owned' && (
@@ -115,14 +147,12 @@ export function CardDetail({ card, release, member, image, candidates, status, q
             <div className="image-info small">
               {image ? (
                 <>
-                  <strong>Prévia:</strong>{' '}
+                  <strong>Imagem:</strong>{' '}
                   {image.kind === 'custom'
-                    ? 'imagem escolhida por você'
+                    ? 'escolhida por você'
                     : image.kind === 'db'
-                      ? 'base de dados do app'
-                      : image.confidence === 'exact'
-                        ? `encontrada na ${image.source}`
-                        : `aproximada (${image.source}) — mesmo membro e álbum, versão não confirmada`}
+                      ? 'foto do photocard (base do app)'
+                      : `📷 foto de divulgação de ${name} nesta era (${image.source ?? 'wiki'}) — não é a foto do photocard`}
                   {image.page && (
                     <>
                       {' · '}
@@ -133,7 +163,7 @@ export function CardDetail({ card, release, member, image, candidates, status, q
                   )}
                 </>
               ) : (
-                <span className="muted">Nenhuma prévia encontrada nas wikis para este card.</span>
+                <span className="muted">Sem imagem para este item. As wikis não têm fotos dos photocards.</span>
               )}
             </div>
 
@@ -153,27 +183,27 @@ export function CardDetail({ card, release, member, image, candidates, status, q
                 {candidates.length > 0 ? (
                   <>
                     <p className="small muted">
-                      Imagens de photocards deste álbum encontradas nas wikis
-                      {forMember.length ? ` (${forMember.length} de ${name})` : ''}:
+                      Imagens deste lançamento na wiki (fotos de divulgação e prévias das versões). Para a foto real do
+                      photocard, cole um link abaixo.
                     </p>
                     <div className="picker-grid">
                       {[...forMember, ...others].map((c) => (
                         <button
                           key={c.url}
                           className={image?.url === c.url ? 'pick on' : 'pick'}
-                          title={c.title}
+                          title={c.label}
                           onClick={() => {
                             onImage({ url: c.url, page: c.page, source: c.source });
                             setPicking(false);
                           }}
                         >
-                          <img src={c.thumb} alt={c.title} loading="lazy" referrerPolicy="no-referrer" />
+                          <img src={c.thumb ?? c.url} alt={c.label} loading="lazy" referrerPolicy="no-referrer" />
                         </button>
                       ))}
                     </div>
                   </>
                 ) : (
-                  <p className="small muted">Nenhuma imagem deste álbum foi encontrada nas wikis.</p>
+                  <p className="small muted">Ainda não há imagens da wiki para este lançamento.</p>
                 )}
                 <form
                   className="row"

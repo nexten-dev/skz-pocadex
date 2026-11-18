@@ -3,8 +3,7 @@ import type { ViewProps } from '../components/common';
 import { exportCollection, parseBackup } from '../lib/collection';
 import { DEFAULT_DATA_URL, getDataUrl, setDataUrl, type SyncResult } from '../lib/data';
 import type { Collection } from '../lib/types';
-import { clearWikiCache, isWikiEnabled, setWikiEnabled } from '../lib/images';
-import { WIKI_SOURCES } from '../lib/wiki';
+import { isConceptEnabled, setConceptEnabled } from '../lib/images';
 import { CATEGORIES } from '../lib/categories';
 import { usePwa } from '../lib/pwa';
 
@@ -21,8 +20,7 @@ export function SettingsView({
   const fileRef = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState(getDataUrl());
   const pwa = usePwa();
-  const [wiki, setWiki] = useState(isWikiEnabled());
-  const [cleared, setCleared] = useState(false);
+  const [concept, setConcept] = useState(isConceptEnabled());
   const marked = Object.keys(collection.cards).length;
   const orphans = Object.keys(collection.cards).filter((id) => !index.byId.has(id)).length;
 
@@ -176,35 +174,24 @@ export function SettingsView({
       </section>
 
       <section className="panel">
-        <h2>Prévias dos photocards</h2>
+        <h2>Imagens</h2>
         <p className="muted small">
-          Ao abrir um álbum, o app procura imagens de photocards nas wikis ({WIKI_SOURCES.map((s) => s.name).join(', ')}) e
-          guarda o resultado por 7 dias. Imagens marcadas com ≈ são aproximadas (mesmo membro e álbum, versão não
-          confirmada). Você pode trocar qualquer imagem no modo “🔍 Ver”. {Object.keys(customImages).length} imagens
-          escolhidas por você.
+          As imagens vêm da Stray Kids Wiki e são atualizadas toda semana na base do app. As wikis não têm fotos
+          individuais dos photocards; o app mostra a <strong>prévia oficial de cada versão</strong> do álbum e, nos cards,
+          a <strong>foto de divulgação do membro</strong> naquela era (marcada com 📷). Você pode trocar a imagem de
+          qualquer card no modo “🔍 Ver”. {Object.keys(customImages).length} imagens escolhidas por você.
         </p>
         <label className="toggle">
           <input
             type="checkbox"
-            checked={wiki}
+            checked={concept}
             onChange={(e) => {
-              setWikiEnabled(e.target.checked);
-              setWiki(e.target.checked);
+              setConceptEnabled(e.target.checked);
+              setConcept(e.target.checked);
             }}
           />
-          Buscar prévias automaticamente nas wikis
+          Mostrar as fotos de divulgação dos membros nos cards
         </label>
-        <div className="row" style={{ marginTop: '0.8rem' }}>
-          <button
-            className="btn"
-            onClick={() => {
-              clearWikiCache();
-              setCleared(true);
-            }}
-          >
-            {cleared ? 'Cache limpo ✓' : 'Limpar cache de imagens'}
-          </button>
-        </div>
       </section>
 
       <section className="panel">

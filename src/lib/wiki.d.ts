@@ -1,33 +1,22 @@
-import type { Photocard, Release } from './types';
+import type { MediaImage, PhotocardSet, Release, ReleaseMedia } from './types';
 
 export interface WikiSource {
   id: string;
   name: string;
   api: string;
-}
-
-export interface ImageCandidate {
-  title: string;
-  thumb: string;
-  url: string;
-  page?: string;
-  source: string;
-  member: string | null;
-}
-
-export interface MatchedImage extends ImageCandidate {
-  confidence: 'exact' | 'member';
+  wiki: string;
 }
 
 export const WIKI_SOURCES: WikiSource[];
 export const MEMBER_ALIASES: Record<string, string[]>;
 export function norm(s: string): string;
+export function hasWord(text: string, word: string): boolean;
 export function detectMember(title: string, memberIds: string[]): string | null;
-export function isPhotocard(title: string): boolean;
-export function findReleaseImages(
-  release: Pick<Release, 'title' | 'altTitle'>,
+export function previewLabel(title: string): string;
+export function previewKeys(previewTitle: string, sets: PhotocardSet[], slug: (s: string) => string): string[];
+export function collectReleaseMedia(
+  release: Pick<Release, 'title' | 'altTitle' | 'wikiPage'>,
   memberIds: string[],
   fetchImpl?: typeof fetch,
   sources?: WikiSource[],
-): Promise<ImageCandidate[]>;
-export function matchImages(cards: Photocard[], candidates: ImageCandidate[]): Map<string, MatchedImage>;
+): Promise<(Omit<ReleaseMedia, 'previews'> & { previews: (MediaImage & { label: string })[] }) | null>;

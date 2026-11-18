@@ -1,20 +1,23 @@
 import { useMemo, useState } from 'react';
 import { countCards, memberMap, PhotocardTile, Progress, type ViewProps } from '../components/common';
-import { STATUS_LABEL } from '../lib/collection';
+import { isTransit, STATUS_INFO, TRANSIT_STEPS } from '../lib/status';
 import { formatDate, releaseMembers, TYPE_LABEL } from '../lib/data';
-import type { CardStatus, Photocard } from '../lib/types';
-import { useReleaseImages } from '../lib/images';
+import type { CardStatus, Photocard, TransitStatus } from '../lib/types';
+import { groupKey, useReleaseImages } from '../lib/images';
+import { Lightbox } from '../components/Lightbox';
+import type { MediaImage } from '../lib/types';
 import { CardDetail } from '../components/CardDetail';
 import { CategoryBar } from '../components/CategoryBar';
 import { CATEGORY_BY_ID, CATEGORY_ORDER } from '../lib/categories';
 
-type Mode = CardStatus | 'clear' | 'view';
-type StatusFilter = 'all' | 'missing' | CardStatus;
+type Mode = 'owned' | 'transit' | 'wish' | 'notwant' | 'clear' | 'view';
+type StatusFilter = 'all' | 'missing' | 'transit' | CardStatus;
 
 const MODES: { id: Mode; label: string }[] = [
   { id: 'owned', label: '✓ Tenho' },
-  { id: 'transit', label: '✈ A caminho' },
+  { id: 'transit', label: '🚚 A caminho' },
   { id: 'wish', label: '♥ Quero' },
+  { id: 'notwant', label: '🚫 Não quero' },
   { id: 'clear', label: '✕ Limpar' },
   { id: 'view', label: '🔍 Ver' },
 ];
@@ -32,6 +35,9 @@ export function ReleaseView({
 }: ViewProps & { releaseId: string }) {
   const release = db.releases.find((r) => r.id === releaseId);
   const [mode, setMode] = useState<Mode>('owned');
+  const [step, setStep] = useState<TransitStatus>('bought');
+  /** Status aplicado ao tocar num card no modo atual. */
+  const target: CardStatus | null = mode === 'transit' ? step : mode === 'clear' || mode === 'view' ? null : mode;
   const [member, setMember] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [openCard, setOpenCard] = useState<string | null>(null);
@@ -39,7 +45,8 @@ export function ReleaseView({
 
   const cards = index.byRelease.get(releaseId) ?? [];
   const memberIds = useMemo(() => (release ? releaseMembers(db, release) : []), [db, release]);
-  const { images, candidates, state: imgState, reload } = useReleaseImages(release, cards, memberIds, customImages);
+  const { images, previews, previewByGroup, memberPhotos } = useReleaseImages(release, cards, customImages);
+  const [zoom, setZoom] = useState<(MediaImage & { caption?: string }) | null>(null);
   const counts = useMemo(() => countCards(cards, collection), [cards, collection]);
 
   const visible = useMemo(
@@ -48,7 +55,8 @@ export function ReleaseView({
         if (member !== 'all' && c.memberId !== member) return false;
         const s = collection.cards[c.id]?.s;
         if (statusFilter === 'all') return true;
-        if (statusFilter === 'missing') return s !== 'owned';
+        if (statusFilter === 'missing') return s !== 'owned' && s !== 'notwant';
+        if (statusFilter === 'transit') return isTransit(s);
         return s === statusFilter;
       }),
     [cards, member, statusFilter, collection],
@@ -56,13 +64,17 @@ export function ReleaseView({
 
   // Agrupa por set + versão, com as categorias na ordem padrão (photocards primeiro)
   const groups = useMemo(() => {
-    const map = new Map<string, { title: string; icon?: string; note?: string; order: number; cards: Photocard[] }>();
+    const map = new Map<
+      string,
+      { key: string; title: string; icon?: string; note?: string; order: number; cards: Photocard[] }
+    >();
     for (const c of visible) {
       const key = `${c.setId}|${c.version ?? ''}`;
       if (!map.has(key)) {
         const set = release?.sets.find((s) => s.id === c.setId);
         const cat = CATEGORY_BY_ID.get(c.category);
         map.set(key, {
+          key: groupKey(c),
           title: [c.setName, c.version].filter(Boolean).join(' · '),
           icon: c.category !== 'photocard' ? cat?.icon : undefined,
           note: [c.category !== 'photocard' ? cat?.short : null, c.itemType, set?.note].filter(Boolean).join(' · '),
@@ -89,20 +101,22 @@ export function ReleaseView({
   const apply = (c: Photocard) => {
     if (mode === 'view') return setOpenCard(c.id);
     const current = collection.cards[c.id]?.s;
-    if (mode === 'clear' || current === mode) setStatus([c.id], null);
-    else setStatus([c.id], mode);
+    if (target === null || current === target) setStatus([c.id], null);
+    else setStatus([c.id], target);
   };
 
   const applyAll = (list: Photocard[]) => {
     if (mode === 'view') return;
-    const target = mode === 'clear' ? null : mode;
-    const label = target ? STATUS_LABEL[target] : 'sem marcação';
-    if (confirm(`Marcar ${list.length} photocards como "${label}"?`)) setStatus(list.map((c) => c.id), target);
+    const label = target ? STATUS_INFO[target].label : 'sem marcação';
+    if (confirm(`Marcar ${list.length} itens como "${label}"?`)) setStatus(list.map((c) => c.id), target);
   };
 
   const relMembers = memberIds;
   const detailCard = openCard ? index.byId.get(openCard) : undefined;
-  const imgCount = images.size;
+  const candidates = [
+    ...Object.entries(memberPhotos).map(([id, m]) => ({ ...m, label: `Divulgação · ${members.get(id)?.name ?? id}`, memberId: id })),
+    ...previews.map((p) => ({ ...p, label: `Prévia da versão · ${p.label}`, memberId: undefined as string | undefined })),
+  ];
 
   return (
     <>
@@ -124,18 +138,37 @@ export function ReleaseView({
             <p className="small muted">Versões do álbum: {release.albumVersions.join(', ')}</p>
           )}
           {release.notes && <p className="small">{release.notes}</p>}
+          {previews.length > 0 ? (
+            <div className="preview-strip">
+              <span className="small muted">Conteúdo de cada versão (prévia oficial):</span>
+              <div className="preview-row">
+                {previews.map((p) => (
+                  <button
+                    key={p.url}
+                    className="preview-thumb"
+                    title={p.label}
+                    onClick={() => setZoom({ ...p, caption: `${release.title} — ${p.label}` })}
+                  >
+                    <img src={p.thumb ?? p.url} alt={p.label} loading="lazy" referrerPolicy="no-referrer" />
+                    <span>{p.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <p className="small muted img-status">
-            {imgState === 'loading' && 'Procurando prévias nas wikis…'}
-            {imgState === 'done' &&
-              (imgCount > 0
-                ? `${imgCount} de ${cards.length} cards com prévia. Use “🔍 Ver” para ver em tamanho grande ou trocar a imagem.`
-                : 'Nenhuma prévia encontrada nas wikis para este álbum.')}
-            {imgState === 'error' && 'Não foi possível consultar as wikis agora.'}
-            {imgState === 'off' && 'Busca de prévias nas wikis desativada (Configurações).'}{' '}
-            {(imgState === 'done' || imgState === 'error') && (
-              <button className="linklike" onClick={reload}>
-                buscar de novo
-              </button>
+            {release.media
+              ? Object.keys(memberPhotos).length > 0
+                ? 'Os cards mostram a foto de divulgação de cada membro nesta era (📷). As wikis não têm fotos dos photocards; para usar a foto real, toque em “🔍 Ver” → “Escolher imagem”.'
+                : 'As wikis não têm fotos dos photocards deste lançamento. Você pode adicionar a sua em “🔍 Ver” → “Escolher imagem”.'
+              : 'Ainda não há imagens da wiki para este lançamento.'}
+            {release.media?.gallery && (
+              <>
+                {' '}
+                <a href={release.media.gallery} target="_blank" rel="noreferrer">
+                  Ver galeria na wiki
+                </a>
+              </>
             )}
           </p>
         </div>
@@ -154,6 +187,18 @@ export function ReleaseView({
             </button>
           ))}
         </div>
+        {mode === 'transit' && (
+          <label className="step-picker">
+            <span className="small muted">Etapa:</span>
+            <select value={step} onChange={(e) => setStep(e.target.value as TransitStatus)} aria-label="Etapa da compra">
+              {TRANSIT_STEPS.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.step}. {t.icon} {t.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <div className="chips">
           <button className={member === 'all' ? 'chip on' : 'chip'} onClick={() => setMember('all')}>
             Todos
@@ -180,8 +225,16 @@ export function ReleaseView({
           <option value="all">Mostrar todos</option>
           <option value="missing">Faltando</option>
           <option value="owned">Tenho</option>
-          <option value="transit">A caminho</option>
+          <option value="transit">A caminho (todas as etapas)</option>
+          <optgroup label="Etapas">
+            {TRANSIT_STEPS.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.step}. {t.label}
+              </option>
+            ))}
+          </optgroup>
           <option value="wish">Quero</option>
+          <option value="notwant">Não quero</option>
         </select>
       </div>
 
@@ -197,6 +250,23 @@ export function ReleaseView({
                 </h2>
                 {g.note && <p className="small muted">{g.note}</p>}
               </div>
+              {previewByGroup.get(g.key) && (
+                <button
+                  className="group-preview"
+                  title={`Prévia oficial: ${previewByGroup.get(g.key)!.label}`}
+                  onClick={() => {
+                    const p = previewByGroup.get(g.key)!;
+                    setZoom({ ...p, caption: `${release.title} — ${p.label}` });
+                  }}
+                >
+                  <img
+                    src={previewByGroup.get(g.key)!.thumb ?? previewByGroup.get(g.key)!.url}
+                    alt=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                  />
+                </button>
+              )}
               <div className="group-actions">
                 <span className="small muted">
                   {gc.owned}/{gc.total}
@@ -244,6 +314,9 @@ export function ReleaseView({
           onImage={(img) => setCustomImage(detailCard.id, img)}
           onClose={() => setOpenCard(null)}
         />
+      )}
+      {zoom && (
+        <Lightbox url={zoom.url} caption={zoom.caption} page={zoom.page} source={zoom.source} onClose={() => setZoom(null)} />
       )}
     </>
   );

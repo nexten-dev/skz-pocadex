@@ -2,7 +2,7 @@ import type { CardIndex } from '../App';
 import { useState } from 'react';
 import type { CardImage, CardStatus, Collection, Database, ItemCategory, Member, Photocard } from '../lib/types';
 import { CATEGORY_BY_ID } from '../lib/categories';
-import { STATUS_LABEL } from '../lib/collection';
+import { STATUS_INFO } from '../lib/status';
 
 export interface ViewProps {
   db: Database;
@@ -17,17 +17,21 @@ export interface ViewProps {
 }
 
 export interface Counts {
+  /** Total que conta para o progresso (exclui “Não quero”). */
   total: number;
   owned: number;
   transit: number;
   wish: number;
+  notwant: number;
 }
 
 export function countCards(cards: Photocard[], c: Collection): Counts {
-  const r: Counts = { total: cards.length, owned: 0, transit: 0, wish: 0 };
+  const r: Counts = { total: 0, owned: 0, transit: 0, wish: 0, notwant: 0 };
   for (const card of cards) {
     const s = c.cards[card.id]?.s;
-    if (s) r[s]++;
+    const tone = s ? STATUS_INFO[s]?.tone : undefined;
+    if (tone) r[tone]++;
+    if (tone !== 'notwant') r.total++;
   }
   return r;
 }
@@ -36,7 +40,7 @@ export function Progress({ counts, compact }: { counts: Counts; compact?: boolea
   const pct = (n: number) => (counts.total ? (n / counts.total) * 100 : 0);
   return (
     <div className={compact ? 'progress compact' : 'progress'}>
-      <div className="bar" role="img" aria-label={`${counts.owned} de ${counts.total} photocards`}>
+      <div className="bar" role="img" aria-label={`${counts.owned} de ${counts.total} itens`}>
         <span className="seg owned" style={{ width: `${pct(counts.owned)}%` }} />
         <span className="seg transit" style={{ width: `${pct(counts.transit)}%` }} />
       </div>
@@ -47,6 +51,7 @@ export function Progress({ counts, compact }: { counts: Counts; compact?: boolea
         <span className="muted"> · {Math.round(pct(counts.owned))}%</span>
         {counts.transit > 0 && <span className="pill transit">{counts.transit} a caminho</span>}
         {!compact && counts.wish > 0 && <span className="pill wish">{counts.wish} quero</span>}
+        {!compact && counts.notwant > 0 && <span className="pill notwant">{counts.notwant} não quero</span>}
       </div>
     </div>
   );
@@ -82,10 +87,10 @@ export function PhotocardTile({
   return (
     <button
       type="button"
-      className={`pc ${status ?? 'none'} fmt-${card.format}`}
+      className={`pc ${status ? STATUS_INFO[status].tone : 'none'} fmt-${card.format}`}
       style={{ ['--mc' as string]: m.color }}
       onClick={onClick}
-      title={`${m.name}${card.version ? ` · ${card.version}` : ''}${card.label ? ` · ${card.label}` : ''}${status ? ` — ${STATUS_LABEL[status]}` : ''}`}
+      title={`${m.name}${card.version ? ` · ${card.version}` : ''}${card.label ? ` · ${card.label}` : ''}${status ? ` — ${STATUS_INFO[status].label}` : ''}`}
     >
       <div className={img ? 'pc-art has-img' : 'pc-art'}>
         {img ? (
@@ -105,13 +110,18 @@ export function PhotocardTile({
         {card.category !== 'photocard' && (card.itemType || card.store) && (
           <span className="pc-type">{card.itemType ?? CATEGORY_BY_ID.get(card.category)?.short}</span>
         )}
-        {img?.kind === 'wiki' && img.confidence === 'member' && (
-          <span className="pc-approx" title="Prévia aproximada: imagem do membro neste álbum, versão não confirmada">
-            ≈
+        {img?.kind === 'concept' && (
+          <span className="pc-approx" title="Foto de divulgação do membro nesta era — não é a foto do photocard">
+            📷
           </span>
         )}
         {card.label && <span className="pc-num">{card.label}</span>}
-        {status && <span className={`pc-badge ${status}`}>{status === 'owned' ? '✓' : status === 'transit' ? '✈' : '♥'}</span>}
+        {status && (
+          <span className={`pc-badge ${STATUS_INFO[status].tone}`} title={STATUS_INFO[status].label}>
+            {STATUS_INFO[status].icon}
+          </span>
+        )}
+        {status && STATUS_INFO[status].step && <span className="pc-step">{STATUS_INFO[status].label}</span>}
         {qty && qty > 1 ? <span className="pc-qty">×{qty}</span> : null}
       </div>
       <div className="pc-meta">

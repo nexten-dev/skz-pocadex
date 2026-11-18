@@ -5,6 +5,26 @@ Todas as mudanças relevantes do app. Segue [Versionamento Semântico](https://s
 
 A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.DD.N`), independente da versão do app.
 
+## [0.5.0] — 2026-11-18
+
+### Adicionado
+- **Status “Não quero”** 🚫: o item fica marcado, mas sai do progresso e do “faltando”.
+- **Etapas da compra** no lugar de “A caminho”, na ordem:
+  1. 🛒 Comprado → 2. 🔒 Garantido → 3. 📮 Enviado para Proxy → 4. ✈️ Frete Inter → 5. 💰 Taxa RF → 6. 🏠 Dispo Frete Casa → 7. 🚚 Enviado → ✓ Tenho
+  - Na página do álbum, o modo “🚚 A caminho” tem o seletor **Etapa**.
+  - No detalhe do card, uma linha do tempo mostra a etapa atual, com o botão **“Avançar →”**.
+  - Em “Minha coleção”, os itens a caminho ficam agrupados por etapa. Tocar num card avança para a próxima etapa, e **“Todos → …”** avança o grupo inteiro.
+  - Marcações “A caminho” das versões anteriores viram **Comprado** automaticamente.
+- **Imagens da Stray Kids Wiki** nos 29 lançamentos:
+  - **Prévia oficial do conteúdo de cada versão** do álbum, numa faixa no topo da página e em miniatura em cada grupo de cards. Toque para ampliar.
+  - **Foto de divulgação de cada membro** naquela era (teaser oficial) no fundo dos cards, marcada com 📷. As wikis **não têm fotos individuais dos photocards**, e o app deixa isso claro.
+  - Link para a galeria do álbum na wiki.
+  - Em Configurações dá para desligar as fotos de divulgação nos cards.
+- Automação **“Prévias das wikis”** no GitHub, que coleta as imagens toda segunda-feira e atualiza a base e o site. Também pode ser rodada manualmente nos modos diagnóstico, teste ou gravação.
+
+### Alterado
+- O app não consulta mais as wikis pelo navegador: as imagens vêm prontas na base de dados (mais rápido e funciona offline).
+
 ## [0.4.2] — 2026-11-18
 
 ### Alterado

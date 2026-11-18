@@ -1,11 +1,15 @@
 name: Prévias das wikis
 
-# Roda manualmente (aba Actions → "Prévias das wikis" → Run workflow).
-# As máquinas do GitHub têm acesso às wikis, então a busca roda aqui.
-#   modo "diagnostico": mostra o que as wikis devolvem (não altera nada)
-#   modo "testar":      mostra quais imagens seriam associadas (não altera nada)
-#   modo "gravar":      grava as imagens na base, publica e atualiza o site
+# Coleta as imagens das wikis (prévias das versões e fotos de divulgação dos
+# membros) e grava na base. As máquinas do GitHub têm acesso às wikis.
+#   - Automático: toda segunda-feira, no modo "gravar" (pega lançamentos novos).
+#   - Manual: aba Actions → "Prévias das wikis" → Run workflow.
+#       diagnostico: mostra o que as wikis têm (não altera nada)
+#       testar:      mostra o que seria gravado (não altera nada)
+#       gravar:      grava na base, publica a base e atualiza o site
 on:
+  schedule:
+    - cron: '17 9 * * 1'
   workflow_dispatch:
     inputs:
       modo:
@@ -17,10 +21,6 @@ on:
         description: 'IDs dos lançamentos separados por espaço (vazio = todos)'
         required: false
         default: ''
-      aproximadas:
-        description: 'Também gravar prévias aproximadas (≈)'
-        type: boolean
-        default: false
 
 permissions:
   contents: write
@@ -33,6 +33,9 @@ concurrency:
 jobs:
   images:
     runs-on: ubuntu-latest
+    env:
+      MODO: ${{ inputs.modo || 'gravar' }}
+      IDS: ${{ inputs.lancamentos || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,25 +45,18 @@ jobs:
       - run: npm ci
 
       - name: Diagnóstico
-        if: inputs.modo == 'diagnostico'
-        run: node scripts/wiki-probe.mjs ${{ inputs.lancamentos }}
+        if: env.MODO == 'diagnostico'
+        run: node scripts/wiki-probe.mjs $IDS
 
-      - uses: actions/upload-artifact@v4
-        if: inputs.modo == 'diagnostico'
-        with:
-          name: wiki-probe
-          path: wiki-probe.json
-
-      - name: Buscar prévias
-        if: inputs.modo != 'diagnostico'
+      - name: Buscar imagens
+        if: env.MODO != 'diagnostico'
         run: |
           FLAGS="--verbose"
-          [ "${{ inputs.modo }}" = "testar" ] && FLAGS="$FLAGS --dry"
-          [ "${{ inputs.aproximadas }}" = "true" ] && FLAGS="$FLAGS --approx"
-          node scripts/fetch-images.mjs ${{ inputs.lancamentos }} $FLAGS
+          [ "$MODO" = "testar" ] && FLAGS="$FLAGS --dry"
+          node scripts/fetch-images.mjs $IDS $FLAGS
 
       - name: Publicar base atualizada
-        if: inputs.modo == 'gravar'
+        if: env.MODO == 'gravar'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -72,7 +68,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/photocards.json
-          git commit -m "data: prévias das wikis ($(node -p "require('./public/data/photocards.json').dataVersion"))"
+          git commit -m "data: imagens das wikis ($(node -p "require('./public/data/photocards.json').dataVersion"))"
+          git pull --rebase origin main
           git push origin HEAD:main
           # Commits feitos pelo Actions não disparam outros workflows: publica o site manualmente
           gh workflow run deploy.yml --ref main
