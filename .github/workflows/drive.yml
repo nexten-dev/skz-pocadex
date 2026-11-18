@@ -3,13 +3,14 @@ name: Fotos dos photocards (Google Drive)
 # Lê as pastas públicas do Google Drive listadas em data/drive-sources.json.
 # Roda manualmente (aba Actions → "Fotos dos photocards (Google Drive)" → Run workflow).
 #   diagnostico: mostra a organização das pastas (não altera nada)
+#   ocr:         lê o texto escrito em cada imagem (não salva as imagens)
 on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'diagnostico'
+        description: 'diagnostico ou ocr'
         type: choice
-        options: [diagnostico]
+        options: [diagnostico, ocr]
         default: diagnostico
       pastas:
         description: 'IDs de pastas separados por espaço (vazio = todas)'
@@ -30,3 +31,8 @@ jobs:
       - name: Diagnóstico das pastas
         if: inputs.modo == 'diagnostico'
         run: node scripts/drive-probe.mjs ${{ inputs.pastas }}
+      - name: Ler texto das imagens (OCR)
+        if: inputs.modo == 'ocr'
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr >/dev/null
+          node scripts/drive-ocr.mjs ${{ inputs.pastas }}
