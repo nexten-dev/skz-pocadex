@@ -10,7 +10,7 @@ A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.
 ### Alterado
 - Projeto publicado no GitHub (`nexten-dev/skz-pocadex`).
 - **Publicação automática**: a cada envio para a `main` com versão nova no `package.json`, o GitHub gera os 3 pacotes, cria a tag `vX.Y.Z` e publica a Release com os arquivos para download. Envios sem mudança de versão (ex.: só a base de dados) apenas atualizam o site.
-- O workflow também cria no GitHub as tags das versões anteriores (0.1.0 a 0.4.1).
+- O workflow também cria no GitHub as tags das versões anteriores. Se o GitHub recusar alguma (restrição de segurança para commits com automações diferentes), ele só avisa e segue com a publicação.
 
 ## [0.4.1] — 2026-11-18
 

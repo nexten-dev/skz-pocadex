@@ -44,17 +44,20 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          created=0
           while read -r sha subject; do
             t=$(printf '%s' "$subject" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
             [ -z "$t" ] && continue
             [ "$t" = "$CURRENT" ] && continue
             git rev-parse -q --verify "refs/tags/$t" >/dev/null && continue
             git tag -a "$t" -m "$t" "$sha"
-            echo "tag $t -> $sha"
-            created=1
+            # Cada tag é enviada separadamente: o GitHub recusa tags cujo commit tem
+            # arquivos de workflow diferentes dos atuais. Isso não deve impedir a Release.
+            if git push origin "refs/tags/$t"; then
+              echo "tag $t -> $sha"
+            else
+              echo "::warning::Tag $t não pôde ser criada pelo GitHub Actions (restrição de workflows). Crie manualmente se precisar."
+            fi
           done < <(git log --reverse --format='%H %s')
-          if [ "$created" = 1 ]; then git push origin --tags; fi
 
       - uses: actions/setup-node@v4
         if: steps.v.outputs.exists == 'false'
