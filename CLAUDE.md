@@ -56,7 +56,7 @@ No GitHub (`nexten-dev/skz-pocadex`), o workflow `.github/workflows/release.yml`
 ## Decisões e roteiro
 
 - Nome “SKZ Pocadex” (poca = 포카, photocard; dex = Pokédex) — aprovado pelo usuário.
-- **Publicação**: repositório público `nexten-dev/skz-pocadex`, site no GitHub Pages (`https://nexten-dev.github.io/skz-pocadex/`) via workflow `deploy.yml`. Ativar o Pages (Settings → Pages → Source: GitHub Actions) só pode ser feito pelo usuário — a API não é acessível da sessão.
+- **Publicação**: repositório público `nexten-dev/skz-pocadex`, site no GitHub Pages (`https://nexten-dev.github.io/skz-pocadex/`) via workflow `deploy.yml`. Pages **ativo** (Source: GitHub Actions) e repositório **público** desde a v0.4.2. Configurações do repositório (visibilidade, Pages) só podem ser alteradas pelo usuário — a API de settings não é acessível da sessão. Para republicar o site sem commit: `gh api repos/nexten-dev/skz-pocadex/actions/workflows/deploy.yml/dispatches -X POST -f ref=main`.
 - **Sincronização entre aparelhos**: decidido usar a **nuvem pessoal do usuário** (Google Drive primeiro; OneDrive/Dropbox depois), arquivo da coleção numa pasta do app, mesclagem por card usando o timestamp `t`. **Não** usar Supabase por enquanto.
 - Próximos passos sugeridos: sync com Google Drive (v0.5.0), conferir dados “(a confirmar)” com templates oficiais.
 
