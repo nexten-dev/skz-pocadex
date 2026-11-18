@@ -1,0 +1,32 @@
+name: Release (pacotes Source, Dist e Mobile)
+
+# Ao enviar uma tag vX.Y.Z, gera os pacotes com "npm run release"
+# e anexa à GitHub Release da versão.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # histórico completo vai no pacote Source
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run release
+      - name: Criar GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" releases/$TAG/*.zip releases/$TAG/RELEASE.txt \
+            --title "SKZ Pocadex $TAG" \
+            --notes-file releases/$TAG/NOTES.md

@@ -5,6 +5,17 @@ Todas as mudanças relevantes do app. Segue [Versionamento Semântico](https://s
 
 A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.DD.N`), independente da versão do app.
 
+## [0.4.1] — 2026-11-18
+
+### Adicionado
+- **Processo de publicação com 3 pacotes** (`npm run release`), gerados em `releases/vX.Y.Z/`:
+  - **Source**: todos os arquivos do projeto, incluindo o contexto do Claude (`CLAUDE.md`) e o histórico de versões.
+  - **Dist**: só o necessário para usar o app. Vem com `abrir.bat`, que abre o app **sem instalar nada** (usa o PowerShell do Windows), e um `LEIA-ME.txt`.
+  - **Mobile**: gerado só quando há arquivos que precisam ir para o celular. Hoje não há (o app é instalado pelo endereço publicado), e isso fica registrado no `RELEASE.txt`.
+  - `RELEASE.txt` com tamanho e SHA-256 de cada pacote, e `NOTES.md` com as novidades da versão.
+- `CLAUDE.md`: contexto do projeto, regras, decisões e roteiro, para qualquer sessão do Claude continuar de onde paramos.
+- Workflow `release.yml`: ao enviar uma tag `vX.Y.Z` para o GitHub, gera os pacotes e anexa à Release da versão.
+
 ## [0.4.0] — 2026-11-18
 
 ### Adicionado

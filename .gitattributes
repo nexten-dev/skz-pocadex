@@ -1,3 +1,5 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 * text=auto
+*.ps1 text eol=crlf
+packaging/dist/*.txt text eol=crlf

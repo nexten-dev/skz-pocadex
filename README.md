@@ -4,7 +4,7 @@ Web app para organizar a coleção de photocards do **Stray Kids**: veja todos o
 
 > Projeto de fã, sem afiliação com a JYP Entertainment.
 
-**Versão atual:** 0.4.0 — veja o [CHANGELOG](CHANGELOG.md).
+**Versão atual:** 0.4.1 — veja o [CHANGELOG](CHANGELOG.md).
 
 ## Rodando no Windows (jeito mais fácil)
 
@@ -102,6 +102,24 @@ npm run data:bump                  # depois de conferir no app
 ```
 
 As imagens são exibidas direto das wikis (não são copiadas para o projeto) e cada card tem link para a página de origem.
+
+## Publicar uma versão (3 pacotes)
+
+Toda versão publicada gera três pacotes:
+
+```bash
+npm run release
+```
+
+Os arquivos ficam em `releases/vX.Y.Z/`:
+
+| Pacote | Para quê | Conteúdo |
+|---|---|---|
+| **Source** `…-source.zip` | Continuar o desenvolvimento | Todo o projeto, incluindo `CLAUDE.md` e o histórico git (sem `node_modules`/`dist`) |
+| **Dist** `…-dist.zip` | Só usar o app | Build pronto + `abrir.bat` (Windows, não precisa de Node) + `LEIA-ME.txt` |
+| **Mobile** `…-mobile.zip` | Arquivos para o celular | Só existe quando necessário. Hoje não é: o app é instalado pelo endereço publicado |
+
+O script exige que a versão esteja documentada no `CHANGELOG.md`. No GitHub, enviar a tag (`git push --tags`) gera os pacotes automaticamente e os anexa à Release.
 
 ## Versionamento
 
