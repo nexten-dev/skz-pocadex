@@ -54,8 +54,10 @@ const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
 const PERFORMANCE = /inkigayo|countdown|music core|music bank|show champion|the show|fancam|stage|airport|concert|tour|live|award|festival|radio|weverse|vlive|instagram|twitter|selca|mv shorts/i;
 
 /** Pontuação de uma foto de divulgação (maior = melhor para representar o membro). */
-function conceptScore(title) {
-  const t = title.toLowerCase();
+function conceptScore(title, releaseNames = []) {
+  // O nome do álbum não conta (ex.: "GO LIVE" não é foto de show "live").
+  let t = title.toLowerCase();
+  for (const n of releaseNames) t = t.split(n.toLowerCase()).join(' ');
   let s = 0;
   if (/teaser/.test(t)) s += 4;
   if (/jacket|concept|profile|promotional/.test(t)) s += 3;
@@ -194,7 +196,7 @@ export async function collectReleaseMedia(release, memberIds, fetchImpl = fetch,
     for (const id of memberIds) {
       const best = images
         .filter((t) => detectMember(t, memberIds) === id)
-        .map((t) => ({ t, s: conceptScore(t) }))
+        .map((t) => ({ t, s: conceptScore(t, pageNames(release)) }))
         .filter((x) => x.s >= 0)
         .sort((a, b) => b.s - a.s || a.t.localeCompare(b.t, undefined, { numeric: true }))[0];
       if (best) memberPick[id] = best.t;
