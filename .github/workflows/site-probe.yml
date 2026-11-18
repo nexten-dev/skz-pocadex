@@ -1,0 +1,26 @@
+name: Diagnóstico de site
+
+# Baixa uma página e os arquivos de dados que ela usa, para planejar importações.
+# Manual: Actions → "Diagnóstico de site" → Run workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Endereço da página'
+        required: true
+      max:
+        description: 'Caracteres mostrados de cada arquivo'
+        default: '2500'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/site-probe.mjs "${{ inputs.url }}" "${{ inputs.max }}"
