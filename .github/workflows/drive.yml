@@ -1,0 +1,32 @@
+name: Fotos dos photocards (Google Drive)
+
+# Lê as pastas públicas do Google Drive listadas em data/drive-sources.json.
+# Roda manualmente (aba Actions → "Fotos dos photocards (Google Drive)" → Run workflow).
+#   diagnostico: mostra a organização das pastas (não altera nada)
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'diagnostico'
+        type: choice
+        options: [diagnostico]
+        default: diagnostico
+      pastas:
+        description: 'IDs de pastas separados por espaço (vazio = todas)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  drive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Diagnóstico das pastas
+        if: inputs.modo == 'diagnostico'
+        run: node scripts/drive-probe.mjs ${{ inputs.pastas }}
