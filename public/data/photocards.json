@@ -1,0 +1,1201 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "2026.11.18.1",
+  "updatedAt": "2026-11-18",
+  "sources": [
+    {
+      "name": "Stray Kids — Kpop Wiki (Fandom)",
+      "url": "https://kpop.fandom.com/wiki/Stray_Kids"
+    },
+    {
+      "name": "Stray Kids — site oficial (JYP)",
+      "url": "https://straykids.jype.com/"
+    },
+    {
+      "name": "Stray Kids — site oficial Japão",
+      "url": "https://www.straykidsjapan.com/"
+    }
+  ],
+  "members": [
+    {
+      "id": "bangchan",
+      "name": "Bang Chan",
+      "hangul": "방찬",
+      "color": "#c0392b"
+    },
+    {
+      "id": "leeknow",
+      "name": "Lee Know",
+      "hangul": "리노",
+      "color": "#8e44ad"
+    },
+    {
+      "id": "changbin",
+      "name": "Changbin",
+      "hangul": "창빈",
+      "color": "#2c3e50"
+    },
+    {
+      "id": "hyunjin",
+      "name": "Hyunjin",
+      "hangul": "현진",
+      "color": "#d35400"
+    },
+    {
+      "id": "han",
+      "name": "HAN",
+      "hangul": "한",
+      "color": "#16a085"
+    },
+    {
+      "id": "felix",
+      "name": "Felix",
+      "hangul": "필릭스",
+      "color": "#d4a017"
+    },
+    {
+      "id": "seungmin",
+      "name": "Seungmin",
+      "hangul": "승민",
+      "color": "#2471a3"
+    },
+    {
+      "id": "in",
+      "name": "I.N",
+      "hangul": "아이엔",
+      "color": "#c2185b"
+    },
+    {
+      "id": "woojin",
+      "name": "Woojin",
+      "hangul": "우진",
+      "color": "#6d7b8d",
+      "former": true
+    }
+  ],
+  "releases": [
+    {
+      "verified": false,
+      "id": "i-am-not",
+      "title": "I Am NOT",
+      "subtitle": "1º mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2018-03-26",
+      "members": [
+        "bangchan",
+        "woojin",
+        "leeknow",
+        "changbin",
+        "hyunjin",
+        "han",
+        "felix",
+        "seungmin",
+        "in"
+      ],
+      "albumVersions": [
+        "I Am ver.",
+        "NOT ver."
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "I Am",
+            "NOT"
+          ],
+          "perMember": 1,
+          "note": "1 photocard aleatório por álbum (pool de 9 por versão)"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "i-am-who",
+      "title": "I Am WHO",
+      "subtitle": "2º mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2018-08-06",
+      "members": [
+        "bangchan",
+        "woojin",
+        "leeknow",
+        "changbin",
+        "hyunjin",
+        "han",
+        "felix",
+        "seungmin",
+        "in"
+      ],
+      "albumVersions": [
+        "I Am ver.",
+        "WHO ver."
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "I Am",
+            "WHO"
+          ],
+          "perMember": 1,
+          "note": "1 photocard aleatório por álbum"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "i-am-you",
+      "title": "I Am YOU",
+      "subtitle": "3º mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2018-10-22",
+      "members": [
+        "bangchan",
+        "woojin",
+        "leeknow",
+        "changbin",
+        "hyunjin",
+        "han",
+        "felix",
+        "seungmin",
+        "in"
+      ],
+      "albumVersions": [
+        "I Am ver.",
+        "YOU ver."
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "I Am",
+            "YOU"
+          ],
+          "perMember": 1,
+          "note": "1 photocard aleatório por álbum"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "cle-1-miroh",
+      "title": "Clé 1: MIROH",
+      "subtitle": "4º mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2019-03-25",
+      "members": [
+        "bangchan",
+        "woojin",
+        "leeknow",
+        "changbin",
+        "hyunjin",
+        "han",
+        "felix",
+        "seungmin",
+        "in"
+      ],
+      "albumVersions": [
+        "Clé ver.",
+        "MIROH ver.",
+        "Limited"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "Clé",
+            "MIROH"
+          ],
+          "perMember": 1,
+          "note": "1 photocard aleatório por álbum"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 1,
+          "note": "Photocard da edição limitada"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "cle-2-yellow-wood",
+      "title": "Clé 2: Yellow Wood",
+      "subtitle": "Álbum especial",
+      "type": "special",
+      "market": "KR",
+      "date": "2019-06-19",
+      "members": [
+        "bangchan",
+        "woojin",
+        "leeknow",
+        "changbin",
+        "hyunjin",
+        "han",
+        "felix",
+        "seungmin",
+        "in"
+      ],
+      "albumVersions": [
+        "Normal (2 versões)",
+        "Limited"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "Clé",
+            "Yellow Wood"
+          ],
+          "perMember": 1,
+          "note": "1 photocard aleatório por álbum"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 1,
+          "note": "Photocard da edição limitada"
+        }
+      ],
+      "notes": "Último lançamento com Woojin."
+    },
+    {
+      "verified": false,
+      "id": "cle-levanter",
+      "title": "Clé: LEVANTER",
+      "subtitle": "5º mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2019-12-09",
+      "albumVersions": [
+        "Clé ver.",
+        "LEVANTER ver.",
+        "Limited"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "Clé",
+            "LEVANTER"
+          ],
+          "perMember": 1,
+          "note": "1 photocard aleatório por álbum"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 1,
+          "note": "Photocard da edição limitada"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "go-live",
+      "title": "GO生",
+      "altTitle": "GO LIVE",
+      "subtitle": "1º álbum completo",
+      "type": "full",
+      "market": "KR",
+      "date": "2020-06-17",
+      "albumVersions": [
+        "Standard A",
+        "Standard B",
+        "Standard C",
+        "Limited"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "A",
+            "B",
+            "C"
+          ],
+          "perMember": 1,
+          "note": "2 photocards aleatórios por álbum"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 1,
+          "note": "Photocards da edição limitada"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "in-life",
+      "title": "IN生",
+      "altTitle": "IN LIFE",
+      "subtitle": "Repackage de GO生",
+      "type": "repackage",
+      "market": "KR",
+      "date": "2020-09-14",
+      "albumVersions": [
+        "IN ver.",
+        "LIFE ver.",
+        "Limited"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "IN",
+            "LIFE"
+          ],
+          "perMember": 1,
+          "note": "Photocards aleatórios por álbum"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 1,
+          "note": "Photocards da edição limitada"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "noeasy",
+      "title": "NOEASY",
+      "subtitle": "2º álbum completo",
+      "type": "full",
+      "market": "KR",
+      "date": "2021-08-23",
+      "albumVersions": [
+        "Standard A",
+        "Standard B",
+        "Standard C",
+        "Limited",
+        "Jewel Case (8 versões)"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "A",
+            "B",
+            "C"
+          ],
+          "perMember": 1,
+          "note": "Photocards aleatórios por álbum"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 1,
+          "note": "Photocards da edição limitada"
+        },
+        {
+          "id": "jewel",
+          "name": "Jewel Case",
+          "perMember": 1,
+          "note": "1 photocard do membro da capa"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "christmas-evel",
+      "title": "Christmas EveL",
+      "subtitle": "Álbum especial de Natal",
+      "type": "special",
+      "market": "KR",
+      "date": "2021-11-29",
+      "albumVersions": [
+        "Standard",
+        "Limited"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [],
+          "perMember": 1,
+          "note": "Photocard aleatório por álbum"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 1,
+          "note": "Photocards da edição limitada"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "oddinary",
+      "title": "ODDINARY",
+      "subtitle": "6º mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2022-03-18",
+      "albumVersions": [
+        "FRANKENSTEIN",
+        "SCANNING",
+        "MASK OFF",
+        "Jewel Case",
+        "Limited"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "FRANKENSTEIN",
+            "SCANNING",
+            "MASK OFF"
+          ],
+          "perMember": 1,
+          "note": "Photocards aleatórios (pool de 24)"
+        },
+        {
+          "id": "jewel",
+          "name": "Jewel Case",
+          "perMember": 1,
+          "note": "1 photocard aleatório"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 1,
+          "note": "Photocards da edição limitada"
+        },
+        {
+          "id": "target",
+          "name": "Target exclusivo (EUA)",
+          "perMember": 1,
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "maxident",
+      "title": "MAXIDENT",
+      "subtitle": "7º mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2022-10-07",
+      "albumVersions": [
+        "GO",
+        "T-CRUSH",
+        "HEART",
+        "Case ver. (8 versões)",
+        "Limited"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "GO",
+            "T-CRUSH",
+            "HEART"
+          ],
+          "perMember": 1,
+          "note": "2 aleatórios de 24 por álbum"
+        },
+        {
+          "id": "case",
+          "name": "Case ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "case-fp",
+          "name": "Case ver. — 1ª tiragem",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (somente primeira prensagem)"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 1,
+          "note": "Photocards da edição limitada"
+        },
+        {
+          "id": "target",
+          "name": "Target exclusivo (EUA)",
+          "perMember": 1,
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "5-star",
+      "title": "★★★★★ (5-STAR)",
+      "altTitle": "5-STAR",
+      "subtitle": "3º álbum completo",
+      "type": "full",
+      "market": "KR",
+      "date": "2023-06-02",
+      "albumVersions": [
+        "Standard A",
+        "Standard B",
+        "Standard C",
+        "Limited",
+        "Digipack (8 versões)",
+        "Postcard ver."
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "A",
+            "B",
+            "C"
+          ],
+          "perMember": 1,
+          "note": "Photocards aleatórios por álbum"
+        },
+        {
+          "id": "limited",
+          "name": "Limited",
+          "perMember": 3,
+          "note": "2 aleatórios de 24",
+          "versions": [
+            "Limited"
+          ]
+        },
+        {
+          "id": "digipack",
+          "name": "Digipack",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "target",
+          "name": "Target exclusivo (EUA)",
+          "perMember": 1,
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "rock-star",
+      "title": "樂-STAR",
+      "altTitle": "ROCK-STAR",
+      "subtitle": "8º mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2023-11-10",
+      "albumVersions": [
+        "ROCK ver.",
+        "ROLL ver.",
+        "Limited STAR ver.",
+        "Postcard ver.",
+        "Headliner ver."
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "ROCK",
+            "ROLL"
+          ],
+          "perMember": 1,
+          "note": "1 aleatório de 16"
+        },
+        {
+          "id": "unit",
+          "name": "Unit photocard",
+          "note": "1 aleatório de 4",
+          "perMember": 0,
+          "extras": [
+            {
+              "id": "unit-1",
+              "label": "Unit 1",
+              "members": [
+                "bangchan",
+                "changbin"
+              ]
+            },
+            {
+              "id": "unit-2",
+              "label": "Unit 2",
+              "members": [
+                "leeknow",
+                "hyunjin"
+              ]
+            },
+            {
+              "id": "unit-3",
+              "label": "Unit 3",
+              "members": [
+                "han",
+                "felix"
+              ]
+            },
+            {
+              "id": "unit-4",
+              "label": "Unit 4",
+              "members": [
+                "seungmin",
+                "in"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "star",
+          "name": "Limited STAR ver.",
+          "perMember": 1,
+          "note": "Photocards da edição limitada"
+        },
+        {
+          "id": "target",
+          "name": "Target exclusivo (EUA)",
+          "perMember": 1,
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "ate",
+      "title": "ATE",
+      "subtitle": "9º mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2024-07-19",
+      "albumVersions": [
+        "CHK CHK ver.",
+        "BOOM ver.",
+        "Accordion ver.",
+        "SKZOO ver."
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "CHK CHK",
+            "BOOM"
+          ],
+          "perMember": 1,
+          "note": "1 aleatório de 16"
+        },
+        {
+          "id": "accordion",
+          "name": "Accordion ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "skzoo",
+          "name": "SKZOO ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "target",
+          "name": "Target exclusivo (EUA)",
+          "perMember": 1,
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "hop",
+      "title": "HOP",
+      "altTitle": "SKZhop HIPTAPE",
+      "subtitle": "Hiptape especial",
+      "type": "special",
+      "market": "KR",
+      "date": "2024-12-13",
+      "albumVersions": [
+        "SKZHOP ver.",
+        "HIPTAPE ver.",
+        "Accordion ver. (8 versões)"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "SKZHOP",
+            "HIPTAPE"
+          ],
+          "perMember": 1,
+          "note": "1 aleatório de 8 por álbum"
+        },
+        {
+          "id": "unit",
+          "name": "Unit photocard (SKZHOP ver.)",
+          "note": "1 aleatório de 4",
+          "perMember": 0,
+          "extras": [
+            {
+              "id": "unit-1",
+              "label": "Unit 1"
+            },
+            {
+              "id": "unit-2",
+              "label": "Unit 2"
+            },
+            {
+              "id": "unit-3",
+              "label": "Unit 3"
+            },
+            {
+              "id": "unit-4",
+              "label": "Unit 4"
+            }
+          ]
+        },
+        {
+          "id": "accordion",
+          "name": "Accordion ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "accordion-mono",
+          "name": "Accordion ver. — Monocromático",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "accordion-add",
+          "name": "Accordion ver. — Adicional",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "karma",
+      "title": "KARMA",
+      "subtitle": "4º álbum completo",
+      "type": "full",
+      "market": "KR",
+      "date": "2025-08-22",
+      "albumVersions": [
+        "CEREMONY ver.",
+        "HOORAY ver.",
+        "KARMA ver.",
+        "Accordion ver. (8 versões)",
+        "SKZOO ver."
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "CEREMONY",
+            "HOORAY"
+          ],
+          "perMember": 1,
+          "note": "1 aleatório de 8 por álbum"
+        },
+        {
+          "id": "karma",
+          "name": "KARMA ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "unit",
+          "name": "Unit photocard (KARMA ver.)",
+          "note": "1 aleatório de 3",
+          "perMember": 0,
+          "extras": [
+            {
+              "id": "unit-1",
+              "label": "Unit 1"
+            },
+            {
+              "id": "unit-2",
+              "label": "Unit 2"
+            },
+            {
+              "id": "unit-3",
+              "label": "Unit 3"
+            }
+          ]
+        },
+        {
+          "id": "accordion",
+          "name": "Accordion ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "skzoo",
+          "name": "SKZOO ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "target",
+          "name": "Target exclusivo (EUA)",
+          "perMember": 1,
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "do-it",
+      "title": "DO IT",
+      "altTitle": "SKZ IT TAPE 'DO IT'",
+      "subtitle": "IT TAPE especial",
+      "type": "special",
+      "market": "KR",
+      "date": "2025-11-21",
+      "albumVersions": [
+        "DO ver.",
+        "IT ver.",
+        "Accordion ver.",
+        "EVIL SKZOO SPEAKER ver."
+      ],
+      "sets": [
+        {
+          "id": "do",
+          "name": "DO ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "do-unit",
+          "name": "Unit photocard (DO ver.)",
+          "note": "1 aleatório de 4",
+          "perMember": 0,
+          "extras": [
+            {
+              "id": "unit-1",
+              "label": "Unit 1"
+            },
+            {
+              "id": "unit-2",
+              "label": "Unit 2"
+            },
+            {
+              "id": "unit-3",
+              "label": "Unit 3"
+            },
+            {
+              "id": "unit-4",
+              "label": "Unit 4"
+            }
+          ]
+        },
+        {
+          "id": "it",
+          "name": "IT ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "it-lenticular",
+          "name": "IT ver. — Lenticular",
+          "perMember": 2,
+          "note": "2 aleatórios de 16"
+        },
+        {
+          "id": "accordion",
+          "name": "Accordion ver.",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "accordion-add",
+          "name": "Accordion ver. — Adicional",
+          "perMember": 1,
+          "note": "1 aleatório de 8"
+        },
+        {
+          "id": "target",
+          "name": "Target exclusivo (EUA)",
+          "perMember": 1,
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "this-and-that",
+      "title": "THIS & THAT",
+      "subtitle": "Mini álbum",
+      "type": "mini",
+      "market": "KR",
+      "date": "2026-08-07",
+      "albumVersions": [
+        "Standard (2 versões)",
+        "Limited TRUCK ver.",
+        "LP"
+      ],
+      "sets": [
+        {
+          "id": "std",
+          "name": "Standard",
+          "versions": [
+            "THIS",
+            "&"
+          ],
+          "perMember": 1,
+          "note": "Photocards aleatórios — nomes de versão a confirmar"
+        },
+        {
+          "id": "truck",
+          "name": "Limited TRUCK ver.",
+          "perMember": 1,
+          "note": "Photocards da edição limitada"
+        }
+      ],
+      "notes": "Dados preliminares: versões e quantidade de photocards ainda não confirmadas."
+    },
+    {
+      "verified": false,
+      "id": "skz2020",
+      "title": "SKZ2020",
+      "subtitle": "Álbum de regravações (Japão)",
+      "type": "compilation",
+      "market": "JP",
+      "date": "2020-03-18",
+      "albumVersions": [
+        "Limited",
+        "Regular"
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited, Regular. Distribuição por edição a conferir."
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "top-jp",
+      "title": "TOP -Japanese ver.-",
+      "subtitle": "1º single japonês",
+      "type": "single",
+      "market": "JP",
+      "date": "2020-06-17",
+      "albumVersions": [
+        "Limited A",
+        "Limited B",
+        "Regular",
+        "Tower of God ed."
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, Tower of God ed.. Distribuição por edição a conferir."
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "all-in",
+      "title": "ALL IN",
+      "subtitle": "1º mini álbum japonês",
+      "type": "mini",
+      "market": "JP",
+      "date": "2020-11-04",
+      "albumVersions": [
+        "Limited A",
+        "Limited B",
+        "Regular"
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular. Distribuição por edição a conferir."
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "scars-thunderous",
+      "title": "Scars / ソリクン -Japanese ver.-",
+      "altTitle": "Scars / Thunderous",
+      "subtitle": "2º single japonês",
+      "type": "single",
+      "market": "JP",
+      "date": "2021-08-18",
+      "albumVersions": [
+        "Limited A",
+        "Limited B",
+        "Regular",
+        "FC"
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "circus",
+      "title": "CIRCUS",
+      "subtitle": "2º mini álbum japonês",
+      "type": "mini",
+      "market": "JP",
+      "date": "2022-06-22",
+      "albumVersions": [
+        "Limited A",
+        "Limited B",
+        "Regular",
+        "FC"
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "the-sound",
+      "title": "THE SOUND",
+      "subtitle": "1º álbum japonês",
+      "type": "full",
+      "market": "JP",
+      "date": "2023-02-22",
+      "albumVersions": [
+        "Limited A",
+        "Limited B",
+        "Regular",
+        "FC"
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "social-path",
+      "title": "Social Path / Super Bowl -Japanese ver.-",
+      "altTitle": "Social Path (feat. LiSA)",
+      "subtitle": "EP japonês",
+      "type": "single",
+      "market": "JP",
+      "date": "2023-09-06",
+      "albumVersions": [
+        "Limited A",
+        "Limited B",
+        "Regular",
+        "FC"
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "giant",
+      "title": "GIANT",
+      "subtitle": "2º álbum japonês",
+      "type": "full",
+      "market": "JP",
+      "date": "2024-11-13",
+      "albumVersions": [
+        "Limited A",
+        "Limited B",
+        "Regular",
+        "FC"
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "hollow",
+      "title": "Hollow",
+      "subtitle": "3º mini álbum japonês",
+      "type": "mini",
+      "market": "JP",
+      "date": "2025-06-18",
+      "albumVersions": [
+        "Limited A",
+        "Limited B",
+        "Regular",
+        "FC"
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        }
+      ]
+    },
+    {
+      "verified": false,
+      "id": "suiatsu",
+      "title": "SUIATSU",
+      "subtitle": "4º mini álbum japonês",
+      "type": "mini",
+      "market": "JP",
+      "date": "2026-11-25",
+      "albumVersions": [
+        "Limited A",
+        "Limited B",
+        "Regular",
+        "Período limitado"
+      ],
+      "sets": [
+        {
+          "id": "pc",
+          "name": "Photocard",
+          "perMember": 1,
+          "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, Período limitado. Distribuição por edição a conferir."
+        }
+      ],
+      "notes": "Lançamento futuro — photocards ainda não divulgados."
+    }
+  ]
+}
