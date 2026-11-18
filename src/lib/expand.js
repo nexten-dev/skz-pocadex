@@ -21,6 +21,12 @@ export function expandRelease(db, r) {
     const versions = set.versions?.length ? set.versions : [null];
     const setMembers = set.members ?? members;
     const per = set.perMember ?? 1;
+    const meta = {
+      category: set.category ?? 'photocard',
+      ...(set.itemType ? { itemType: set.itemType } : {}),
+      ...(set.store ? { store: set.store } : {}),
+      format: set.format ?? 'card',
+    };
     for (const version of versions) {
       const vKey = version ? slug(version) : '_';
       for (const memberId of setMembers) {
@@ -34,6 +40,7 @@ export function expandRelease(db, r) {
             memberId,
             label: per > 1 ? `#${i}` : '',
             index: i,
+            ...meta,
           });
         }
       }
@@ -47,6 +54,7 @@ export function expandRelease(db, r) {
           memberId: extra.members?.length === 1 ? extra.members[0] : 'group',
           label: extra.label,
           index: 1,
+          ...meta,
         });
       }
     }

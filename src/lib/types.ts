@@ -21,6 +21,20 @@ export type ReleaseType =
 export type Market = 'KR' | 'JP';
 
 /**
+ * Categoria do item colecionável.
+ * photocard = photocards que vêm dentro do álbum (padrão)
+ * pob       = benefícios de pré-venda/loja (Target, Soundwave, JYP Shop…)
+ * luckydraw = lucky draws / sorteios de lojas
+ * popup     = itens de pop-up stores oficiais
+ * inclusion = outros itens do álbum (postcards, pôsteres, ID photo, film…)
+ * event     = fanmeeting, turnê, fanclub e afins
+ */
+export type ItemCategory = 'photocard' | 'pob' | 'luckydraw' | 'popup' | 'inclusion' | 'event';
+
+/** Formato do item, para a proporção da miniatura. */
+export type ItemFormat = 'card' | 'wide' | 'tall' | 'square';
+
+/**
  * Um "set" é um grupo de photocards que compartilham as mesmas regras.
  * Ex.: "Standard" com versões A/B/C e 2 photocards por membro em cada versão.
  * A lista de cards é gerada a partir das regras, com IDs estáveis.
@@ -38,6 +52,13 @@ export interface PhotocardSet {
   members?: string[];
   /** Descrição de como os cards vêm (ex.: "1 aleatório por álbum"). */
   note?: string;
+  /** Categoria (padrão: photocard). */
+  category?: ItemCategory;
+  /** Tipo do item quando não é photocard (ex.: "Postcard", "Mini pôster"). */
+  itemType?: string;
+  /** Loja/evento de origem (ex.: "Soundwave", "Pop-up Seul"). */
+  store?: string;
+  format?: ItemFormat;
 }
 
 export interface Release {
@@ -89,6 +110,10 @@ export interface Photocard {
   memberId: string; // id do membro ou "group"
   label: string;
   index: number;
+  category: ItemCategory;
+  itemType?: string;
+  store?: string;
+  format: ItemFormat;
 }
 
 export interface CardImage {

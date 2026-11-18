@@ -5,6 +5,8 @@ import { formatDate, releaseMembers, TYPE_LABEL } from '../lib/data';
 import type { CardStatus, Photocard } from '../lib/types';
 import { useReleaseImages } from '../lib/images';
 import { CardDetail } from '../components/CardDetail';
+import { CategoryBar } from '../components/CategoryBar';
+import { CATEGORY_BY_ID, CATEGORY_ORDER } from '../lib/categories';
 
 type Mode = CardStatus | 'clear' | 'view';
 type StatusFilter = 'all' | 'missing' | CardStatus;
@@ -25,6 +27,7 @@ export function ReleaseView({
   setQty,
   customImages,
   setCustomImage,
+  toggleCategory,
   releaseId,
 }: ViewProps & { releaseId: string }) {
   const release = db.releases.find((r) => r.id === releaseId);
@@ -51,22 +54,25 @@ export function ReleaseView({
     [cards, member, statusFilter, collection],
   );
 
-  // Agrupa por set + versão
+  // Agrupa por set + versão, com as categorias na ordem padrão (photocards primeiro)
   const groups = useMemo(() => {
-    const map = new Map<string, { title: string; note?: string; cards: Photocard[] }>();
+    const map = new Map<string, { title: string; icon?: string; note?: string; order: number; cards: Photocard[] }>();
     for (const c of visible) {
       const key = `${c.setId}|${c.version ?? ''}`;
       if (!map.has(key)) {
         const set = release?.sets.find((s) => s.id === c.setId);
+        const cat = CATEGORY_BY_ID.get(c.category);
         map.set(key, {
-          title: c.version ? `${c.setName} · ${c.version}` : c.setName,
-          note: set?.note,
+          title: [c.setName, c.version].filter(Boolean).join(' · '),
+          icon: c.category !== 'photocard' ? cat?.icon : undefined,
+          note: [c.category !== 'photocard' ? cat?.short : null, c.itemType, set?.note].filter(Boolean).join(' · '),
+          order: CATEGORY_ORDER.get(c.category) ?? 99,
           cards: [],
         });
       }
       map.get(key)!.cards.push(c);
     }
-    return [...map.values()];
+    return [...map.values()].sort((a, b) => a.order - b.order);
   }, [visible, release]);
 
   if (!release) {
@@ -138,6 +144,8 @@ export function ReleaseView({
         </div>
       </section>
 
+      <CategoryBar items={index.byReleaseAll.get(release.id) ?? []} visible={index.visible} onToggle={toggleCategory} />
+
       <div className="sticky-tools">
         <div className="seg-control mode" role="group" aria-label="Ao tocar num card, marcar como">
           {MODES.map((m) => (
@@ -183,7 +191,10 @@ export function ReleaseView({
           <section key={g.title} className="pc-group">
             <header>
               <div>
-                <h2>{g.title}</h2>
+                <h2>
+                  {g.icon && <span aria-hidden>{g.icon} </span>}
+                  {g.title}
+                </h2>
                 {g.note && <p className="small muted">{g.note}</p>}
               </div>
               <div className="group-actions">
@@ -211,7 +222,13 @@ export function ReleaseView({
           </section>
         );
       })}
-      {groups.length === 0 && <p className="center muted">Nenhum photocard com esses filtros.</p>}
+      {groups.length === 0 && (
+        <p className="center muted">
+          {cards.length === 0
+            ? 'Nenhum item das categorias selecionadas neste lançamento. Use “Mostrar” acima para incluir outras categorias.'
+            : 'Nenhum item com esses filtros.'}
+        </p>
+      )}
       {detailCard && (
         <CardDetail
           card={detailCard}

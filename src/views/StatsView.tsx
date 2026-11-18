@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { countCards, memberMap, PhotocardTile, Progress, type ViewProps } from '../components/common';
+import { CATEGORIES } from '../lib/categories';
 
 export function StatsView({ db, index, collection, setStatus }: ViewProps) {
   const members = memberMap(db);
@@ -31,7 +32,9 @@ export function StatsView({ db, index, collection, setStatus }: ViewProps) {
       <section className="hero">
         <div>
           <h1>Minha coleção</h1>
-          <p className="muted">Resumo de todos os lançamentos</p>
+          <p className="muted">
+            Resumo de todos os lançamentos · <a href="#/settings">escolher o que mostrar</a>
+          </p>
         </div>
         <div className="hero-progress">
           <Progress counts={overall} />
@@ -56,6 +59,28 @@ export function StatsView({ db, index, collection, setStatus }: ViewProps) {
           <span className="muted small">Faltando</span>
         </div>
       </div>
+
+      {index.visible.length > 1 && (
+        <>
+          <h2>Por categoria</h2>
+          <div className="member-list">
+            {CATEGORIES.filter((c) => index.visible.includes(c.id)).map((c) => {
+              const counts = countCards(
+                index.all.filter((x) => x.category === c.id),
+                collection,
+              );
+              if (!counts.total) return null;
+              return (
+                <div key={c.id} className="member-row" style={{ ['--mc' as string]: 'var(--accent)' }}>
+                  <span aria-hidden>{c.icon}</span>
+                  <span className="member-name">{c.short}</span>
+                  <Progress counts={counts} compact />
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <h2>Por membro</h2>
       <div className="member-list">

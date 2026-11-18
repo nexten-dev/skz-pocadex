@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react';
 import { countCards, Progress, type ViewProps } from '../components/common';
 import { formatDate, TYPE_LABEL } from '../lib/data';
+import { CategoryBar } from '../components/CategoryBar';
 
 type MarketFilter = 'all' | 'KR' | 'JP';
 
-export function HomeView({ db, index, collection }: ViewProps) {
+export function HomeView({ db, index, collection, toggleCategory }: ViewProps) {
   const [q, setQ] = useState('');
   const [market, setMarket] = useState<MarketFilter>('all');
   const [sort, setSort] = useState<'new' | 'old'>('new');
 
+  const allItems = useMemo(() => [...index.byReleaseAll.values()].flat(), [index]);
   const overall = useMemo(() => countCards(index.all, collection), [index, collection]);
 
   const releases = useMemo(() => {
@@ -31,13 +33,15 @@ export function HomeView({ db, index, collection }: ViewProps) {
         <div>
           <h1>Minha coleção de photocards</h1>
           <p className="muted">
-            {db.releases.length} lançamentos · {overall.total} photocards na base
+            {db.releases.length} lançamentos · {overall.total} itens nas categorias selecionadas
           </p>
         </div>
         <div className="hero-progress">
           <Progress counts={overall} />
         </div>
       </section>
+
+      <CategoryBar items={allItems} visible={index.visible} onToggle={toggleCategory} />
 
       <div className="toolbar">
         <input

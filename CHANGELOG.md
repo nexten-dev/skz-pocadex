@@ -5,6 +5,23 @@ Todas as mudanças relevantes do app. Segue [Versionamento Semântico](https://s
 
 A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.DD.N`), independente da versão do app.
 
+## [0.3.0] — 2026-11-18
+
+### Adicionado
+- **Itens extras além dos photocards**, organizados em categorias:
+  - 📦 **Itens do álbum**: postcards, mini pôsteres, ID photos, photo boards, 4-cuts, stickers…
+  - 🛍️ **Benefícios de loja (POB)**: Target, Soundwave, Aladin, Withmuu, Barnes & Noble, Tower Records, HMV…
+  - 🍀 **Lucky draws**
+  - 🏪 **Pop-up stores**: itens das pop-ups oficiais (HOP, KARMA, DO IT, THIS & THAT…)
+  - 🎤 **Eventos e merch** (categoria pronta para uso futuro)
+- **Seletor do que mostrar**: por padrão o app mostra **só photocards**. Os chips “Mostrar” no topo da página inicial e de cada álbum incluem ou removem categorias, com a quantidade de itens de cada uma. A escolha vale para o app todo (progresso, “Minha coleção”) e fica salva. Em Configurações → “O que mostrar” há atalhos “Só photocards” e “Mostrar tudo”.
+- “Minha coleção” mostra o progresso por categoria quando há mais de uma visível.
+- Miniaturas no formato do item: horizontal para postcards, vertical para pôsteres e quadrado para stickers. Itens que não são photocards mostram o tipo no canto.
+- Base de dados `2026.11.18.2`: 315 itens extras em 18 lançamentos. Os itens ainda não confirmados têm “(a confirmar)” na descrição.
+
+### Alterado
+- O set “Target exclusivo” virou a categoria POB (o ID dos cards não mudou, então as marcações continuam).
+
 ## [0.2.0] — 2026-11-18
 
 ### Adicionado

@@ -1,7 +1,7 @@
 {
   "name": "skz-pocadex",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Organizador de coleção de photocards do Stray Kids",
   "type": "module",
   "scripts": {

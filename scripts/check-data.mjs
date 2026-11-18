@@ -17,9 +17,13 @@ for (const r of db.releases) {
   if (!['KR', 'JP'].includes(r.market)) errors.push(`${where}: market inválido`);
   for (const m of r.members ?? []) if (!memberIds.has(m)) errors.push(`${where}: membro desconhecido ${m}`);
   const setIds = new Set();
+  const CATS = ['photocard', 'pob', 'luckydraw', 'popup', 'inclusion', 'event'];
+  const FORMATS = ['card', 'wide', 'tall', 'square'];
   for (const s of r.sets ?? []) {
     if (setIds.has(s.id)) errors.push(`${where}: set duplicado ${s.id}`);
     setIds.add(s.id);
+    if (s.category && !CATS.includes(s.category)) errors.push(`${where}/${s.id}: categoria inválida ${s.category}`);
+    if (s.format && !FORMATS.includes(s.format)) errors.push(`${where}/${s.id}: formato inválido ${s.format}`);
     for (const m of s.members ?? []) if (!memberIds.has(m)) errors.push(`${where}/${s.id}: membro desconhecido ${m}`);
     for (const x of s.extras ?? []) for (const m of x.members ?? []) if (!memberIds.has(m)) errors.push(`${where}/${s.id}: membro desconhecido ${m}`);
   }

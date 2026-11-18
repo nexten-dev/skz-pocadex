@@ -4,7 +4,7 @@ Web app para organizar a coleção de photocards do **Stray Kids**: veja todos o
 
 > Projeto de fã, sem afiliação com a JYP Entertainment.
 
-**Versão atual:** 0.2.0 — veja o [CHANGELOG](CHANGELOG.md).
+**Versão atual:** 0.3.0 — veja o [CHANGELOG](CHANGELOG.md).
 
 ## Rodando no Windows (jeito mais fácil)
 
@@ -60,6 +60,25 @@ Cada lançamento tem `sets` de photocards. Um set descreve regras e o app gera o
 
 O ID de cada card é `release:set:versão:membro:n`. **Não renomeie `id`s já publicados**: a coleção dos usuários é salva por esses IDs.
 
+## Itens extras e o seletor “Mostrar”
+
+Além dos photocards dos álbuns, a base inclui itens do álbum, benefícios de loja (POB), lucky draws, pop-up stores e eventos. Por padrão o app mostra **só photocards**. Use os chips **Mostrar** no topo da página (ou *Configurações → O que mostrar*) para incluir outras categorias quando quiser. O progresso e os totais consideram apenas o que está visível.
+
+Na base, cada set pode ter:
+
+```jsonc
+{
+  "id": "pob-aladin",
+  "name": "Aladin",
+  "category": "pob",          // photocard (padrão) | inclusion | pob | luckydraw | popup | event
+  "itemType": "Photocard",    // rótulo livre: Postcard, Mini pôster, ID photo…
+  "store": "Aladin",          // loja ou evento de origem
+  "format": "card",           // card (padrão) | wide | tall | square
+  "perMember": 1,
+  "note": "1 aleatório de 8"
+}
+```
+
 ## Prévias dos photocards
 
 As imagens vêm de três fontes, nesta ordem de prioridade:
@@ -96,6 +115,6 @@ Há um workflow do GitHub Actions (`.github/workflows/deploy.yml`) que publica n
 ## Próximos passos sugeridos
 
 - Conferir cada lançamento com templates oficiais e marcar `verified: true`.
-- POBs de lojas, lucky draws e photocards de fanmeeting/turnê.
+- Conferir os itens extras marcados “(a confirmar)” e completar POBs/lucky draws de lançamentos antigos; itens de fanmeeting/turnê.
 - Sincronização da coleção entre aparelhos (login).
 - PWA instalável e com suporte offline completo.

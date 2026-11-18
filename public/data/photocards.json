@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "dataVersion": "2026.11.18.1",
+  "dataVersion": "2026.11.18.2",
   "updatedAt": "2026-11-18",
   "sources": [
     {
@@ -434,6 +434,28 @@
           "name": "Limited",
           "perMember": 1,
           "note": "Photocards da edição limitada"
+        },
+        {
+          "id": "inc-glitter",
+          "name": "Limited — glitter photocard",
+          "category": "photocard",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)"
+        },
+        {
+          "id": "inc-card",
+          "name": "Limited — cartão de Natal",
+          "category": "inclusion",
+          "perMember": 0,
+          "note": "Cartão + selo de Natal (a confirmar)",
+          "itemType": "Cartão",
+          "format": "wide",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Cartão de Natal"
+            }
+          ]
         }
       ]
     },
@@ -478,9 +500,36 @@
         },
         {
           "id": "target",
-          "name": "Target exclusivo (EUA)",
+          "name": "Target",
           "perMember": 1,
-          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target",
+          "category": "pob",
+          "store": "Target (EUA)",
+          "itemType": "Photocard"
+        },
+        {
+          "id": "inc-poster",
+          "name": "Pôster dobrado",
+          "category": "inclusion",
+          "perMember": 0,
+          "note": "Pôster da edição (a confirmar)",
+          "itemType": "Pôster",
+          "format": "tall",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Pôster"
+            }
+          ]
+        },
+        {
+          "id": "pob-unit",
+          "name": "Trading unit photocard",
+          "category": "pob",
+          "perMember": 1,
+          "note": "Benefício de pré-venda (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pré-venda"
         }
       ]
     },
@@ -531,9 +580,21 @@
         },
         {
           "id": "target",
-          "name": "Target exclusivo (EUA)",
+          "name": "Target",
           "perMember": 1,
-          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target",
+          "category": "pob",
+          "store": "Target (EUA)",
+          "itemType": "Photocard"
+        },
+        {
+          "id": "pob-photopack",
+          "name": "Photo pack (polaroid + carta)",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8 — benefício de pré-venda (a confirmar)",
+          "itemType": "Polaroid",
+          "store": "Pré-venda"
         }
       ]
     },
@@ -583,9 +644,99 @@
         },
         {
           "id": "target",
-          "name": "Target exclusivo (EUA)",
+          "name": "Target",
           "perMember": 1,
-          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target",
+          "category": "pob",
+          "store": "Target (EUA)",
+          "itemType": "Photocard"
+        },
+        {
+          "id": "inc-ootd",
+          "name": "OOTD mini pôster",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Mini pôster",
+          "format": "tall"
+        },
+        {
+          "id": "inc-postcard",
+          "name": "Postcard cartoon",
+          "category": "inclusion",
+          "perMember": 0,
+          "note": "1 por álbum (a confirmar)",
+          "itemType": "Postcard",
+          "format": "wide",
+          "versions": [
+            "A",
+            "B",
+            "C"
+          ],
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Postcard"
+            }
+          ]
+        },
+        {
+          "id": "pob-film",
+          "name": "Mini photobook B-cut (film)",
+          "category": "pob",
+          "perMember": 0,
+          "note": "1 aleatório de 3 — primeira tiragem (a confirmar)",
+          "itemType": "Mini photobook",
+          "store": "1ª tiragem",
+          "format": "tall",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Film 1"
+            },
+            {
+              "id": "x2",
+              "label": "Film 2"
+            },
+            {
+              "id": "x3",
+              "label": "Film 3"
+            }
+          ]
+        },
+        {
+          "id": "pob-target-pc",
+          "name": "Target — postcard",
+          "category": "pob",
+          "perMember": 0,
+          "note": "Postcard exclusivo de varejo internacional (a confirmar)",
+          "itemType": "Postcard",
+          "store": "Target (EUA)",
+          "format": "wide",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Postcard"
+            }
+          ]
+        },
+        {
+          "id": "pob-makestar",
+          "name": "Makestar",
+          "category": "pob",
+          "perMember": 1,
+          "note": "Photocard de pré-venda (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Makestar"
+        },
+        {
+          "id": "ld-soundwave",
+          "name": "Soundwave lucky draw",
+          "category": "luckydraw",
+          "perMember": 1,
+          "note": "Várias rodadas; set por rodada a confirmar",
+          "itemType": "Photocard",
+          "store": "Soundwave"
         }
       ]
     },
@@ -664,9 +815,121 @@
         },
         {
           "id": "target",
-          "name": "Target exclusivo (EUA)",
+          "name": "Target",
           "perMember": 1,
-          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target",
+          "category": "pob",
+          "store": "Target (EUA)",
+          "itemType": "Photocard"
+        },
+        {
+          "id": "inc-panorama",
+          "name": "ROLL ver. — mini pôster panorâmico",
+          "category": "inclusion",
+          "perMember": 0,
+          "note": "1 aleatório de 3 (a confirmar)",
+          "itemType": "Mini pôster",
+          "format": "wide",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Panorama 1"
+            },
+            {
+              "id": "x2",
+              "label": "Panorama 2"
+            },
+            {
+              "id": "x3",
+              "label": "Panorama 3"
+            }
+          ]
+        },
+        {
+          "id": "inc-4cut",
+          "name": "Limited STAR ver. — 4-cut photo",
+          "category": "inclusion",
+          "perMember": 0,
+          "note": "Incluído na edição limitada (a confirmar)",
+          "itemType": "4-cut",
+          "format": "tall",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "4-cut"
+            }
+          ]
+        },
+        {
+          "id": "pob-film",
+          "name": "Film photocard set",
+          "category": "pob",
+          "perMember": 0,
+          "note": "1 aleatório de 2 sets, 4 cards cada — pré-venda (a confirmar)",
+          "itemType": "Film photocard",
+          "store": "Pré-venda",
+          "format": "card",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Set A #1"
+            },
+            {
+              "id": "x2",
+              "label": "Set A #2"
+            },
+            {
+              "id": "x3",
+              "label": "Set A #3"
+            },
+            {
+              "id": "x4",
+              "label": "Set A #4"
+            },
+            {
+              "id": "x5",
+              "label": "Set B #1"
+            },
+            {
+              "id": "x6",
+              "label": "Set B #2"
+            },
+            {
+              "id": "x7",
+              "label": "Set B #3"
+            },
+            {
+              "id": "x8",
+              "label": "Set B #4"
+            }
+          ]
+        },
+        {
+          "id": "pob-weverse",
+          "name": "Weverse Shop",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Weverse Shop"
+        },
+        {
+          "id": "ld-soundwave",
+          "name": "Soundwave lucky draw",
+          "category": "luckydraw",
+          "perMember": 1,
+          "note": "Pelo menos 2 rodadas; set a confirmar",
+          "itemType": "Photocard",
+          "store": "Soundwave"
+        },
+        {
+          "id": "popup",
+          "name": "Pop-up store 樂-STAR",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Photocards de evento offline; local e quantidade a confirmar",
+          "itemType": "Photocard",
+          "store": "Pop-up Seul"
         }
       ]
     },
@@ -709,9 +972,104 @@
         },
         {
           "id": "target",
-          "name": "Target exclusivo (EUA)",
+          "name": "Target",
           "perMember": 1,
-          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target",
+          "category": "pob",
+          "store": "Target (EUA)",
+          "itemType": "Photocard"
+        },
+        {
+          "id": "inc-unit",
+          "name": "BOOM ver. — unit photocard",
+          "category": "photocard",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)"
+        },
+        {
+          "id": "inc-4cut",
+          "name": "BOOM ver. — 4-cut photo",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "Incluído no álbum (a confirmar)",
+          "itemType": "4-cut",
+          "format": "tall"
+        },
+        {
+          "id": "inc-bitmap",
+          "name": "Edição limitada — mini pôster BITMAP",
+          "category": "inclusion",
+          "perMember": 0,
+          "note": "Incluído na edição limitada (a confirmar)",
+          "itemType": "Mini pôster",
+          "format": "tall",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "BITMAP"
+            }
+          ]
+        },
+        {
+          "id": "pob-postcard",
+          "name": "Postcard exclusivo de varejo (EUA/UE)",
+          "category": "pob",
+          "perMember": 0,
+          "note": "Target e outras lojas internacionais",
+          "itemType": "Postcard",
+          "store": "Varejo EUA/UE",
+          "format": "wide",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Postcard"
+            }
+          ]
+        },
+        {
+          "id": "pob-selfie",
+          "name": "Soundwave / Withmuu — selfie inédita",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (uma loja cita 16) (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Soundwave / Withmuu"
+        },
+        {
+          "id": "pob-aladin",
+          "name": "Aladin",
+          "category": "pob",
+          "perMember": 1,
+          "note": "Photocard de pré-venda (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Aladin"
+        },
+        {
+          "id": "ld-soundwave",
+          "name": "Soundwave lucky draw",
+          "category": "luckydraw",
+          "perMember": 1,
+          "note": "Set a confirmar",
+          "itemType": "Photocard",
+          "store": "Soundwave"
+        },
+        {
+          "id": "popup-polaroid",
+          "name": "Pop-up ATE — polaroid",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Benefício da pop-up store (ago/2024) (a confirmar)",
+          "itemType": "Polaroid",
+          "store": "Pop-up ATE"
+        },
+        {
+          "id": "popup-ld",
+          "name": "Pop-up ATE — lucky draw",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Lucky draw da pop-up store (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up ATE"
         }
       ]
     },
@@ -781,6 +1139,63 @@
           "name": "Accordion ver. — Adicional",
           "perMember": 1,
           "note": "1 aleatório de 8"
+        },
+        {
+          "id": "pob-poster",
+          "name": "Pôster dobrado + sticker",
+          "category": "pob",
+          "perMember": 0,
+          "note": "Benefício de pré-venda (a confirmar)",
+          "itemType": "Pôster",
+          "store": "Pré-venda",
+          "format": "tall",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Pôster"
+            },
+            {
+              "id": "x2",
+              "label": "Sticker"
+            }
+          ]
+        },
+        {
+          "id": "pob-soundwave",
+          "name": "Soundwave — selfie inédita",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Soundwave"
+        },
+        {
+          "id": "pob-tower",
+          "name": "Tower Records",
+          "category": "pob",
+          "perMember": 1,
+          "note": "Photocard de benefício (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Tower Records"
+        },
+        {
+          "id": "pob-skzshop",
+          "name": "Stray Kids Shop — postcard autografado",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (impresso)",
+          "itemType": "Postcard",
+          "store": "Stray Kids Shop (EUA)",
+          "format": "wide"
+        },
+        {
+          "id": "popup",
+          "name": "Pop-up store 合 (HOP)",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Jongno, Seul, 14–22/dez/2024; itens a confirmar",
+          "itemType": "Photocard",
+          "store": "Pop-up HOP — Seul"
         }
       ]
     },
@@ -850,9 +1265,142 @@
         },
         {
           "id": "target",
-          "name": "Target exclusivo (EUA)",
+          "name": "Target",
           "perMember": 1,
-          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target",
+          "category": "pob",
+          "store": "Target (EUA)",
+          "itemType": "Photocard"
+        },
+        {
+          "id": "inc-postcards",
+          "name": "Photo postcard set",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "Versões CEREMONY/HOORAY (a confirmar)",
+          "itemType": "Postcard",
+          "format": "wide"
+        },
+        {
+          "id": "inc-2cut",
+          "name": "Accordion ver. — 2-cut photo",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "2-cut",
+          "format": "tall"
+        },
+        {
+          "id": "inc-photocard-b",
+          "name": "Accordion ver. — photocard B",
+          "category": "photocard",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)"
+        },
+        {
+          "id": "inc-keyring",
+          "name": "SKZOO ver. — keyring",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Chaveiro",
+          "format": "square"
+        },
+        {
+          "id": "inc-profile",
+          "name": "SKZOO ver. — profile card",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Profile card"
+        },
+        {
+          "id": "pob-postcard",
+          "name": "Postcard exclusivo de varejo (EUA/UE)",
+          "category": "pob",
+          "perMember": 0,
+          "note": "Lojas internacionais (a confirmar)",
+          "itemType": "Postcard",
+          "store": "Varejo EUA/UE",
+          "format": "wide",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Postcard"
+            }
+          ]
+        },
+        {
+          "id": "pob-soundwave",
+          "name": "Soundwave",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Soundwave"
+        },
+        {
+          "id": "pob-soundwave-ver",
+          "name": "Soundwave ver. — inédita",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Soundwave"
+        },
+        {
+          "id": "pob-withmuu",
+          "name": "Withmuu",
+          "category": "pob",
+          "perMember": 1,
+          "note": "Photocard exclusivo (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Withmuu"
+        },
+        {
+          "id": "ld-fansshop",
+          "name": "Fans Shop lucky draw",
+          "category": "luckydraw",
+          "perMember": 1,
+          "note": "Pelo menos 2 rodadas; set a confirmar",
+          "itemType": "Photocard",
+          "store": "Fans Shop"
+        },
+        {
+          "id": "popup-w1",
+          "name": "Pop-up KARMA — POB semana 1",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Lotte World Mall, Seul, 23/ago–3/set/2025 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up KARMA — Seul"
+        },
+        {
+          "id": "popup-w2",
+          "name": "Pop-up KARMA — POB semana 2",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Lotte World Mall, Seul (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up KARMA — Seul"
+        },
+        {
+          "id": "popup-ld",
+          "name": "Pop-up KARMA — lucky draw",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Lucky draw da pop-up (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up KARMA — Seul"
+        },
+        {
+          "id": "popup-30k",
+          "name": "Pop-up KARMA — compra acima de ₩30.000",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Benefício por valor de compra (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up KARMA — Seul"
         }
       ]
     },
@@ -928,9 +1476,138 @@
         },
         {
           "id": "target",
-          "name": "Target exclusivo (EUA)",
+          "name": "Target",
           "perMember": 1,
-          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target"
+          "note": "1 aleatório de 8 — exclusivo das edições vendidas na Target",
+          "category": "pob",
+          "store": "Target (EUA)",
+          "itemType": "Photocard"
+        },
+        {
+          "id": "inc-board",
+          "name": "IT ver. — photo board",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (200×280 mm) (a confirmar)",
+          "itemType": "Photo board",
+          "format": "tall"
+        },
+        {
+          "id": "inc-lyric",
+          "name": "DO ver. — lyric postcard",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "4 aleatórios de 8 (a confirmar)",
+          "itemType": "Postcard",
+          "format": "wide"
+        },
+        {
+          "id": "pob-postcard",
+          "name": "Postcard de varejo (EUA/UE)",
+          "category": "pob",
+          "perMember": 0,
+          "note": "Lojas internacionais (a confirmar)",
+          "itemType": "Postcard",
+          "store": "Varejo EUA/UE",
+          "format": "wide",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "Postcard"
+            }
+          ]
+        },
+        {
+          "id": "pob-aladin",
+          "name": "Aladin",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8 — pré-venda",
+          "itemType": "Photocard",
+          "store": "Aladin"
+        },
+        {
+          "id": "pob-bn",
+          "name": "Barnes & Noble",
+          "category": "pob",
+          "perMember": 0,
+          "note": "1 aleatório de 4",
+          "itemType": "Photocard",
+          "store": "Barnes & Noble (EUA)",
+          "format": "card",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "#1"
+            },
+            {
+              "id": "x2",
+              "label": "#2"
+            },
+            {
+              "id": "x3",
+              "label": "#3"
+            },
+            {
+              "id": "x4",
+              "label": "#4"
+            }
+          ]
+        },
+        {
+          "id": "pob-speaker",
+          "name": "EVIL SKZOO SPEAKER ver.",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Lojas"
+        },
+        {
+          "id": "ld-nemoz",
+          "name": "Nemoz lucky draw",
+          "category": "luckydraw",
+          "perMember": 1,
+          "note": "Set a confirmar",
+          "itemType": "Photocard",
+          "store": "Nemoz"
+        },
+        {
+          "id": "popup-ld",
+          "name": "Pop-up DO IT — lucky draw semana 1",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Seul (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up DO IT — Seul"
+        },
+        {
+          "id": "popup-md",
+          "name": "Pop-up DO IT — benefício semana 2",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Seul (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up DO IT — Seul"
+        },
+        {
+          "id": "popup-30",
+          "name": "Pop-up DO IT — a cada $30",
+          "category": "popup",
+          "perMember": 2,
+          "note": "1 aleatório de 16 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up DO IT — Seul",
+          "format": "card"
+        },
+        {
+          "id": "popup-skzoo",
+          "name": "Pop-up DO IT — SKZOO figure photocard C",
+          "category": "popup",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up DO IT — Seul"
         }
       ]
     },
@@ -963,6 +1640,51 @@
           "name": "Limited TRUCK ver.",
           "perMember": 1,
           "note": "Photocards da edição limitada"
+        },
+        {
+          "id": "pob-soundwave",
+          "name": "Soundwave pré-venda",
+          "category": "pob",
+          "perMember": 1,
+          "note": "Set de 8 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Soundwave"
+        },
+        {
+          "id": "pob-sony",
+          "name": "Sony Music Shop — serial",
+          "category": "pob",
+          "perMember": 1,
+          "note": "1 aleatório de 8",
+          "itemType": "Photocard",
+          "store": "Sony Music Shop (JP)"
+        },
+        {
+          "id": "ld-soundwave",
+          "name": "Soundwave lucky draw (pop-up)",
+          "category": "luckydraw",
+          "perMember": 1,
+          "note": "Set de 8 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Soundwave"
+        },
+        {
+          "id": "popup-ld1",
+          "name": "Pop-up THIS & THAT — lucky draw semana 1",
+          "category": "popup",
+          "perMember": 1,
+          "note": "The Gabae Seongsu, 8–13/ago/2026 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up THIS & THAT — Seul"
+        },
+        {
+          "id": "popup-ld2",
+          "name": "Pop-up THIS & THAT — lucky draw semana 2",
+          "category": "popup",
+          "perMember": 1,
+          "note": "Set de 8 (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Pop-up THIS & THAT — Seul"
         }
       ],
       "notes": "Dados preliminares: versões e quantidade de photocards ainda não confirmadas."
@@ -1100,6 +1822,15 @@
           "name": "Photocard",
           "perMember": 1,
           "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        },
+        {
+          "id": "inc-sticker",
+          "name": "Limited A — photo sticker",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "Incluído na edição (a confirmar)",
+          "itemType": "Sticker",
+          "format": "square"
         }
       ]
     },
@@ -1124,6 +1855,33 @@
           "name": "Photocard",
           "perMember": 1,
           "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        },
+        {
+          "id": "inc-sticker-a",
+          "name": "Limited A — sticker",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Sticker",
+          "format": "square"
+        },
+        {
+          "id": "inc-sticker-b",
+          "name": "Limited B — sticker B",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "1 aleatório de 8 (a confirmar)",
+          "itemType": "Sticker",
+          "format": "square"
+        },
+        {
+          "id": "pob-tower",
+          "name": "Tower Records — serial",
+          "category": "pob",
+          "perMember": 1,
+          "note": "Benefício por serial (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Tower Records"
         }
       ]
     },
@@ -1147,6 +1905,22 @@
           "name": "Photocard",
           "perMember": 1,
           "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        },
+        {
+          "id": "inc-pcc",
+          "name": "1ª tiragem — photocard C",
+          "category": "photocard",
+          "perMember": 1,
+          "note": "1 aleatório de 8 + serial (a confirmar)"
+        },
+        {
+          "id": "pob-tower",
+          "name": "Tower Records",
+          "category": "pob",
+          "perMember": 1,
+          "note": "8 tipos, aleatório, por ordem de chegada (a confirmar)",
+          "itemType": "Photocard",
+          "store": "Tower Records"
         }
       ]
     },
@@ -1170,6 +1944,22 @@
           "name": "Photocard",
           "perMember": 1,
           "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, FC. Distribuição por edição a conferir."
+        },
+        {
+          "id": "inc-idphoto",
+          "name": "Limited A — ID photo original",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "1 aleatório de 8",
+          "itemType": "ID photo"
+        },
+        {
+          "id": "inc-visual",
+          "name": "Edição de período limitado — visual card set",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "Set dos membros",
+          "itemType": "Visual card"
         }
       ]
     },
@@ -1193,6 +1983,38 @@
           "name": "Photocard",
           "perMember": 1,
           "note": "1 aleatório por CD. Edições: Limited A, Limited B, Regular, Período limitado. Distribuição por edição a conferir."
+        },
+        {
+          "id": "inc-idphoto",
+          "name": "Limited A — ID photo original",
+          "category": "inclusion",
+          "perMember": 1,
+          "note": "1 aleatório de 8",
+          "itemType": "ID photo"
+        },
+        {
+          "id": "inc-fc",
+          "name": "Edição fanclub — photocard dupla face",
+          "category": "photocard",
+          "perMember": 1,
+          "note": "1 aleatório de 8",
+          "itemType": "Photocard"
+        },
+        {
+          "id": "pob-poster",
+          "name": "HMV/Loppi — B3 clear poster (compra do set)",
+          "category": "pob",
+          "perMember": 0,
+          "note": "Limited A + Limited B + Regular; 1 tipo (grupo)",
+          "itemType": "Pôster",
+          "store": "HMV / Loppi",
+          "format": "tall",
+          "extras": [
+            {
+              "id": "x1",
+              "label": "B3 clear poster"
+            }
+          ]
         }
       ],
       "notes": "Lançamento futuro — photocards ainda não divulgados."

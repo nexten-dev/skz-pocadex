@@ -5,12 +5,14 @@ import { DEFAULT_DATA_URL, getDataUrl, setDataUrl, type SyncResult } from '../li
 import type { Collection } from '../lib/types';
 import { clearWikiCache, isWikiEnabled, setWikiEnabled } from '../lib/images';
 import { WIKI_SOURCES } from '../lib/wiki';
+import { CATEGORIES } from '../lib/categories';
 
 export function SettingsView({
   db,
   index,
   collection,
   customImages,
+  setVisibleCategories,
   sync,
   onSync,
   onReplace,
@@ -87,6 +89,44 @@ export function SettingsView({
             </ul>
           </>
         )}
+      </section>
+
+      <section className="panel">
+        <h2>O que mostrar</h2>
+        <p className="muted small">
+          Escolha quais tipos de itens aparecem nos álbuns, no progresso e na sua coleção. Itens ocultos continuam com
+          suas marcações salvas.
+        </p>
+        <div className="cat-list">
+          {CATEGORIES.map((c) => {
+            const total = [...index.byReleaseAll.values()].flat().filter((x) => x.category === c.id).length;
+            const on = index.visible.includes(c.id);
+            return (
+              <label key={c.id} className="toggle cat-option">
+                <input
+                  type="checkbox"
+                  checked={on}
+                  onChange={() =>
+                    setVisibleCategories(on ? index.visible.filter((v) => v !== c.id) : [...index.visible, c.id])
+                  }
+                />
+                <span>
+                  {c.icon} <strong>{c.label}</strong> <span className="muted small">({total})</span>
+                  <br />
+                  <span className="muted small">{c.description}</span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+        <div className="row" style={{ marginTop: '0.8rem' }}>
+          <button className="btn small" onClick={() => setVisibleCategories(['photocard'])}>
+            Só photocards
+          </button>
+          <button className="btn small" onClick={() => setVisibleCategories(CATEGORIES.map((c) => c.id))}>
+            Mostrar tudo
+          </button>
+        </div>
       </section>
 
       <section className="panel">

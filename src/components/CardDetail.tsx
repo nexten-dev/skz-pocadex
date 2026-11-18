@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { CardImage, CardStatus, Member, Photocard, Release } from '../lib/types';
 import type { ImageCandidate } from '../lib/wiki';
 import { STATUS_LABEL } from '../lib/collection';
+import { CATEGORY_BY_ID } from '../lib/categories';
 
 interface Props {
   card: Photocard;
@@ -55,7 +56,7 @@ export function CardDetail({ card, release, member, image, candidates, status, q
           ✕
         </button>
         <div className="modal-body">
-          <div className="detail-art">
+          <div className={`detail-art fmt-${card.format}`}>
             {image && !broken ? (
               <img src={image.url} alt={`Photocard de ${name}`} referrerPolicy="no-referrer" onError={() => setBroken(true)} />
             ) : (
@@ -75,6 +76,14 @@ export function CardDetail({ card, release, member, image, candidates, status, q
               {card.setName}
               {card.label ? ` · ${card.label}` : ''}
             </p>
+            {card.category !== 'photocard' && (
+              <p className="small">
+                <span className="tag">
+                  {CATEGORY_BY_ID.get(card.category)?.icon} {CATEGORY_BY_ID.get(card.category)?.short}
+                </span>{' '}
+                {[card.itemType, card.store].filter(Boolean).join(' · ')}
+              </p>
+            )}
             {setNote && <p className="small muted">{setNote}</p>}
 
             <div className="status-buttons">

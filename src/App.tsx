@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { expandRelease, syncDatabase, type SyncResult } from './lib/data';
 import { useCollection } from './lib/collection';
 import { useCustomImages } from './lib/images';
-import type { Database, Photocard } from './lib/types';
+import type { Database, ItemCategory, Photocard } from './lib/types';
+import { useVisibleCategories } from './lib/categories';
 import { HomeView } from './views/HomeView';
 import { ReleaseView } from './views/ReleaseView';
 import { StatsView } from './views/StatsView';
@@ -23,24 +24,38 @@ function useHashRoute() {
 }
 
 export interface CardIndex {
+  /** Itens visíveis (respeitando as categorias escolhidas), por lançamento. */
   byRelease: Map<string, Photocard[]>;
+  /** Todos os itens do lançamento, independente das categorias escolhidas. */
+  byReleaseAll: Map<string, Photocard[]>;
+  /** Todos os itens da base, por ID. */
   byId: Map<string, Photocard>;
+  /** Itens visíveis da base inteira. */
   all: Photocard[];
+  visible: ItemCategory[];
 }
 
-function buildIndex(db: Database): CardIndex {
-  const byRelease = new Map<string, Photocard[]>();
+function buildFullIndex(db: Database) {
+  const byReleaseAll = new Map<string, Photocard[]>();
   const byId = new Map<string, Photocard>();
-  const all: Photocard[] = [];
   for (const r of db.releases) {
     const cards = expandRelease(db, r);
-    byRelease.set(r.id, cards);
-    for (const c of cards) {
-      byId.set(c.id, c);
-      all.push(c);
-    }
+    byReleaseAll.set(r.id, cards);
+    for (const c of cards) byId.set(c.id, c);
   }
-  return { byRelease, byId, all };
+  return { byReleaseAll, byId };
+}
+
+function filterIndex(full: ReturnType<typeof buildFullIndex>, visible: ItemCategory[]): CardIndex {
+  const show = new Set(visible);
+  const byRelease = new Map<string, Photocard[]>();
+  const all: Photocard[] = [];
+  for (const [id, cards] of full.byReleaseAll) {
+    const list = cards.filter((c) => show.has(c.category));
+    byRelease.set(id, list);
+    all.push(...list);
+  }
+  return { ...full, byRelease, all, visible };
 }
 
 export function App() {
@@ -77,7 +92,9 @@ export function App() {
   }, [toast]);
 
   const db = sync?.db ?? null;
-  const index = useMemo(() => (db ? buildIndex(db) : null), [db]);
+  const { visible, toggle: toggleCategory, setVisible: setVisibleCategories } = useVisibleCategories();
+  const fullIndex = useMemo(() => (db ? buildFullIndex(db) : null), [db]);
+  const index = useMemo(() => (fullIndex ? filterIndex(fullIndex, visible) : null), [fullIndex, visible]);
 
   let content: React.ReactNode;
   if (!sync) {
@@ -94,7 +111,17 @@ export function App() {
     );
   } else {
     const [page, param] = route;
-    const props = { db, index, collection, setStatus, setQty, customImages, setCustomImage };
+    const props = {
+      db,
+      index,
+      collection,
+      setStatus,
+      setQty,
+      customImages,
+      setCustomImage,
+      toggleCategory,
+      setVisibleCategories,
+    };
     if (page === 'release' && param) content = <ReleaseView {...props} releaseId={decodeURIComponent(param)} />;
     else if (page === 'stats') content = <StatsView {...props} />;
     else if (page === 'settings')

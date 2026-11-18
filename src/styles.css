@@ -865,3 +865,84 @@ details {
     font-size: 0.78rem;
   }
 }
+
+/* ---------- Categorias ---------- */
+.category-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 1rem;
+}
+.cat-chip {
+  font: inherit;
+  font-size: 0.8rem;
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cat-chip.on {
+  border-style: solid;
+  border-color: var(--text);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+}
+.cat-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+  font-weight: 400;
+}
+.cat-list {
+  display: grid;
+  gap: 0.6rem;
+}
+.cat-option {
+  align-items: flex-start;
+}
+.cat-option input {
+  margin-top: 0.25rem;
+}
+.pc-icon {
+  display: block;
+  font-size: 1.1rem;
+  text-align: center;
+  text-shadow: none;
+}
+.pc-initials {
+  text-align: center;
+}
+.pc-type {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  max-width: calc(100% - 36px);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 0.05rem 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pc.fmt-wide .pc-art,
+.detail-art.fmt-wide {
+  aspect-ratio: 148 / 100;
+}
+.pc.fmt-tall .pc-art,
+.detail-art.fmt-tall {
+  aspect-ratio: 3 / 4;
+}
+.pc.fmt-square .pc-art,
+.detail-art.fmt-square {
+  aspect-ratio: 1;
+}
+.pc-grid {
+  align-items: start;
+}

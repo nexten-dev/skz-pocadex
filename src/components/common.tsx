@@ -1,6 +1,7 @@
 import type { CardIndex } from '../App';
 import { useState } from 'react';
-import type { CardImage, CardStatus, Collection, Database, Member, Photocard } from '../lib/types';
+import type { CardImage, CardStatus, Collection, Database, ItemCategory, Member, Photocard } from '../lib/types';
+import { CATEGORY_BY_ID } from '../lib/categories';
 import { STATUS_LABEL } from '../lib/collection';
 
 export interface ViewProps {
@@ -11,6 +12,8 @@ export interface ViewProps {
   setQty: (id: string, q: number) => void;
   customImages: Record<string, { url: string; page?: string; source?: string }>;
   setCustomImage: (cardId: string, img: { url: string; page?: string; source?: string } | null) => void;
+  toggleCategory: (c: ItemCategory) => void;
+  setVisibleCategories: (c: ItemCategory[]) => void;
 }
 
 export interface Counts {
@@ -79,7 +82,7 @@ export function PhotocardTile({
   return (
     <button
       type="button"
-      className={`pc ${status ?? 'none'}`}
+      className={`pc ${status ?? 'none'} fmt-${card.format}`}
       style={{ ['--mc' as string]: m.color }}
       onClick={onClick}
       title={`${m.name}${card.version ? ` · ${card.version}` : ''}${card.label ? ` · ${card.label}` : ''}${status ? ` — ${STATUS_LABEL[status]}` : ''}`}
@@ -94,7 +97,13 @@ export function PhotocardTile({
             onError={() => setBroken(img.thumb)}
           />
         ) : (
-          <span className="pc-initials">{initials}</span>
+          <span className="pc-initials">
+            {card.category !== 'photocard' && <span className="pc-icon">{CATEGORY_BY_ID.get(card.category)?.icon}</span>}
+            {initials}
+          </span>
+        )}
+        {card.category !== 'photocard' && (card.itemType || card.store) && (
+          <span className="pc-type">{card.itemType ?? CATEGORY_BY_ID.get(card.category)?.short}</span>
         )}
         {img?.kind === 'wiki' && img.confidence === 'member' && (
           <span className="pc-approx" title="Prévia aproximada: imagem do membro neste álbum, versão não confirmada">
@@ -107,7 +116,7 @@ export function PhotocardTile({
       </div>
       <div className="pc-meta">
         <span className="pc-name">{m.id === 'group' ? card.label || 'Grupo' : m.name}</span>
-        <span className="pc-sub muted">{showRelease ?? card.version ?? card.setName}</span>
+        <span className="pc-sub muted">{showRelease ?? card.version ?? card.store ?? card.setName}</span>
       </div>
     </button>
   );
