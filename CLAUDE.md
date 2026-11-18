@@ -49,14 +49,16 @@ npm run release        # gera os pacotes de release em releases/vX.Y.Z/
 2. **Dist** — `skz-pocadex-vX.Y.Z-dist.zip`: só o necessário para rodar (o build + inicializador `abrir.bat`/`servidor.ps1` que não precisa de Node + `LEIA-ME.txt`). Sem código-fonte, scripts de desenvolvimento ou contexto do Claude.
 3. **Mobile** — só se houver arquivos que precisem ir para o celular. Hoje **não há**: o app é PWA e é instalado pelo endereço publicado. O script registra isso no `RELEASE.txt`. Se um dia existir um app nativo (ex.: Capacitor), coloque a configuração em `mobile/` e o script passa a gerar o pacote.
 
-No GitHub, o workflow `.github/workflows/release.yml` faz o mesmo ao enviar uma tag `v*` e anexa os pacotes à GitHub Release.
+No GitHub (`nexten-dev/skz-pocadex`), o workflow `.github/workflows/release.yml` roda a cada push na `main`: se a versão do `package.json` ainda não tem Release, ele gera os pacotes, **cria a tag** e publica a GitHub Release com os arquivos. Também cria tags de versões antigas que faltem (pela versão citada no assunto do commit).
+
+**Tags**: o ambiente de nuvem do Claude não consegue enviar tags (`git push --tags` é recusado). Crie a tag localmente como de costume, mas não tente enviá-la: o workflow cria a tag no GitHub. Por isso, mantenha a versão no assunto do commit de release (ex.: `feat: v0.5.0 — …`).
 
 ## Decisões e roteiro
 
 - Nome “SKZ Pocadex” (poca = 포카, photocard; dex = Pokédex) — aprovado pelo usuário.
-- **Publicação**: GitHub Pages (workflow `deploy.yml` pronto). Pendente: o usuário conectar o GitHub e criar o repositório público `skz-pocadex`.
+- **Publicação**: repositório público `nexten-dev/skz-pocadex`, site no GitHub Pages (`https://nexten-dev.github.io/skz-pocadex/`) via workflow `deploy.yml`. Ativar o Pages (Settings → Pages → Source: GitHub Actions) só pode ser feito pelo usuário — a API não é acessível da sessão.
 - **Sincronização entre aparelhos**: decidido usar a **nuvem pessoal do usuário** (Google Drive primeiro; OneDrive/Dropbox depois), arquivo da coleção numa pasta do app, mesclagem por card usando o timestamp `t`. **Não** usar Supabase por enquanto.
-- Próximos passos sugeridos: publicar (GitHub Pages), sync com Google Drive (v0.5.0), conferir dados “(a confirmar)” com templates oficiais.
+- Próximos passos sugeridos: sync com Google Drive (v0.5.0), conferir dados “(a confirmar)” com templates oficiais.
 
 ## Limitações do ambiente de nuvem do Claude
 

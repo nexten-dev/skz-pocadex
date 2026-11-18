@@ -1,13 +1,20 @@
 name: Release (pacotes Source, Dist e Mobile)
 
-# Ao enviar uma tag vX.Y.Z, gera os pacotes com "npm run release"
-# e anexa à GitHub Release da versão.
+# A cada push na main: se a versão do package.json ainda não tem Release,
+# gera os pacotes com "npm run release", cria a tag vX.Y.Z e publica a
+# GitHub Release com os arquivos. Pushes sem mudança de versão (ex.: só
+# atualização da base de dados) não geram Release.
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -15,18 +22,59 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # histórico completo vai no pacote Source
+          fetch-depth: 0 # histórico completo: vai no pacote Source
+
+      - name: Verificar versão
+        id: v
+        run: |
+          V=$(node -p "require('./package.json').version")
+          echo "tag=v$V" >> "$GITHUB_OUTPUT"
+          if gh release view "v$V" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "A Release v$V já existe — nada a publicar."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Criar tags de versões anteriores que faltam
+        env:
+          CURRENT: ${{ steps.v.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          created=0
+          while read -r sha subject; do
+            t=$(printf '%s' "$subject" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+            [ -z "$t" ] && continue
+            [ "$t" = "$CURRENT" ] && continue
+            git rev-parse -q --verify "refs/tags/$t" >/dev/null && continue
+            git tag -a "$t" -m "$t" "$sha"
+            echo "tag $t -> $sha"
+            created=1
+          done < <(git log --reverse --format='%H %s')
+          if [ "$created" = 1 ]; then git push origin --tags; fi
+
       - uses: actions/setup-node@v4
+        if: steps.v.outputs.exists == 'false'
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run release
-      - name: Criar GitHub Release
+
+      - name: Gerar pacotes
+        if: steps.v.outputs.exists == 'false'
+        run: |
+          npm ci
+          npm run release
+
+      - name: Publicar GitHub Release
+        if: steps.v.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ steps.v.outputs.tag }}
         run: |
           gh release create "$TAG" releases/$TAG/*.zip releases/$TAG/RELEASE.txt \
+            --target "$GITHUB_SHA" \
             --title "SKZ Pocadex $TAG" \
             --notes-file releases/$TAG/NOTES.md

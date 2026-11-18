@@ -4,7 +4,9 @@ Web app para organizar a coleção de photocards do **Stray Kids**: veja todos o
 
 > Projeto de fã, sem afiliação com a JYP Entertainment.
 
-**Versão atual:** 0.4.1 — veja o [CHANGELOG](CHANGELOG.md).
+**Versão atual:** 0.4.2
+
+**App online:** https://nexten-dev.github.io/skz-pocadex/ · **Downloads:** [Releases](https://github.com/nexten-dev/skz-pocadex/releases) — veja o [CHANGELOG](CHANGELOG.md).
 
 ## Rodando no Windows (jeito mais fácil)
 
@@ -119,7 +121,7 @@ Os arquivos ficam em `releases/vX.Y.Z/`:
 | **Dist** `…-dist.zip` | Só usar o app | Build pronto + `abrir.bat` (Windows, não precisa de Node) + `LEIA-ME.txt` |
 | **Mobile** `…-mobile.zip` | Arquivos para o celular | Só existe quando necessário. Hoje não é: o app é instalado pelo endereço publicado |
 
-O script exige que a versão esteja documentada no `CHANGELOG.md`. No GitHub, enviar a tag (`git push --tags`) gera os pacotes automaticamente e os anexa à Release.
+O script exige que a versão esteja documentada no `CHANGELOG.md`. No GitHub isso é automático: ao enviar para a `main` um commit com versão nova no `package.json`, o workflow `release.yml` gera os pacotes, cria a tag e publica a Release.
 
 ## Versionamento
 

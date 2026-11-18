@@ -5,6 +5,13 @@ Todas as mudanças relevantes do app. Segue [Versionamento Semântico](https://s
 
 A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.DD.N`), independente da versão do app.
 
+## [0.4.2] — 2026-11-18
+
+### Alterado
+- Projeto publicado no GitHub (`nexten-dev/skz-pocadex`).
+- **Publicação automática**: a cada envio para a `main` com versão nova no `package.json`, o GitHub gera os 3 pacotes, cria a tag `vX.Y.Z` e publica a Release com os arquivos para download. Envios sem mudança de versão (ex.: só a base de dados) apenas atualizam o site.
+- O workflow também cria no GitHub as tags das versões anteriores (0.1.0 a 0.4.1).
+
 ## [0.4.1] — 2026-11-18
 
 ### Adicionado
