@@ -1262,3 +1262,22 @@ details {
   background: var(--surface);
   box-shadow: var(--shadow);
 }
+
+/* Faixa de prévias: só ela rola na horizontal, a página não */
+.hero > div:first-child {
+  flex: 1 1 320px;
+  min-width: 0;
+  max-width: 100%;
+}
+.preview-strip,
+.preview-row {
+  max-width: 100%;
+  min-width: 0;
+}
+.preview-row {
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+main {
+  overflow-x: clip;
+}

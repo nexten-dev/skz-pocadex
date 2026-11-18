@@ -5,6 +5,11 @@ Todas as mudanças relevantes do app. Segue [Versionamento Semântico](https://s
 
 A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.DD.N`), independente da versão do app.
 
+## [0.5.1] — 2026-11-18
+
+### Corrigido
+- No celular, a faixa com as prévias das versões fazia a página inteira correr para o lado. Agora só a faixa de imagens rola na horizontal, dentro da largura da tela.
+
 ## [0.5.0] — 2026-11-18
 
 ### Adicionado

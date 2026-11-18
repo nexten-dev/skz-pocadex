@@ -4,7 +4,7 @@ Web app para organizar a coleção de photocards do **Stray Kids**: veja todos o
 
 > Projeto de fã, sem afiliação com a JYP Entertainment.
 
-**Versão atual:** 0.5.0
+**Versão atual:** 0.5.1
 
 **App online:** https://nexten-dev.github.io/skz-pocadex/ · **Downloads:** [Releases](https://github.com/nexten-dev/skz-pocadex/releases) — veja o [CHANGELOG](CHANGELOG.md).
 
