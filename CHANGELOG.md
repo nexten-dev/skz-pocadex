@@ -5,6 +5,21 @@ Todas as mudanças relevantes do app. Segue [Versionamento Semântico](https://s
 
 A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.DD.N`), independente da versão do app.
 
+## [0.4.0] — 2026-11-18
+
+### Adicionado
+- **App instalável (PWA)**: depois de publicado, dá para instalar no celular e no computador.
+  - **iPhone**: Safari → Compartilhar → “Adicionar à Tela de Início”.
+  - **Android**: Chrome → ⋮ → “Instalar app”.
+  - Abre em tela cheia, com ícone próprio, e **funciona sem internet** (os arquivos do app ficam guardados no aparelho; a base de dados continua sendo atualizada a cada abertura quando há conexão).
+- Ícones do app (tela inicial, favicon e ícone adaptável do Android).
+- Aviso **“Nova versão do app disponível → Atualizar”** quando uma versão nova é publicada.
+- Configurações → **“Instalar no celular ou computador”**, com botão de instalação (quando o navegador permite) e instruções para iPhone e Android.
+- Ajustes de layout para a área do entalhe/barra de gestos em celulares com o app instalado.
+
+### Alterado
+- O modo normal e o modo dev (`iniciar.bat dev`) agora usam a **mesma porta (4173)**, então a coleção salva no navegador é a mesma nos dois modos.
+
 ## [0.3.0] — 2026-11-18
 
 ### Adicionado

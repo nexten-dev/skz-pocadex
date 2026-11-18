@@ -4,7 +4,7 @@ Web app para organizar a coleção de photocards do **Stray Kids**: veja todos o
 
 > Projeto de fã, sem afiliação com a JYP Entertainment.
 
-**Versão atual:** 0.3.0 — veja o [CHANGELOG](CHANGELOG.md).
+**Versão atual:** 0.4.0 — veja o [CHANGELOG](CHANGELOG.md).
 
 ## Rodando no Windows (jeito mais fácil)
 
@@ -108,13 +108,28 @@ As imagens são exibidas direto das wikis (não são copiadas para o projeto) e 
 - **App:** SemVer em `package.json` (`0.1.0`), exibido no rodapé. Cada versão ganha uma tag git `vX.Y.Z` e uma entrada no CHANGELOG.
 - **Dados:** `dataVersion` no JSON (`AAAA.MM.DD.N`), incrementado com `npm run data:bump`.
 
-## Deploy
+## Publicar e usar no celular
 
-Há um workflow do GitHub Actions (`.github/workflows/deploy.yml`) que publica no GitHub Pages a cada push na `main`. Em *Settings → Pages* do repositório, selecione **GitHub Actions** como fonte.
+O app precisa estar num endereço na internet para abrir no celular (o `localhost` só existe no seu computador).
+
+1. Crie um repositório **público** vazio no GitHub chamado `skz-pocadex` (sem README, .gitignore ou licença).
+2. Envie o projeto:
+   ```bash
+   git remote add origin https://github.com/SEU-USUARIO/skz-pocadex.git
+   ```
+   ```bash
+   git push -u origin main --tags
+   ```
+3. No repositório, vá em *Settings → Pages* e escolha **GitHub Actions** como fonte.
+4. Em ~2 minutos o app estará em `https://SEU-USUARIO.github.io/skz-pocadex/`. Cada push na `main` publica de novo automaticamente (`.github/workflows/deploy.yml`).
+5. No celular, abra esse endereço e instale:
+   - **iPhone**: Safari → Compartilhar → “Adicionar à Tela de Início”.
+   - **Android**: Chrome → ⋮ → “Instalar app”.
+
+A coleção de cada aparelho fica salva nele mesmo. Para levar do PC para o celular, use *Configurações → Exportar/Importar backup* (até a sincronização com nuvem pessoal chegar).
 
 ## Próximos passos sugeridos
 
 - Conferir cada lançamento com templates oficiais e marcar `verified: true`.
 - Conferir os itens extras marcados “(a confirmar)” e completar POBs/lucky draws de lançamentos antigos; itens de fanmeeting/turnê.
-- Sincronização da coleção entre aparelhos (login).
-- PWA instalável e com suporte offline completo.
+- Sincronização da coleção pela nuvem pessoal (Google Drive, depois OneDrive/Dropbox).

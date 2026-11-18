@@ -946,3 +946,35 @@ details {
 .pc-grid {
   align-items: start;
 }
+
+/* ---------- App instalado (PWA) ---------- */
+.topbar {
+  padding-top: max(0.6rem, env(safe-area-inset-top));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+.footer {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+.update-banner {
+  position: fixed;
+  left: 50%;
+  top: calc(64px + env(safe-area-inset-top));
+  transform: translateX(-50%);
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.5rem 0.6rem 0.5rem 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  font-size: 0.9rem;
+  max-width: calc(100% - 32px);
+}
+.install-steps {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+  line-height: 1.7;
+}

@@ -4,6 +4,7 @@ import { useCollection } from './lib/collection';
 import { useCustomImages } from './lib/images';
 import type { Database, ItemCategory, Photocard } from './lib/types';
 import { useVisibleCategories } from './lib/categories';
+import { usePwa } from './lib/pwa';
 import { HomeView } from './views/HomeView';
 import { ReleaseView } from './views/ReleaseView';
 import { StatsView } from './views/StatsView';
@@ -60,6 +61,7 @@ function filterIndex(full: ReturnType<typeof buildFullIndex>, visible: ItemCateg
 
 export function App() {
   const route = useHashRoute();
+  const pwa = usePwa();
   const [sync, setSync] = useState<SyncResult | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const { collection, setStatus, setQty, replace } = useCollection();
@@ -166,6 +168,14 @@ export function App() {
         {db && <> · base {db.dataVersion}</>}
         {sync?.status === 'offline' && <> · offline</>} · projeto de fã, sem afiliação com JYP Entertainment
       </footer>
+      {pwa.updateReady && (
+        <div className="update-banner" role="status">
+          <span>Nova versão do app disponível.</span>
+          <button className="btn small primary" onClick={pwa.applyUpdate}>
+            Atualizar
+          </button>
+        </div>
+      )}
       {toast && (
         <div className="toast" role="status" onClick={() => setToast(null)}>
           {toast}

@@ -6,6 +6,7 @@ import type { Collection } from '../lib/types';
 import { clearWikiCache, isWikiEnabled, setWikiEnabled } from '../lib/images';
 import { WIKI_SOURCES } from '../lib/wiki';
 import { CATEGORIES } from '../lib/categories';
+import { usePwa } from '../lib/pwa';
 
 export function SettingsView({
   db,
@@ -19,6 +20,7 @@ export function SettingsView({
 }: ViewProps & { sync: SyncResult; onSync: () => void; onReplace: (c: Collection, imgs: Record<string, { url: string; page?: string; source?: string }> | null) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState(getDataUrl());
+  const pwa = usePwa();
   const [wiki, setWiki] = useState(isWikiEnabled());
   const [cleared, setCleared] = useState(false);
   const marked = Object.keys(collection.cards).length;
@@ -87,6 +89,50 @@ export function SettingsView({
                 </li>
               ))}
             </ul>
+          </>
+        )}
+      </section>
+
+      <section className="panel">
+        <h2>Instalar no celular ou computador</h2>
+        {pwa.standalone ? (
+          <p className="small">✓ Você está usando o app instalado. Ele abre em tela cheia e funciona sem internet.</p>
+        ) : (
+          <>
+            <p className="muted small">
+              Instale o Pocadex para abrir pelo ícone na tela inicial, em tela cheia e mesmo sem internet.
+            </p>
+            {pwa.canInstall && (
+              <button className="btn primary" onClick={pwa.promptInstall}>
+                Instalar app
+              </button>
+            )}
+            {pwa.platform === 'ios' && (
+              <ol className="small install-steps">
+                <li>Abra esta página no <strong>Safari</strong>.</li>
+                <li>
+                  Toque em <strong>Compartilhar</strong> (quadrado com seta para cima).
+                </li>
+                <li>
+                  Escolha <strong>“Adicionar à Tela de Início”</strong> e confirme.
+                </li>
+              </ol>
+            )}
+            {pwa.platform === 'android' && !pwa.canInstall && (
+              <ol className="small install-steps">
+                <li>Abra esta página no <strong>Chrome</strong>.</li>
+                <li>
+                  Toque no menu <strong>⋮</strong> e escolha <strong>“Instalar app”</strong> ou{' '}
+                  <strong>“Adicionar à tela inicial”</strong>.
+                </li>
+              </ol>
+            )}
+            {pwa.platform === 'desktop' && !pwa.canInstall && (
+              <p className="small muted">
+                No Chrome ou Edge, use o ícone de instalação na barra de endereço. No celular, abra o mesmo endereço
+                deste site e siga as instruções que aparecem aqui.
+              </p>
+            )}
           </>
         )}
       </section>
