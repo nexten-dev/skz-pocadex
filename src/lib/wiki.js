@@ -109,6 +109,23 @@ function pageNames(release) {
   return [...new Set([release.wikiPage, release.altTitle, release.title].filter(Boolean))];
 }
 
+/** Busca páginas da wiki pelo título (para nomes diferentes do app, ex.: singles japoneses). */
+async function searchPages(source, release, fetchImpl) {
+  const found = [];
+  for (const q of pageNames(release)) {
+    const d = await api(source, { action: 'query', list: 'search', srnamespace: '0', srlimit: '5', srsearch: q }, fetchImpl).catch(
+      () => null,
+    );
+    for (const r of d?.query?.search ?? []) if (!r.title.includes('/')) found.push(r.title);
+  }
+  // Só aceita páginas que contêm uma palavra marcante do título (evita "I Am NOT" → "I Am WHO").
+  const STOP = new Set(['the', 'and', 'ver', 'version', 'japanese', 'stray', 'kids', 'album', 'mini', 'special', 'skz']);
+  const tokens = pageNames(release)
+    .flatMap((n) => norm(n).split(/[\s/.:!?-]+/))
+    .filter((t) => t.length >= 3 && !STOP.has(t));
+  return [...new Set(found)].filter((title) => tokens.some((t) => hasWord(norm(title), t)));
+}
+
 /** Rótulo da versão a partir do nome do arquivo de prévia. */
 export function previewLabel(title) {
   return title
@@ -128,7 +145,10 @@ export function previewKeys(previewTitle, sets, slug) {
   for (const set of sets) {
     const versions = set.versions?.length ? set.versions : [null];
     for (const v of versions) {
-      const base = (v ?? set.name).split('—')[0].replace(/\b(ver\.?|version|vers[aã]o|edi[cç][aã]o)\b/gi, '').trim();
+      const base = (v ?? set.name)
+        .split('—')[0]
+        .replace(/(^|\s)(ver|version|vers[aã]o|edi[cç][aã]o)\.?(?=\s|$)/gi, ' ')
+        .trim();
       const tok = norm(base);
       if (tok && hasWord(label, tok)) keys.push(`${set.id}|${v ? slug(v) : '_'}`);
     }
@@ -144,7 +164,15 @@ export async function collectReleaseMedia(release, memberIds, fetchImpl = fetch,
   for (const source of sources) {
     let titles = [];
     let galleryPage = null;
-    for (const name of pageNames(release)) {
+    const tried = new Set();
+    const names = [...pageNames(release)];
+    const candidatesFor = async function* () {
+      for (const n of names) yield n;
+      for (const n of await searchPages(source, release, fetchImpl)) yield n;
+    };
+    for await (const name of candidatesFor()) {
+      if (tried.has(name)) continue;
+      tried.add(name);
       let imgs;
       try {
         imgs = await pageImages(source, `${name}/Gallery`, fetchImpl);
@@ -167,7 +195,7 @@ export async function collectReleaseMedia(release, memberIds, fetchImpl = fetch,
       const best = images
         .filter((t) => detectMember(t, memberIds) === id)
         .map((t) => ({ t, s: conceptScore(t) }))
-        .filter((x) => x.s > 0)
+        .filter((x) => x.s >= 0)
         .sort((a, b) => b.s - a.s || a.t.localeCompare(b.t, undefined, { numeric: true }))[0];
       if (best) memberPick[id] = best.t;
     }
