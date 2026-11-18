@@ -27,7 +27,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: images
+  group: data
   cancel-in-progress: false
 
 jobs:

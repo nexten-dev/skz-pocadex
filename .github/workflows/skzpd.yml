@@ -1,0 +1,66 @@
+name: Photocards do SKZPD
+
+# Importa a lista de photocards e as fotos do SKZPD (https://skzpd.com,
+# Stray Kids Photocard Database por Manyo — github.com/manyodev/skzpd).
+#   - Automático: toda quarta-feira, modo "gravar" (pega novidades do SKZPD).
+#   - Manual: Actions → "Photocards do SKZPD" → Run workflow.
+#       testar: mostra o que mudaria e testa se as fotos abrem (não altera nada)
+#       gravar: grava na base, publica e atualiza o site
+on:
+  schedule:
+    - cron: '41 10 * * 3'
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'testar ou gravar'
+        type: choice
+        options: [testar, gravar]
+        default: testar
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: data
+  cancel-in-progress: false
+
+jobs:
+  skzpd:
+    runs-on: ubuntu-latest
+    env:
+      MODO: ${{ inputs.modo || 'gravar' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Baixar o SKZPD (só as páginas, sem as imagens)
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/manyodev/skzpd "$RUNNER_TEMP/skzpd"
+          git -C "$RUNNER_TEMP/skzpd" sparse-checkout set src
+          git -C "$RUNNER_TEMP/skzpd" log -1 --format='SKZPD: %h %cd %s'
+
+      - name: Importar (no modo testar, nada é salvo no repositório)
+        run: node scripts/skzpd-import.mjs "$RUNNER_TEMP/skzpd"
+
+      - name: Testar se as fotos abrem
+        run: node scripts/check-images.mjs 6
+
+      - name: Publicar base atualizada
+        if: env.MODO == 'gravar'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- public/data/photocards.json; then
+            echo "Nada mudou no SKZPD — nada a publicar."
+            exit 0
+          fi
+          npm run data:bump
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/photocards.json
+          git commit -m "data: photocards do SKZPD ($(node -p "require('./public/data/photocards.json').dataVersion"))"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          gh workflow run deploy.yml --ref main
