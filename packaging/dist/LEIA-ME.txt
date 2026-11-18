@@ -1,0 +1,36 @@
+SKZ Pocadex v{{VERSION}} - pacote para uso (Dist)
+=================================================
+
+Este pacote tem so o necessario para usar o app, sem codigo-fonte.
+
+COMO ABRIR NO WINDOWS
+  1. Descompacte o .zip numa pasta (ex.: Documentos\SKZ Pocadex).
+  2. De dois cliques em "abrir.bat".
+  3. O navegador abre em http://localhost:4173
+  4. Para encerrar, feche a janela preta.
+
+  Nao precisa instalar nada: ele usa o PowerShell que ja vem no Windows.
+  Se o Windows mostrar "O Windows protegeu o computador", clique em
+  "Mais informacoes" > "Executar assim mesmo" (o aviso aparece porque o
+  arquivo veio da internet).
+
+  O endereco (localhost:4173) e o mesmo do modo de desenvolvimento, entao
+  a colecao salva no navegador e a mesma.
+
+COMO ABRIR NO MAC OU LINUX
+  No terminal, dentro da pasta "app":
+      python3 -m http.server 4173
+  e abra http://localhost:4173 no navegador.
+
+PUBLICAR NA INTERNET (para usar no celular)
+  O conteudo da pasta "app" pode ser enviado para qualquer hospedagem de
+  sites estaticos (GitHub Pages, Netlify, Cloudflare Pages...). Depois,
+  abra o endereco no celular e use "Adicionar a Tela de Inicio".
+
+IMPORTANTE
+  Abrir o index.html direto (dando dois cliques nele) NAO funciona: o
+  navegador bloqueia o carregamento da base de dados nesse modo. Use o
+  abrir.bat ou uma hospedagem.
+
+  Sua colecao fica salva no navegador. Faca backup em
+  Configuracoes > Exportar backup.
