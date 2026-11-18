@@ -106,6 +106,8 @@ db.imageHosts = {
   inf: { base: 'https://ndc.infludeo.com/media/photocard_blur/', thumb: '?f=auto&q=75&w=320', full: '?f=auto&q=80&w=800' },
   skzpd: { base: 'https://skzpd.com/images/' },
 };
+// Miniaturas de imagens grandes (scans do SKZPD, Pinterest…) passam por um redimensionador
+db.imageProxy = 'https://wsrv.nl/?url={url}&w={w}&output=webp&q=80';
 function compact(url) {
   const inf = url.match(/^https:\/\/ndc\.infludeo\.com\/media\/photocard_blur\/([^?]+)/);
   if (inf) return `inf:${inf[1]}`;

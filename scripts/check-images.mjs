@@ -6,17 +6,22 @@ import { readFileSync } from 'node:fs';
 const db = JSON.parse(readFileSync(new URL('../public/data/photocards.json', import.meta.url), 'utf-8'));
 const per = Number(process.argv[2] ?? 6);
 
-function resolve(v, size) {
+// Mesma lógica de src/lib/images.ts (resolveImage)
+function resolve(v, size, width = 360) {
   const m = v.match(/^([a-z0-9]+):(?!\/\/)(.+)$/i);
   const h = m && db.imageHosts?.[m[1]];
-  return h ? encodeURI(h.base + m[2]) + (h[size] ?? '') : v;
+  const url = h ? encodeURI(h.base + m[2]) : v;
+  if (h?.[size]) return url + h[size];
+  if (size === 'thumb' && db.imageProxy) return db.imageProxy.replace('{url}', encodeURIComponent(url)).replace('{w}', String(width));
+  return url;
 }
 
 const byHost = new Map();
 for (const r of db.releases)
   for (const v of Object.values(r.images ?? {})) {
     const url = resolve(typeof v === 'string' ? v : v.url, 'thumb');
-    const host = new URL(url).host;
+    const orig = resolve(typeof v === 'string' ? v : v.url, 'full');
+    const host = `${new URL(orig).host} → ${new URL(url).host}`;
     if (!byHost.has(host)) byHost.set(host, []);
     byHost.get(host).push(url);
   }
@@ -37,6 +42,6 @@ for (const [host, urls] of byHost) {
       results.push(`erro ${e.message}`);
     }
   }
-  console.log(`${host.padEnd(24)} ${String(urls.length).padStart(5)} imagens · amostra: ${results.join(' | ')}`);
+  console.log(`${host.padEnd(36)} ${String(urls.length).padStart(5)} imagens · amostra: ${results.join(' | ')}`);
 }
 console.log(bad ? `\n⚠ ${bad} imagens da amostra não abriram.` : '\n✔ Todas as imagens da amostra abriram.');
