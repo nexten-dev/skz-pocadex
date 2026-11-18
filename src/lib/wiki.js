@@ -1,16 +1,19 @@
-// Busca de prévias de photocards em wikis MediaWiki (Fandom).
-// Arquivo em JS puro para ser usado tanto pelo app (navegador) quanto pelo
-// script scripts/fetch-images.mjs (Node).
+// Coleta de imagens nas wikis (MediaWiki/Fandom) para a base de dados.
+// Roda no GitHub Actions (scripts/fetch-images.mjs), que tem acesso às wikis.
+//
+// O que a Stray Kids Wiki oferece (diagnóstico de nov/2026):
+//  - NÃO há fotos individuais dos photocards;
+//  - cada álbum tem a página "<Álbum>/Gallery" com:
+//      * "Album Preview <versão>": imagem oficial do conteúdo de cada versão;
+//      * teasers / fotos de capa de cada membro na era do álbum.
 
-/** @type {{ id: string, name: string, api: string }[]} */
+/** @type {{ id: string, name: string, api: string, wiki: string }[]} */
 export const WIKI_SOURCES = [
-  { id: 'skz', name: 'Stray Kids Wiki', api: 'https://stray-kids.fandom.com/api.php' },
-  { id: 'kpop', name: 'Kpop Wiki', api: 'https://kpop.fandom.com/api.php' },
+  { id: 'skz', name: 'Stray Kids Wiki', api: 'https://stray-kids.fandom.com/api.php', wiki: 'https://stray-kids.fandom.com/wiki/' },
+  { id: 'kpop', name: 'Kpop Wiki', api: 'https://kpop.fandom.com/api.php', wiki: 'https://kpop.fandom.com/wiki/' },
 ];
 
-const PC_RE = /photo ?cards?|\bpcs?\b|포토카드|トレカ|selfie ?card|\bpoca\b/;
-
-/** Apelidos usados para identificar o membro no nome do arquivo (mais longos primeiro). */
+/** Apelidos usados para identificar o membro no nome do arquivo. */
 export const MEMBER_ALIASES = {
   bangchan: ['bang chan', 'bangchan', 'christopher', 'chris', 'chan'],
   leeknow: ['lee know', 'leeknow', 'lee minho', 'minho'],
@@ -19,7 +22,7 @@ export const MEMBER_ALIASES = {
   han: ['han jisung', 'jisung', 'han'],
   felix: ['lee felix', 'felix', 'yongbok'],
   seungmin: ['kim seungmin', 'seungmin'],
-  in: ['yang jeongin', 'jeongin', 'i.n', 'i n'],
+  in: ['yang jeongin', 'jeongin', 'i.n'],
   woojin: ['kim woojin', 'woojin'],
 };
 
@@ -30,181 +33,155 @@ export function norm(s) {
     .toLowerCase()
     .replace(/^file:/, '')
     .replace(/\.(png|jpe?g|gif|webp)$/, '')
-    .replace(/[_\-()[\],]+/g, ' ')
+    .replace(/[_\-()[\],'"“”&+]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-function hasWord(text, word) {
+export function hasWord(text, word) {
   const esc = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`(^|[^a-z0-9])${esc}([^a-z0-9]|$)`).test(text);
 }
 
-/** Descobre qual membro aparece no nome do arquivo (ou null se nenhum/mais de um). */
+/** Qual membro aparece no nome do arquivo (null se nenhum ou mais de um). */
 export function detectMember(title, memberIds) {
   const t = norm(title);
-  const found = [];
-  for (const id of memberIds) {
-    const aliases = MEMBER_ALIASES[id] ?? [id];
-    if (aliases.some((a) => hasWord(t, a))) found.push(id);
-  }
-  // "chan" casa dentro de "bang chan"; "han" isolado não deve casar com "changbin"
+  const found = memberIds.filter((id) => (MEMBER_ALIASES[id] ?? [id]).some((a) => hasWord(t, a)));
   return found.length === 1 ? found[0] : null;
 }
 
-export function isPhotocard(title) {
-  return PC_RE.test(norm(title));
+const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
+const PERFORMANCE = /inkigayo|countdown|music core|music bank|show champion|the show|fancam|stage|airport|concert|tour|live|award|festival|radio|weverse|vlive|instagram|twitter|selca|mv shorts/i;
+
+/** Pontuação de uma foto de divulgação (maior = melhor para representar o membro). */
+function conceptScore(title) {
+  const t = title.toLowerCase();
+  let s = 0;
+  if (/teaser/.test(t)) s += 4;
+  if (/jacket|concept|profile|promotional/.test(t)) s += 3;
+  if (/clean/.test(t)) s += 1;
+  if (/behind|making/.test(t)) s -= 1;
+  if (PERFORMANCE.test(t)) s -= 10;
+  return s;
 }
 
-function releaseTokens(release) {
-  return [release.title, release.altTitle]
-    .filter(Boolean)
-    .map((t) => norm(t).replace(/[^a-z0-9぀-ヿ一-鿿가-힯 ]/g, '').trim())
-    .filter((t) => t.length >= 2);
-}
-
-function mentionsRelease(title, release) {
-  const t = norm(title).replace(/[^a-z0-9぀-ヿ一-鿿가-힯 ]/g, '');
-  return releaseTokens(release).some((tok) => t.includes(tok) || t.replace(/ /g, '').includes(tok.replace(/ /g, '')));
-}
-
-async function api(base, params, fetchImpl) {
+async function api(source, params, fetchImpl) {
   const qs = new URLSearchParams({ format: 'json', formatversion: '2', origin: '*', ...params });
-  const res = await fetchImpl(`${base}?${qs}`);
+  const res = await fetchImpl(`${source.api}?${qs}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-function pagesToCandidates(pages, source) {
+/** Todas as imagens usadas numa página (com paginação); null se a página não existe. */
+async function pageImages(source, title, fetchImpl) {
   const out = [];
-  for (const p of pages ?? []) {
-    const info = p.imageinfo?.[0];
-    if (!info) continue;
-    out.push({
-      title: p.title,
-      thumb: info.thumburl || info.url,
-      url: info.url,
-      page: info.descriptionurl,
-      source: source.name,
-    });
+  let cont = {};
+  for (let i = 0; i < 20; i++) {
+    const d = await api(source, { action: 'query', prop: 'images', titles: title, imlimit: '500', ...cont }, fetchImpl);
+    const p = d.query?.pages?.[0];
+    if (!p || p.missing || p.invalid) return null;
+    out.push(...(p.images ?? []).map((x) => x.title));
+    if (!d.continue) break;
+    cont = d.continue;
   }
   return out;
 }
 
+async function imageInfo(source, titles, fetchImpl) {
+  const info = new Map();
+  for (let i = 0; i < titles.length; i += 25) {
+    const batch = titles.slice(i, i + 25);
+    const d = await api(
+      source,
+      { action: 'query', prop: 'imageinfo', titles: batch.join('|'), iiprop: 'url', iiurlwidth: '480' },
+      fetchImpl,
+    );
+    for (const p of d.query?.pages ?? []) {
+      const ii = p.imageinfo?.[0];
+      if (ii) info.set(p.title, { url: ii.url, thumb: ii.thumburl || ii.url, page: ii.descriptionurl, title: p.title, source: source.name });
+    }
+  }
+  return info;
+}
+
+/** Nomes de página prováveis para o lançamento na wiki. */
+function pageNames(release) {
+  return [...new Set([release.wikiPage, release.altTitle, release.title].filter(Boolean))];
+}
+
+/** Rótulo da versão a partir do nome do arquivo de prévia. */
+export function previewLabel(title) {
+  return title
+    .replace(/^File:/, '')
+    .replace(/\.\w+$/, '')
+    .replace(/^.*album preview\s*/i, '')
+    .trim();
+}
+
 /**
- * Procura arquivos de photocard de um lançamento nas wikis.
- * Retorna candidatos { title, thumb, url, page, source, member }.
+ * Associa cada prévia de versão aos grupos (set|versão) do app.
+ * Retorna as chaves "setId|versaoSlug" que a prévia representa.
  */
-export async function findReleaseImages(release, memberIds, fetchImpl = fetch, sources = WIKI_SOURCES) {
-  const names = [release.title, release.altTitle].filter(Boolean);
-  const seen = new Set();
-  const all = [];
+export function previewKeys(previewTitle, sets, slug) {
+  const label = norm(previewLabel(previewTitle));
+  const keys = [];
+  for (const set of sets) {
+    const versions = set.versions?.length ? set.versions : [null];
+    for (const v of versions) {
+      const base = (v ?? set.name).split('—')[0].replace(/\b(ver\.?|version|vers[aã]o|edi[cç][aã]o)\b/gi, '').trim();
+      const tok = norm(base);
+      if (tok && hasWord(label, tok)) keys.push(`${set.id}|${v ? slug(v) : '_'}`);
+    }
+  }
+  return keys;
+}
+
+/**
+ * Coleta as imagens de um lançamento: prévias das versões e uma foto de
+ * divulgação por membro. Tenta as wikis em ordem e usa a primeira que tiver galeria.
+ */
+export async function collectReleaseMedia(release, memberIds, fetchImpl = fetch, sources = WIKI_SOURCES) {
   for (const source of sources) {
-    const batches = [];
-    for (const name of names) {
-      // 1) Busca no namespace de arquivos
-      for (const kw of ['photocard', 'PC']) {
-        batches.push(
-          api(
-            source.api,
-            {
-              action: 'query',
-              generator: 'search',
-              gsrnamespace: '6',
-              gsrlimit: '50',
-              gsrsearch: `${name} ${kw}`,
-              prop: 'imageinfo',
-              iiprop: 'url',
-              iiurlwidth: '360',
-            },
-            fetchImpl,
-          ).then((d) => pagesToCandidates(d.query?.pages, source)),
-        );
+    let titles = [];
+    let galleryPage = null;
+    for (const name of pageNames(release)) {
+      let imgs;
+      try {
+        imgs = await pageImages(source, `${name}/Gallery`, fetchImpl);
+      } catch {
+        imgs = null;
       }
-      // 2) Imagens da página de galeria do álbum
-      for (const page of [`${name}/Gallery`, name]) {
-        batches.push(
-          api(
-            source.api,
-            {
-              action: 'query',
-              generator: 'images',
-              titles: page,
-              gimlimit: '200',
-              prop: 'imageinfo',
-              iiprop: 'url',
-              iiurlwidth: '360',
-            },
-            fetchImpl,
-          ).then((d) => pagesToCandidates(d.query?.pages, source)),
-        );
+      if (imgs?.length) {
+        galleryPage = `${name}/Gallery`;
+        const main = await pageImages(source, name, fetchImpl).catch(() => null);
+        titles = [...new Set([...imgs, ...(main ?? [])])];
+        break;
       }
     }
-    const results = await Promise.allSettled(batches);
-    for (const r of results) {
-      if (r.status !== 'fulfilled') continue;
-      for (const c of r.value) {
-        if (seen.has(c.url)) continue;
-        seen.add(c.url);
-        if (!isPhotocard(c.title)) continue;
-        if (!mentionsRelease(c.title, release)) continue;
-        const member = detectMember(c.title, memberIds);
-        all.push({ ...c, member });
-      }
-    }
-  }
-  return all.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
-}
+    if (!galleryPage) continue;
 
-function trailingNumber(title) {
-  const m = norm(title).match(/(?:^| )(\d{1,2})$/);
-  return m ? Number(m[1]) : null;
-}
-
-/**
- * Associa candidatos aos cards.
- * - "exact": membro + versão (quando houver) batem no nome do arquivo
- * - "member": só o membro bate; imagem é uma prévia aproximada
- * Retorna Map<cardId, { ...candidate, confidence }>.
- */
-export function matchImages(cards, candidates) {
-  const result = new Map();
-  const used = new Set();
-  const byMember = new Map();
-  for (const c of candidates) {
-    if (!c.member) continue;
-    if (!byMember.has(c.member)) byMember.set(c.member, []);
-    byMember.get(c.member).push(c);
-  }
-  const versionHit = (cand, version) => version && hasWord(norm(cand.title), norm(version));
-
-  // Passo 1: membro + versão (+ número)
-  for (const card of cards) {
-    const list = byMember.get(card.memberId) ?? [];
-    const hit =
-      list.find((c) => !used.has(c.url) && versionHit(c, card.version) && trailingNumber(c.title) === card.index) ??
-      list.find((c) => !used.has(c.url) && versionHit(c, card.version));
-    if (hit) {
-      used.add(hit.url);
-      result.set(card.id, { ...hit, confidence: 'exact' });
+    const images = titles.filter((t) => IMAGE_EXT.test(t));
+    const previews = images.filter((t) => /album preview/i.test(t)).sort();
+    const memberPick = {};
+    for (const id of memberIds) {
+      const best = images
+        .filter((t) => detectMember(t, memberIds) === id)
+        .map((t) => ({ t, s: conceptScore(t) }))
+        .filter((x) => x.s > 0)
+        .sort((a, b) => b.s - a.s || a.t.localeCompare(b.t, undefined, { numeric: true }))[0];
+      if (best) memberPick[id] = best.t;
     }
+    const cover = images.find((t) => /digital cover/i.test(t));
+    const info = await imageInfo(source, [...previews, ...Object.values(memberPick), ...(cover ? [cover] : [])], fetchImpl);
+
+    return {
+      source: source.name,
+      gallery: source.wiki + encodeURIComponent(galleryPage.replace(/ /g, '_')).replace(/%2F/g, '/'),
+      totalImages: images.length,
+      cover: cover ? info.get(cover) ?? null : null,
+      previews: previews.map((t) => info.get(t)).filter(Boolean).map((img) => ({ label: previewLabel(img.title), ...img })),
+      members: Object.fromEntries(Object.entries(memberPick).map(([id, t]) => [id, info.get(t)]).filter(([, v]) => v)),
+    };
   }
-  // Passo 2: membro com um único card no lançamento — o membro basta
-  const perMemberCount = new Map();
-  for (const card of cards) perMemberCount.set(card.memberId, (perMemberCount.get(card.memberId) ?? 0) + 1);
-  for (const card of cards) {
-    if (result.has(card.id) || perMemberCount.get(card.memberId) !== 1) continue;
-    const hit = (byMember.get(card.memberId) ?? []).find((c) => !used.has(c.url));
-    if (hit) {
-      used.add(hit.url);
-      result.set(card.id, { ...hit, confidence: 'exact' });
-    }
-  }
-  // Passo 3: sobras do membro viram prévia aproximada (sem marcar como usadas)
-  for (const card of cards) {
-    if (result.has(card.id)) continue;
-    const list = (byMember.get(card.memberId) ?? []).filter((c) => !used.has(c.url));
-    if (list.length) result.set(card.id, { ...list[0], confidence: 'member' });
-  }
-  return result;
+  return null;
 }

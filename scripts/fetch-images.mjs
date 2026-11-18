@@ -1,71 +1,73 @@
-// Procura prévias de photocards nas wikis e grava na base de dados
-// (public/data/photocards.json), para que todos recebam as imagens
-// na próxima atualização automática do app.
+// Coleta imagens das wikis e grava na base (public/data/photocards.json),
+// para que todos recebam na próxima atualização automática do app.
+// Roda no GitHub Actions (workflow "Prévias das wikis"), que tem acesso às wikis.
+//
+// Para cada lançamento grava em release.media:
+//   - previews: prévia oficial do conteúdo de cada versão do álbum
+//   - members:  uma foto de divulgação de cada membro na era
+//   - cover:    capa digital
 //
 // Uso:
-//   npm run images:fetch                 -> todos os lançamentos
-//   npm run images:fetch -- maxident ate -> só os IDs informados
-//   npm run images:fetch -- --dry        -> só mostra o que encontraria
-//   npm run images:fetch -- --approx     -> também grava prévias aproximadas (≈)
-//   npm run images:fetch -- --verbose    -> lista cada imagem encontrada e onde foi usada
-//
-// Só preenche cards que ainda não têm imagem na base. Depois de rodar,
-// confira o resultado no app e execute "npm run data:bump" antes de publicar.
+//   node scripts/fetch-images.mjs                 -> todos os lançamentos
+//   node scripts/fetch-images.mjs maxident ate    -> só os IDs informados
+//   node scripts/fetch-images.mjs --dry           -> só mostra o que encontraria
+//   node scripts/fetch-images.mjs --verbose       -> lista as imagens escolhidas
 import { readFileSync, writeFileSync } from 'node:fs';
-import { expandRelease, releaseMembers } from '../src/lib/expand.js';
-import { findReleaseImages, matchImages } from '../src/lib/wiki.js';
+import { releaseMembers, slug } from '../src/lib/expand.js';
+import { collectReleaseMedia, previewKeys } from '../src/lib/wiki.js';
 
 const FILE = new URL('../public/data/photocards.json', import.meta.url);
 const args = process.argv.slice(2);
 const dry = args.includes('--dry');
-const approx = args.includes('--approx');
 const verbose = args.includes('--verbose');
 const only = args.filter((a) => !a.startsWith('--'));
 
 const db = JSON.parse(readFileSync(FILE, 'utf-8'));
 const politeFetch = async (url) => {
   await new Promise((r) => setTimeout(r, 250)); // não sobrecarregar a wiki
-  return fetch(url, { headers: { 'User-Agent': 'skz-pocadex-image-fetcher/1.0' } });
+  return fetch(url, { headers: { 'User-Agent': 'skz-pocadex-image-fetcher/2.0 (projeto de fã)' } });
 };
 
-let added = 0;
+const stable = (x) => JSON.stringify(x ?? null);
+let changed = 0;
+let withMedia = 0;
 for (const release of db.releases) {
   if (only.length && !only.includes(release.id)) continue;
-  const cards = expandRelease(db, release);
   process.stdout.write(`• ${release.title.padEnd(42)} `);
-  let candidates;
+  let media;
   try {
-    candidates = await findReleaseImages(release, releaseMembers(db, release), politeFetch);
+    media = await collectReleaseMedia(release, releaseMembers(db, release), politeFetch);
   } catch (e) {
     console.log(`erro: ${e.message}`);
     continue;
   }
-  const matches = matchImages(cards, candidates);
-  let n = 0;
-  for (const [cardId, m] of matches) {
-    if (m.confidence !== 'exact' && !approx) continue;
-    release.images ??= {};
-    if (release.images[cardId]) continue;
-    release.images[cardId] = { url: m.url, thumb: m.thumb, page: m.page, source: m.source };
-    n++;
+  if (!media) {
+    console.log('galeria não encontrada na wiki');
+    continue;
   }
-  added += n;
-  console.log(`${candidates.length} imagens na wiki, ${n} novas associadas`);
+  withMedia++;
+  media.previews = media.previews.map((p) => ({ ...p, keys: previewKeys(p.title ?? p.label, release.sets, slug) }));
+  const { totalImages, ...toSave } = media;
+  console.log(
+    `${totalImages} imagens na galeria · ${media.previews.length} prévias de versão · ` +
+      `${Object.keys(media.members).length}/${releaseMembers(db, release).length} membros`,
+  );
   if (verbose) {
-    const byUrl = new Map();
-    for (const [cardId, m] of matches) byUrl.set(m.url, [...(byUrl.get(m.url) ?? []), `${cardId} (${m.confidence})`]);
-    for (const c of candidates) {
-      console.log(`    ${c.member ?? '?'.padEnd(8)} ${c.title}  [${c.source}]`);
-      for (const m of byUrl.get(c.url) ?? []) console.log(`        → ${m}`);
-    }
+    for (const p of media.previews) console.log(`    prévia  ${p.label.padEnd(36)} → ${p.keys.join(', ') || '(sem grupo correspondente)'}`);
+    for (const [id, m] of Object.entries(media.members)) console.log(`    membro  ${id.padEnd(10)} ${m.title}`);
+    if (media.cover) console.log(`    capa    ${media.cover.title}`);
+  }
+  const before = release.media ? { ...release.media, updatedAt: undefined } : null;
+  if (stable(before) !== stable({ ...toSave, updatedAt: undefined })) {
+    release.media = { ...toSave, updatedAt: new Date().toISOString().slice(0, 10) };
+    changed++;
   }
 }
 
+console.log(`\n${withMedia} lançamentos com galeria; ${changed} com imagens novas ou alteradas.`);
 if (dry) {
-  console.log(`\n(--dry) ${added} imagens seriam gravadas. Nada foi alterado.`);
-} else if (added > 0) {
+  console.log('(--dry) Nada foi gravado.');
+} else if (changed > 0) {
   writeFileSync(FILE, JSON.stringify(db, null, 2) + '\n');
-  console.log(`\n✔ ${added} imagens gravadas. Confira no app e rode "npm run data:bump" antes de publicar.`);
-} else {
-  console.log('\nNenhuma imagem nova encontrada.');
+  console.log('✔ Base atualizada. Rode "npm run data:bump" antes de publicar.');
 }

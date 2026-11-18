@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { countCards, memberMap, PhotocardTile, Progress, type ViewProps } from '../components/common';
 import { CATEGORIES } from '../lib/categories';
+import { isTransit, nextStatus, STATUS_INFO, TRANSIT_STEPS } from '../lib/status';
+import type { Photocard, TransitStatus } from '../lib/types';
 
 export function StatsView({ db, index, collection, setStatus }: ViewProps) {
   const members = memberMap(db);
@@ -19,13 +21,13 @@ export function StatsView({ db, index, collection, setStatus }: ViewProps) {
     [db, index, collection],
   );
 
-  const byStatus = (s: 'transit' | 'wish') =>
-    index.all
-      .filter((c) => collection.cards[c.id]?.s === s)
-      .sort((a, b) => (collection.cards[b.id]?.t ?? 0) - (collection.cards[a.id]?.t ?? 0));
-
-  const transit = byStatus('transit');
-  const wish = byStatus('wish');
+  const recent = (a: Photocard, b: Photocard) => (collection.cards[b.id]?.t ?? 0) - (collection.cards[a.id]?.t ?? 0);
+  const transit = index.all.filter((c) => isTransit(collection.cards[c.id]?.s)).sort(recent);
+  const wish = index.all.filter((c) => collection.cards[c.id]?.s === 'wish').sort(recent);
+  const byStep = new Map<TransitStatus, Photocard[]>(TRANSIT_STEPS.map((t) => [t.id as TransitStatus, []]));
+  for (const c of transit) byStep.get(collection.cards[c.id].s as TransitStatus)?.push(c);
+  const [stepFilter, setStepFilter] = useState<TransitStatus | 'all'>('all');
+  const label = (c: Photocard) => `${releaseTitle.get(c.releaseId)}${c.version ? ` · ${c.version}` : ''}`;
 
   return (
     <>
@@ -57,6 +59,10 @@ export function StatsView({ db, index, collection, setStatus }: ViewProps) {
         <div className="tile">
           <span className="tile-num">{overall.total - overall.owned}</span>
           <span className="muted small">Faltando</span>
+        </div>
+        <div className="tile">
+          <span className="tile-num notwant-c">{overall.notwant}</span>
+          <span className="muted small">Não quero</span>
         </div>
       </div>
 
@@ -99,35 +105,80 @@ export function StatsView({ db, index, collection, setStatus }: ViewProps) {
 
       <div className="section-head">
         <h2>A caminho ({transit.length})</h2>
-        {transit.length > 0 && (
-          <button
-            className="btn small"
-            onClick={() => {
-              if (confirm(`Marcar os ${transit.length} photocards a caminho como recebidos?`))
-                setStatus(transit.map((c) => c.id), 'owned');
-            }}
-          >
-            Chegou tudo ✓
-          </button>
-        )}
       </div>
       {transit.length === 0 ? (
-        <p className="muted small">Nenhum photocard a caminho. Marque com “✈ A caminho” na página do álbum.</p>
+        <p className="muted small">
+          Nenhum item a caminho. Na página do álbum, use “🚚 A caminho” e escolha a etapa da compra.
+        </p>
       ) : (
         <>
-          <p className="muted small">Toque num card quando ele chegar para movê-lo para “Tenho”.</p>
-          <div className="pc-grid">
-            {transit.map((c) => (
-              <PhotocardTile
-                key={c.id}
-                card={c}
-                member={members.get(c.memberId)}
-                status="transit"
-                showRelease={`${releaseTitle.get(c.releaseId)}${c.version ? ` · ${c.version}` : ''}`}
-                onClick={() => setStatus([c.id], 'owned')}
-              />
-            ))}
+          <div className="pipeline" role="group" aria-label="Etapas da compra">
+            <button className={stepFilter === 'all' ? 'pipe-step on' : 'pipe-step'} onClick={() => setStepFilter('all')}>
+              <span className="pipe-icon">📦</span>
+              <span className="pipe-label">Todas</span>
+              <span className="pipe-count">{transit.length}</span>
+            </button>
+            {TRANSIT_STEPS.map((t) => {
+              const n = byStep.get(t.id as TransitStatus)?.length ?? 0;
+              return (
+                <button
+                  key={t.id}
+                  className={`pipe-step ${stepFilter === t.id ? 'on' : ''} ${n ? '' : 'empty'}`}
+                  onClick={() => setStepFilter(t.id as TransitStatus)}
+                  title={t.description}
+                >
+                  <span className="pipe-icon">{t.icon}</span>
+                  <span className="pipe-label">
+                    {t.step}. {t.label}
+                  </span>
+                  <span className="pipe-count">{n}</span>
+                </button>
+              );
+            })}
           </div>
+          <p className="muted small">
+            Toque num card para avançar para a próxima etapa. Depois de “Enviado”, ele vai para “Tenho”.
+          </p>
+          {TRANSIT_STEPS.filter((t) => stepFilter === 'all' || stepFilter === t.id).map((t) => {
+            const list = byStep.get(t.id as TransitStatus) ?? [];
+            if (!list.length) return null;
+            const next = nextStatus(t.id as TransitStatus);
+            return (
+              <section key={t.id} className="pc-group">
+                <header>
+                  <div>
+                    <h2>
+                      {t.icon} {t.step}. {t.label} ({list.length})
+                    </h2>
+                    <p className="small muted">{t.description}</p>
+                  </div>
+                  <div className="group-actions">
+                    <button
+                      className="btn small"
+                      onClick={() => {
+                        if (confirm(`Mover ${list.length} itens de “${t.label}” para “${STATUS_INFO[next].label}”?`))
+                          setStatus(list.map((c) => c.id), next);
+                      }}
+                    >
+                      Todos → {STATUS_INFO[next].label}
+                    </button>
+                  </div>
+                </header>
+                <div className="pc-grid">
+                  {list.map((c) => (
+                    <PhotocardTile
+                      key={c.id}
+                      card={c}
+                      member={members.get(c.memberId)}
+                      status={t.id as TransitStatus}
+                      showRelease={label(c)}
+                      onClick={() => setStatus([c.id], next)}
+                    />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
         </>
       )}
 
@@ -142,7 +193,7 @@ export function StatsView({ db, index, collection, setStatus }: ViewProps) {
               card={c}
               member={members.get(c.memberId)}
               status="wish"
-              showRelease={`${releaseTitle.get(c.releaseId)}${c.version ? ` · ${c.version}` : ''}`}
+              showRelease={label(c)}
               onClick={() => (window.location.hash = `#/release/${encodeURIComponent(c.releaseId)}`)}
             />
           ))}
