@@ -1,8 +1,12 @@
-// Diagnóstico: baixa uma página e os arquivos que ela carrega (JS/JSON/CSV),
-// para descobrir de onde vêm os dados. Uso: node scripts/site-probe.mjs <url> [maxChars]
-const start = process.argv[2];
+// Diagnóstico: baixa páginas e os arquivos que elas carregam (JS/JSON/CSV), para
+// descobrir de onde vêm os dados e quais APIs o site usa.
+// Uso: node scripts/site-probe.mjs "<url> [url2 ...]" [maxChars]
+const starts = (process.argv[2] ?? '').split(/\s+/).filter(Boolean);
 const max = Number(process.argv[3] ?? 2500);
-const UA = { 'User-Agent': 'Mozilla/5.0 (skz-pocadex; projeto de fã)' };
+const UA = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36',
+  'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
+};
 
 async function get(url) {
   const res = await fetch(url, { headers: UA, redirect: 'follow' });
@@ -10,31 +14,42 @@ async function get(url) {
   return { status: res.status, type: res.headers.get('content-type'), text, url: res.url };
 }
 
-const page = await get(start);
-console.log(`== ${start} → HTTP ${page.status} ${page.type} (${page.text.length} chars)`);
-console.log(page.text.slice(0, max));
+const API_RE = /["'`](https?:\/\/[^"'`\s]*(?:api|graphql|gateway)[^"'`\s]*|\/(?:api|v\d)\/[^"'`\s]{2,120})["'`]/gi;
 
-const refs = new Set();
-for (const m of page.text.matchAll(/(?:src|href)=["']([^"'#]+)["']/g)) refs.add(new URL(m[1], page.url).href);
-for (const m of page.text.matchAll(/["'`]([^"'`\s]+\.(?:json|csv|js)(?:\?[^"'`\s]*)?)["'`]/g)) refs.add(new URL(m[1], page.url).href);
-console.log(`\n== referências (${refs.size}):\n` + [...refs].join('\n'));
-
-const seen = new Set();
-async function dig(url, depth) {
-  if (seen.has(url) || depth > 2 || seen.size > 25) return;
-  seen.add(url);
-  if (!/\.(js|mjs|json|csv)(\?|$)/i.test(url) || !url.startsWith(new URL(start).origin)) return;
+for (const start of starts) {
+  console.log(`\n################ ${start}`);
+  let page;
   try {
-    const r = await get(url);
-    console.log(`\n======== ${url} → HTTP ${r.status} ${r.type} (${r.text.length} chars)`);
-    console.log(r.text.slice(0, max));
-    for (const m of r.text.matchAll(/["'`]([^"'`\s]+\.(?:json|csv|js)(?:\?[^"'`\s]*)?)["'`]/g)) {
-      try {
-        await dig(new URL(m[1], url).href, depth + 1);
-      } catch {}
-    }
+    page = await get(start);
   } catch (e) {
-    console.log(`(erro ${url}: ${e.message})`);
+    console.log(`erro: ${e.message}`);
+    continue;
   }
+  console.log(`== HTTP ${page.status} ${page.type} (${page.text.length} chars) → ${page.url}`);
+  console.log(page.text.slice(0, max));
+
+  const refs = new Set();
+  for (const m of page.text.matchAll(/(?:src|href)=["']([^"'#]+)["']/g)) {
+    try {
+      refs.add(new URL(m[1], page.url).href);
+    } catch {}
+  }
+  console.log(`\n== referências (${refs.size}):\n` + [...refs].slice(0, 60).join('\n'));
+
+  const apis = new Set([...page.text.matchAll(API_RE)].map((m) => m[1]));
+  const origin = new URL(page.url).origin;
+  let n = 0;
+  for (const r of refs) {
+    if (!/\.(js|mjs|json)(\?|$)/i.test(r) || n >= 25) continue;
+    n++;
+    try {
+      const js = await get(r);
+      console.log(`\n======== ${r} → HTTP ${js.status} (${js.text.length} chars)`);
+      if (r.startsWith(origin) || /json/i.test(js.type ?? '')) console.log(js.text.slice(0, Math.min(max, 800)));
+      for (const m of js.text.matchAll(API_RE)) apis.add(m[1]);
+    } catch (e) {
+      console.log(`(erro ${r}: ${e.message})`);
+    }
+  }
+  console.log(`\n== possíveis endpoints de API (${apis.size}):\n` + [...apis].slice(0, 120).join('\n'));
 }
-for (const r of refs) await dig(r, 0);
