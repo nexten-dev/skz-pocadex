@@ -40,6 +40,7 @@ npm run release        # gera os pacotes de release em releases/vX.Y.Z/
 
 ## Versionamento
 
+- **⚠ Versão congelada em 0.6.0** (pedido do usuário) até concluirmos o trabalho das imagens dos photocards: **não suba a versão** nem crie releases/pacotes até ele liberar. Mudanças entram na `main` sem bump (commits `fix:`/`chore:`/`data:` sem número de versão no assunto); atualizações da base continuam usando `npm run data:bump` (dataVersion é independente).
 - **App**: SemVer em `package.json` (começou em 0.1.0). Novas funcionalidades sobem o MINOR, correções/ferramentas sobem o PATCH. A versão aparece no rodapé.
 - Cada versão: entrada no `CHANGELOG.md`, commit e **tag git `vX.Y.Z`**.
 - **Base de dados**: `dataVersion` próprio (`AAAA.MM.DD.N`), via `npm run data:bump`. Atualizar a base não exige nova versão do app.
