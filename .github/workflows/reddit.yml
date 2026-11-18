@@ -1,0 +1,31 @@
+name: Wiki do Reddit (r/skzcollection)
+
+# Lê a wiki de r/skzcollection pela API oficial do Reddit.
+# Precisa dos segredos REDDIT_CLIENT_ID e REDDIT_CLIENT_SECRET (e opcionalmente REDDIT_USERNAME),
+# de um app do tipo "script" criado em https://www.reddit.com/prefs/apps.
+# Manual: Actions → "Wiki do Reddit (r/skzcollection)" → Run workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      paginas:
+        description: 'Páginas da wiki separadas por espaço (vazio = as de templates)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  reddit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Ler a wiki
+        env:
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+        run: node scripts/reddit-wiki.mjs skzcollection ${{ inputs.paginas }}
