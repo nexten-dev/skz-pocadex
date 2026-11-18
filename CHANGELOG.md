@@ -5,6 +5,24 @@ Todas as mudanças relevantes do app. Segue [Versionamento Semântico](https://s
 
 A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.DD.N`), independente da versão do app.
 
+## [0.6.0] — 2026-11-18
+
+### Adicionado
+- **Fotos reais dos photocards**, importadas do [SKZPD — Stray Kids Photocard Database](https://skzpd.com/src/index.html) (por Manyo): **cerca de 2.000 fotos** em 27 páginas. Cada card mostra a foto do photocard de verdade (toque em “🔍 Ver” para ampliar).
+- **Lista de cards conferida**: nos lançamentos cobertos pelo SKZPD, os grupos de cards seguem exatamente o SKZPD (versões, units, POBs de cada loja, lucky draws, pop-ups, transmissões…). Esses lançamentos deixam de ter a etiqueta “prévia”.
+- **8 lançamentos novos**: Mixtape, edições de Taiwan (I Am NOT, I Am YOU, Clé 2: Yellow Wood), UNVEIL [Op. 01: I am NOT], MEET&GREET — I Am YOU e os fanclubs STAY 0ª e 1ª geração. Filtro **Taiwan** na página inicial.
+- Sincronização semanal automática com o SKZPD (toda quarta-feira): novidades publicadas lá chegam ao app sozinhas.
+- Miniaturas leves: imagens grandes passam por um redimensionador (`wsrv.nl`). Os scans do THIS & THAT, por exemplo, caem de até 1,3 MB para cerca de 20 KB cada.
+
+### Alterado
+- **Suas marcações são preservadas**: cards que mudaram de grupo (ex.: “MAXIDENT · GO · Felix”) têm as marcações e imagens escolhidas movidas automaticamente para o card novo.
+- Os grupos que eram estimativas nossas foram substituídos pelos do SKZPD. Os “itens do álbum” (postcards, pôsteres, ID photos…) foram mantidos.
+- O SKZPD não inclui o Woojin. Nos lançamentos de 2018–2019, os cards dele continuam no app, mas sem foto.
+- As fotos de divulgação da wiki (📷) agora só aparecem quando não existe foto do photocard.
+
+### Corrigido
+- Quando uma miniatura não abre, o card tenta a imagem original antes de mostrar o cartão colorido.
+
 ## [0.5.1] — 2026-11-18
 
 ### Corrigido

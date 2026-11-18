@@ -4,7 +4,7 @@ Web app para organizar a coleção de photocards do **Stray Kids**: veja todos o
 
 > Projeto de fã, sem afiliação com a JYP Entertainment.
 
-**Versão atual:** 0.5.1
+**Versão atual:** 0.6.0
 
 **App online:** https://nexten-dev.github.io/skz-pocadex/ · **Downloads:** [Releases](https://github.com/nexten-dev/skz-pocadex/releases) — veja o [CHANGELOG](CHANGELOG.md).
 
@@ -90,15 +90,16 @@ Na base, cada set pode ter:
 | ♥ Quero | Lista de desejos |
 | 🚫 Não quero | Fica fora do progresso e do “faltando” |
 
-## Imagens
+## Fonte dos dados e das fotos
 
-As imagens vêm da [Stray Kids Wiki](https://stray-kids.fandom.com) e ficam gravadas na base (`release.media`):
+- **Photocards (lista e fotos)**: [SKZPD — Stray Kids Photocard Database](https://skzpd.com/src/index.html), por Manyo ([github.com/manyodev/skzpd](https://github.com/manyodev/skzpd)). O workflow **“Photocards do SKZPD”** (`.github/workflows/skzpd.yml`) importa as páginas toda quarta-feira com `scripts/skzpd-import.mjs` e atualiza a base e o site. As imagens não são copiadas: o app as exibe dos endereços originais, com crédito e link para o SKZPD.
+- **Prévias das versões e fotos de divulgação**: [Stray Kids Wiki](https://stray-kids.fandom.com), workflow **“Prévias das wikis”** (`images.yml`), toda segunda-feira.
+- **Itens do álbum e lançamentos não cobertos pelo SKZPD**: pesquisa própria, marcados “(a confirmar)” / “prévia”.
 
-- **Prévias das versões**: a imagem oficial do conteúdo de cada versão do álbum (“Album Preview”).
-- **Fotos de divulgação dos membros**: o teaser de cada membro na era, usado no fundo dos cards (📷). As wikis não têm fotos individuais dos photocards.
-- Imagens escolhidas pelo usuário (modo “🔍 Ver”) têm prioridade e ficam só no aparelho dele.
+Detalhes técnicos da base:
 
-A coleta roda no GitHub Actions, que tem acesso às wikis: workflow **“Prévias das wikis”**, toda segunda-feira, ou manualmente em *Actions → Prévias das wikis → Run workflow* (modos `diagnostico`, `testar`, `gravar`). Localmente: `npm run images:fetch -- --dry --verbose`.
+- `release.images` guarda a foto de cada card de forma compacta (`inf:2024/07/31/abc.jpg`), expandida com `db.imageHosts`. Miniaturas de imagens grandes passam por `db.imageProxy` (wsrv.nl).
+- `db.idMigrations` mapeia IDs de cards antigos para novos. O app move as marcações sozinho ao abrir.
 
 ## Publicar uma versão (3 pacotes)
 

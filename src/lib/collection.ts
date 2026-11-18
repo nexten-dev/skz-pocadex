@@ -78,7 +78,16 @@ export function useCollection() {
 
   const replace = useCallback((c: Collection) => setCollection(c), []);
 
-  return { collection, setStatus, setQty, replace };
+  /** Aplica a tabela de migração da base (card antigo → card novo). */
+  const migrateIds = useCallback((map: Record<string, string> | undefined) => {
+    if (!map) return;
+    setCollection((prev) => {
+      const cards = migrateKeys(prev.cards, map);
+      return cards === prev.cards ? prev : { ...prev, cards };
+    });
+  }, []);
+
+  return { collection, setStatus, setQty, replace, migrateIds };
 }
 
 type CustomImages = Record<string, { url: string; page?: string; source?: string }>;
@@ -117,3 +126,19 @@ export async function parseBackup(file: File): Promise<{ collection: Collection;
 export const STATUS_LABEL = Object.fromEntries(
   Object.values(STATUS_INFO).map((s) => [s.id, s.label]),
 ) as Record<CardStatus, string>;
+
+/**
+ * Move valores de chaves antigas para as novas, segundo a tabela de migração.
+ * Não sobrescreve uma chave nova que já exista. Devolve o mesmo objeto se nada mudar.
+ */
+export function migrateKeys<T>(record: Record<string, T>, map: Record<string, string>): Record<string, T> {
+  let out: Record<string, T> | null = null;
+  for (const [from, value] of Object.entries(record)) {
+    const to = map[from];
+    if (!to) continue;
+    out ??= { ...record };
+    delete out[from];
+    if (!(to in out)) out[to] = value;
+  }
+  return out ?? record;
+}

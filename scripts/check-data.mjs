@@ -14,7 +14,7 @@ for (const r of db.releases) {
   if (releaseIds.has(r.id)) errors.push(`${where}: id duplicado`);
   releaseIds.add(r.id);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(r.date)) errors.push(`${where}: data inválida (${r.date})`);
-  if (!['KR', 'JP'].includes(r.market)) errors.push(`${where}: market inválido`);
+  if (!['KR', 'JP', 'TW'].includes(r.market)) errors.push(`${where}: market inválido`);
   for (const m of r.members ?? []) if (!memberIds.has(m)) errors.push(`${where}: membro desconhecido ${m}`);
   const setIds = new Set();
   const CATS = ['photocard', 'pob', 'luckydraw', 'popup', 'inclusion', 'event'];

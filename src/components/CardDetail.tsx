@@ -151,7 +151,7 @@ export function CardDetail({ card, release, member, image, candidates, status, q
                   {image.kind === 'custom'
                     ? 'escolhida por você'
                     : image.kind === 'db'
-                      ? 'foto do photocard (base do app)'
+                      ? `foto do photocard (${image.source ?? 'base do app'})`
                       : `📷 foto de divulgação de ${name} nesta era (${image.source ?? 'wiki'}) — não é a foto do photocard`}
                   {image.page && (
                     <>

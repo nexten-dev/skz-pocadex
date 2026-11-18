@@ -64,8 +64,13 @@ export function App() {
   const pwa = usePwa();
   const [sync, setSync] = useState<SyncResult | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const { collection, setStatus, setQty, replace } = useCollection();
-  const { custom: customImages, setImage: setCustomImage, replaceAll: replaceImages } = useCustomImages();
+  const { collection, setStatus, setQty, replace, migrateIds } = useCollection();
+  const {
+    custom: customImages,
+    setImage: setCustomImage,
+    replaceAll: replaceImages,
+    migrateIds: migrateImageIds,
+  } = useCustomImages();
 
   const runSync = useCallback(async (manual = false) => {
     const result = await syncDatabase();
@@ -94,6 +99,13 @@ export function App() {
   }, [toast]);
 
   const db = sync?.db ?? null;
+
+  // Cards que mudaram de ID na base: leva junto as marcações e imagens escolhidas
+  useEffect(() => {
+    if (!db?.idMigrations) return;
+    migrateIds(db.idMigrations);
+    migrateImageIds(db.idMigrations);
+  }, [db, migrateIds, migrateImageIds]);
   const { visible, toggle: toggleCategory, setVisible: setVisibleCategories } = useVisibleCategories();
   const fullIndex = useMemo(() => (db ? buildFullIndex(db) : null), [db]);
   const index = useMemo(() => (fullIndex ? filterIndex(fullIndex, visible) : null), [fullIndex, visible]);

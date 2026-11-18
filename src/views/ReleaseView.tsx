@@ -45,7 +45,7 @@ export function ReleaseView({
 
   const cards = index.byRelease.get(releaseId) ?? [];
   const memberIds = useMemo(() => (release ? releaseMembers(db, release) : []), [db, release]);
-  const { images, previews, previewByGroup, memberPhotos } = useReleaseImages(release, cards, customImages);
+  const { images, previews, previewByGroup, memberPhotos } = useReleaseImages(release, cards, customImages, db);
   const [zoom, setZoom] = useState<(MediaImage & { caption?: string }) | null>(null);
   const counts = useMemo(() => countCards(cards, collection), [cards, collection]);
 
@@ -157,16 +157,28 @@ export function ReleaseView({
             </div>
           ) : null}
           <p className="small muted img-status">
-            {release.media
-              ? Object.keys(memberPhotos).length > 0
-                ? 'Os cards mostram a foto de divulgação de cada membro nesta era (📷). As wikis não têm fotos dos photocards; para usar a foto real, toque em “🔍 Ver” → “Escolher imagem”.'
-                : 'As wikis não têm fotos dos photocards deste lançamento. Você pode adicionar a sua em “🔍 Ver” → “Escolher imagem”.'
-              : 'Ainda não há imagens da wiki para este lançamento.'}
+            {release.source ? (
+              <>
+                Fotos dos photocards:{' '}
+                <a href={release.source.url} target="_blank" rel="noreferrer">
+                  {release.source.name}
+                </a>
+                . Toque em “🔍 Ver” para ampliar.
+              </>
+            ) : release.media ? (
+              Object.keys(memberPhotos).length > 0 ? (
+                'Ainda não temos as fotos dos photocards deste lançamento; os cards mostram a foto de divulgação de cada membro (📷). Você pode adicionar a foto real em “🔍 Ver” → “Escolher imagem”.'
+              ) : (
+                'Ainda não temos as fotos dos photocards deste lançamento. Você pode adicionar a sua em “🔍 Ver” → “Escolher imagem”.'
+              )
+            ) : (
+              'Ainda não temos imagens para este lançamento.'
+            )}
             {release.media?.gallery && (
               <>
                 {' '}
                 <a href={release.media.gallery} target="_blank" rel="noreferrer">
-                  Ver galeria na wiki
+                  Galeria do álbum na wiki
                 </a>
               </>
             )}

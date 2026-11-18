@@ -3,7 +3,7 @@ import { countCards, Progress, type ViewProps } from '../components/common';
 import { formatDate, TYPE_LABEL } from '../lib/data';
 import { CategoryBar } from '../components/CategoryBar';
 
-type MarketFilter = 'all' | 'KR' | 'JP';
+type MarketFilter = 'all' | 'KR' | 'JP' | 'TW';
 
 export function HomeView({ db, index, collection, toggleCategory }: ViewProps) {
   const [q, setQ] = useState('');
@@ -52,9 +52,11 @@ export function HomeView({ db, index, collection, toggleCategory }: ViewProps) {
           aria-label="Buscar"
         />
         <div className="seg-control" role="group" aria-label="Mercado">
-          {(['all', 'KR', 'JP'] as MarketFilter[]).map((m) => (
+          {(['all', 'KR', 'JP', 'TW'] as MarketFilter[])
+            .filter((m) => m === 'all' || db.releases.some((r) => r.market === m))
+            .map((m) => (
             <button key={m} className={market === m ? 'on' : ''} onClick={() => setMarket(m)}>
-              {m === 'all' ? 'Todos' : m === 'KR' ? 'Coreia' : 'Japão'}
+              {m === 'all' ? 'Todos' : m === 'KR' ? 'Coreia' : m === 'JP' ? 'Japão' : 'Taiwan'}
             </button>
           ))}
         </div>

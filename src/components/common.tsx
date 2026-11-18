@@ -81,8 +81,10 @@ export function PhotocardTile({
   showRelease?: string;
 }) {
   const m = member ?? GROUP;
-  const [broken, setBroken] = useState<string | null>(null);
-  const img = image && broken !== image.thumb ? image : undefined;
+  // Se a miniatura falhar, tenta a imagem original; se ela também falhar, mostra o cartão colorido
+  const [failed, setFailed] = useState<string[]>([]);
+  const src = image ? [image.thumb, image.url].find((u) => !failed.includes(u)) : undefined;
+  const img = image && src ? image : undefined;
   const initials = m.id === 'group' ? 'SKZ' : m.name.split(/[\s.]+/).map((p) => p[0]).join('').slice(0, 2);
   return (
     <button
@@ -95,11 +97,11 @@ export function PhotocardTile({
       <div className={img ? 'pc-art has-img' : 'pc-art'}>
         {img ? (
           <img
-            src={img.thumb}
+            src={src}
             alt=""
             loading="lazy"
             referrerPolicy="no-referrer"
-            onError={() => setBroken(img.thumb)}
+            onError={() => src && setFailed((f) => [...f, src])}
           />
         ) : (
           <span className="pc-initials">

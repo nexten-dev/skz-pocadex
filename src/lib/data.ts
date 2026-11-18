@@ -95,6 +95,8 @@ export const TYPE_LABEL: Record<string, string> = {
   mixtape: 'Mixtape',
   single: 'Single',
   compilation: 'Coletânea',
+  event: 'Evento',
+  fanclub: 'Fanclub',
 };
 
 export function formatDate(iso: string): string {

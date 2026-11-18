@@ -16,9 +16,11 @@ export type ReleaseType =
   | 'special'
   | 'mixtape'
   | 'single'
-  | 'compilation';
+  | 'compilation'
+  | 'event'
+  | 'fanclub';
 
-export type Market = 'KR' | 'JP';
+export type Market = 'KR' | 'JP' | 'TW';
 
 /**
  * Categoria do item colecionável.
@@ -59,6 +61,8 @@ export interface PhotocardSet {
   /** Loja/evento de origem (ex.: "Soundwave", "Pop-up Seul"). */
   store?: string;
   format?: ItemFormat;
+  /** Posição do bloco na página do SKZPD (usada para migrar marcações se o rótulo mudar). */
+  skzpdBlock?: number;
 }
 
 export interface Release {
@@ -84,6 +88,8 @@ export interface Release {
   wikiPage?: string;
   /** Imagens coletadas das wikis (scripts/fetch-images.mjs). */
   media?: ReleaseMedia;
+  /** Fonte da lista de cards e das fotos (ex.: SKZPD). */
+  source?: { name: string; url: string };
 }
 
 export interface MediaImage {
@@ -122,6 +128,18 @@ export interface Database {
   sources?: { name: string; url: string }[];
   members: Member[];
   releases: Release[];
+  /**
+   * Prefixos para encurtar URLs de imagem: "inf:caminho.jpg" →
+   * base + caminho + (thumb | full). Ver src/lib/images.ts.
+   */
+  imageHosts?: Record<string, { base: string; thumb?: string; full?: string }>;
+  /**
+   * Serviço de redimensionamento para miniaturas de imagens grandes
+   * ({url} = endereço original, {w} = largura). Usado quando o servidor não oferece miniatura.
+   */
+  imageProxy?: string;
+  /** IDs de cards que mudaram: id antigo → id novo (o app migra as marcações). */
+  idMigrations?: Record<string, string>;
 }
 
 // ---- Gerado no app ----

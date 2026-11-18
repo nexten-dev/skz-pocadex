@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { slug } from './expand';
-import type { CardImage, DbImage, MediaImage, Photocard, Release } from './types';
+import { migrateKeys } from './collection';
+import type { CardImage, Database, DbImage, MediaImage, Photocard, Release } from './types';
 
 const CUSTOM_KEY = 'pocadex:customImages';
 const CONCEPT_KEY = 'pocadex:conceptPhotos';
@@ -52,14 +53,41 @@ export function useCustomImages() {
       return next;
     });
   }, []);
-  return { custom, setImage, replaceAll: setCustom };
+  const migrateIds = useCallback((map: Record<string, string> | undefined) => {
+    if (!map) return;
+    setCustom((prev) => migrateKeys(prev, map));
+  }, []);
+  return { custom, setImage, replaceAll: setCustom, migrateIds };
 }
 
-function dbImage(release: Release, cardId: string): CardImage | null {
+type Hosts = Pick<Database, 'imageHosts' | 'imageProxy'>;
+
+/**
+ * Expande "prefixo:caminho" usando db.imageHosts (URLs completas passam direto).
+ * Para miniaturas sem tamanho próprio no servidor, usa db.imageProxy (redimensiona).
+ */
+export function resolveImage(value: string, hosts: Hosts | undefined, size: 'thumb' | 'full', width = 360): string {
+  const m = value.match(/^([a-z0-9]+):(?!\/\/)(.+)$/i);
+  const host = m ? hosts?.imageHosts?.[m[1]] : undefined;
+  const url = m && host ? encodeURI(host.base + m[2]) : value;
+  if (host?.[size]) return url + host[size];
+  if (size === 'thumb' && hosts?.imageProxy && /^https?:\/\//.test(url)) {
+    return hosts.imageProxy.replace('{url}', encodeURIComponent(url)).replace('{w}', String(width));
+  }
+  return url;
+}
+
+function dbImage(release: Release, cardId: string, hosts?: Hosts): CardImage | null {
   const raw = release.images?.[cardId];
   if (!raw) return null;
   const img: DbImage = typeof raw === 'string' ? { url: raw } : raw;
-  return { url: img.url, thumb: img.thumb ?? img.url, page: img.page, source: img.source, kind: 'db' };
+  return {
+    url: resolveImage(img.url, hosts, 'full'),
+    thumb: resolveImage(img.thumb ?? img.url, hosts, 'thumb'),
+    page: img.page ?? release.source?.url,
+    source: img.source ?? release.source?.name,
+    kind: 'db',
+  };
 }
 
 function fromMedia(m: MediaImage, kind: CardImage['kind']): CardImage {
@@ -76,7 +104,7 @@ export function groupKey(card: Pick<Photocard, 'setId' | 'version'>): string {
  * 1. escolhida pelo usuário  2. imagem do próprio card na base
  * 3. foto de divulgação do membro na era (se ativado)
  */
-export function useReleaseImages(release: Release | undefined, cards: Photocard[], custom: CustomImages) {
+export function useReleaseImages(release: Release | undefined, cards: Photocard[], custom: CustomImages, hosts?: Hosts) {
   const concept = isConceptEnabled();
   return useMemo(() => {
     const images = new Map<string, CardImage>();
@@ -91,7 +119,7 @@ export function useReleaseImages(release: Release | undefined, cards: Photocard[
         images.set(card.id, { url: c.url, thumb: c.url, page: c.page, source: c.source ?? 'Sua escolha', kind: 'custom' });
         continue;
       }
-      const d = dbImage(release, card.id);
+      const d = dbImage(release, card.id, hosts);
       if (d) {
         images.set(card.id, d);
         continue;
@@ -100,5 +128,5 @@ export function useReleaseImages(release: Release | undefined, cards: Photocard[
       if (concept && m) images.set(card.id, fromMedia(m, 'concept'));
     }
     return { images, previews, previewByGroup, memberPhotos };
-  }, [release, cards, custom, concept]);
+  }, [release, cards, custom, concept, hosts]);
 }
