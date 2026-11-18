@@ -1241,3 +1241,24 @@ details {
 .lightbox figcaption {
   padding: 0.6rem 0.9rem;
 }
+.pc.notwant .pc-art {
+  filter: none;
+  opacity: 1;
+  outline-color: transparent;
+  background: var(--surface-2);
+}
+.pc.notwant .pc-art > img,
+.pc.notwant .pc-art > .pc-initials {
+  filter: grayscale(1);
+  opacity: 0.18;
+}
+.pc.notwant .pc-badge.notwant {
+  width: 34px;
+  height: 34px;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  font-size: 1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}

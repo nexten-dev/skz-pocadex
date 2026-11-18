@@ -60,6 +60,9 @@ for (const source of WIKI_SOURCES) {
       const k = t.replace(/^File:/, '').replace(/\(\d+\)|\d+/g, '#').split(/\s+/).slice(0, 3).join(' ');
       pat[k] = (pat[k] ?? 0) + 1;
     }
+    const concept = [...all].filter((t) => /teaser|jacket|profile|concept|promotional/i.test(t)).sort();
+    console.log(`  ${concept.length} teasers/fotos de divulgação (até 40):`);
+    concept.slice(0, 40).forEach((t) => console.log('    ', t));
     const top = Object.entries(pat).sort((a, b) => b[1] - a[1]).slice(0, 25);
     console.log('  padrões mais comuns:', top.map(([k, n]) => `${k} (${n})`).join(' | '));
     report[source.id][r.id] = { total: all.size, hits };
