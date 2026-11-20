@@ -1281,3 +1281,52 @@ details {
 main {
   overflow-x: clip;
 }
+
+/* ---------- Templates da comunidade ---------- */
+.template-thumb {
+  width: 132px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+}
+.template-thumb img {
+  height: 96px;
+  object-fit: cover;
+  object-position: top;
+}
+.template-thumb small {
+  display: block;
+  font-size: 0.62rem;
+  color: var(--muted);
+  padding: 0 0.35rem 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.6rem;
+}
+.template-grid .template-thumb {
+  width: auto;
+}
+.template-grid .template-thumb img {
+  height: 130px;
+}
+.template-link {
+  justify-content: center;
+}
+.template-link-icon {
+  font-size: 1.6rem;
+  text-align: center;
+  padding-top: 0.8rem;
+}
+.template-section h2 {
+  font-size: 1rem;
+}
+@media (max-width: 600px) {
+  .brand span:last-child {
+    display: none;
+  }
+}

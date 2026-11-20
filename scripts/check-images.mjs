@@ -26,6 +26,19 @@ for (const r of db.releases)
     byHost.get(host).push(url);
   }
 
+// Templates da comunidade: miniatura (redimensionada) e original
+for (const t of db.templates?.items ?? []) {
+  if (!t.image) continue;
+  for (const [kind, url] of [
+    ['template miniatura', resolve(t.image, 'thumb', 480)],
+    ['template original', t.image],
+  ]) {
+    const host = `${kind}: ${new URL(t.image).host} → ${new URL(url).host}`;
+    if (!byHost.has(host)) byHost.set(host, []);
+    byHost.get(host).push(url);
+  }
+}
+
 let bad = 0;
 for (const [host, urls] of byHost) {
   const sample = urls.filter((_, i) => i % Math.max(1, Math.floor(urls.length / per)) === 0).slice(0, per);
