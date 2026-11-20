@@ -94,6 +94,7 @@ Na base, cada set pode ter:
 
 - **Photocards (lista e fotos)**: [SKZPD — Stray Kids Photocard Database](https://skzpd.com/src/index.html), por Manyo ([github.com/manyodev/skzpd](https://github.com/manyodev/skzpd)). O workflow **“Photocards do SKZPD”** (`.github/workflows/skzpd.yml`) importa as páginas toda quarta-feira com `scripts/skzpd-import.mjs` e atualiza a base e o site. As imagens não são copiadas: o app as exibe dos endereços originais, com crédito e link para o SKZPD.
 - **Prévias das versões e fotos de divulgação**: [Stray Kids Wiki](https://stray-kids.fandom.com), workflow **“Prévias das wikis”** (`images.yml`), toda segunda-feira.
+- **Templates da comunidade** (folhas com vários cards, para consulta): wiki de [r/skzcollection](https://www.reddit.com/r/skzcollection/wiki/templates/). O conteúdo da wiki fica em `data/sources/reddit-skzcollection-templates.md` e é convertido por `scripts/templates-import.mjs` em `db.templates` (crédito ao autor e link do post em cada item). A automação `reddit.yml` lê a wiki pela API oficial do Reddit quando houver credenciais (`REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` nos segredos do GitHub).
 - **Itens do álbum e lançamentos não cobertos pelo SKZPD**: pesquisa própria, marcados “(a confirmar)” / “prévia”.
 
 Detalhes técnicos da base:

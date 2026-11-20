@@ -55,9 +55,12 @@ export function registerServiceWorker() {
     }
   });
 
+  // Só recarrega quando uma versão NOVA assume o lugar de outra (atualização).
+  // Na primeira visita não havia controlador: nada a recarregar.
+  const hadController = !!navigator.serviceWorker.controller;
   let reloading = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (reloading) return;
+    if (reloading || !hadController) return;
     reloading = true;
     window.location.reload();
   });

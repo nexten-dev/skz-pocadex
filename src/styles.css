@@ -1281,3 +1281,86 @@ details {
 main {
   overflow-x: clip;
 }
+
+/* ---------- Templates da comunidade ---------- */
+.template-thumb {
+  width: 132px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+}
+.template-thumb img {
+  height: 96px;
+  object-fit: cover;
+  object-position: top;
+}
+.template-thumb small {
+  display: block;
+  font-size: 0.62rem;
+  color: var(--muted);
+  padding: 0 0.35rem 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.6rem;
+}
+.template-grid .template-thumb {
+  width: auto;
+}
+.template-grid .template-thumb img {
+  height: 130px;
+}
+.template-link {
+  justify-content: center;
+}
+.template-link-icon {
+  font-size: 1.6rem;
+  text-align: center;
+  padding-top: 0.8rem;
+}
+.template-section h2 {
+  font-size: 1rem;
+}
+@media (max-width: 600px) {
+  .brand span:last-child {
+    display: none;
+  }
+}
+.nav-short {
+  display: none;
+}
+@media (max-width: 600px) {
+  .nav-long {
+    display: none;
+  }
+  .nav-short {
+    display: inline;
+  }
+  .topbar {
+    gap: 0.5rem;
+  }
+  .topbar nav {
+    gap: 0.1rem;
+  }
+  .topbar nav a {
+    padding: 0.35rem 0.45rem;
+  }
+}
+@media (max-width: 360px) {
+  .topbar {
+    padding-left: 10px;
+    padding-right: 10px;
+    gap: 0.3rem;
+  }
+  .logo {
+    font-size: 0.72rem;
+  }
+  .topbar nav a {
+    padding: 0.3rem 0.32rem;
+    font-size: 0.76rem;
+  }
+}

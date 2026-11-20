@@ -6,8 +6,11 @@ export function Lightbox({
   caption,
   page,
   source,
+  linkLabel,
   onClose,
 }: {
+  /** Texto do link de origem (padrão: "ver na <source>"). */
+  linkLabel?: string;
   url: string;
   caption?: string;
   page?: string;
@@ -37,7 +40,7 @@ export function Lightbox({
             <>
               {' · '}
               <a href={page} target="_blank" rel="noreferrer">
-                ver na {source ?? 'origem'}
+                {linkLabel ?? `ver na ${source ?? 'origem'}`}
               </a>
             </>
           )}

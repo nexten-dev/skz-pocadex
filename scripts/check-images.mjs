@@ -12,6 +12,8 @@ function resolve(v, size, width = 360) {
   const h = m && db.imageHosts?.[m[1]];
   const url = h ? encodeURI(h.base + m[2]) : v;
   if (h?.[size]) return url + h[size];
+  const imgur = size === 'thumb' && url.match(/^(https:\/\/i\.imgur\.com\/[A-Za-z0-9]{5,8})\.(png|jpe?g|gif|webp)$/);
+  if (imgur) return `${imgur[1]}l.${imgur[2]}`;
   if (size === 'thumb' && db.imageProxy) return db.imageProxy.replace('{url}', encodeURIComponent(url)).replace('{w}', String(width));
   return url;
 }
@@ -25,6 +27,19 @@ for (const r of db.releases)
     if (!byHost.has(host)) byHost.set(host, []);
     byHost.get(host).push(url);
   }
+
+// Templates da comunidade: miniatura (redimensionada) e original
+for (const t of db.templates?.items ?? []) {
+  if (!t.image) continue;
+  for (const [kind, url] of [
+    ['template miniatura', resolve(t.image, 'thumb', 480)],
+    ['template original', t.image],
+  ]) {
+    const host = `${kind}: ${new URL(t.image).host} → ${new URL(url).host}`;
+    if (!byHost.has(host)) byHost.set(host, []);
+    byHost.get(host).push(url);
+  }
+}
 
 let bad = 0;
 for (const [host, urls] of byHost) {

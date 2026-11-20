@@ -138,6 +138,8 @@ export interface Database {
    * ({url} = endereço original, {w} = largura). Usado quando o servidor não oferece miniatura.
    */
   imageProxy?: string;
+  /** Templates da comunidade (folhas com vários cards), ver scripts/templates-import.mjs. */
+  templates?: { source: { name: string; url: string }; items: TemplateItem[] };
   /** IDs de cards que mudaram: id antigo → id novo (o app migra as marcações). */
   idMigrations?: Record<string, string>;
 }
@@ -185,4 +187,22 @@ export interface CollectionEntry {
 export interface Collection {
   version: 1;
   cards: Record<string, CollectionEntry>;
+}
+
+/** Template da comunidade: imagem com vários cards juntos, usada como referência visual. */
+export interface TemplateItem {
+  id: string;
+  title: string;
+  /** Seções da wiki de origem (ex.: ["Photocards", "Photocards dos álbuns", "Coreia"]). */
+  path: string[];
+  image?: string;
+  /** Quando não é uma imagem (pasta do Drive, galeria do Reddit). */
+  link?: string;
+  author?: string;
+  post?: string;
+  updated?: string;
+  upTo?: string;
+  status?: string;
+  releaseId?: string;
+  member?: string;
 }

@@ -5,6 +5,7 @@ import { formatDate, releaseMembers, TYPE_LABEL } from '../lib/data';
 import type { CardStatus, Photocard, TransitStatus } from '../lib/types';
 import { groupKey, useReleaseImages } from '../lib/images';
 import { Lightbox } from '../components/Lightbox';
+import { TemplateGrid } from '../components/TemplateStrip';
 import type { MediaImage } from '../lib/types';
 import { CardDetail } from '../components/CardDetail';
 import { CategoryBar } from '../components/CategoryBar';
@@ -156,6 +157,18 @@ export function ReleaseView({
               </div>
             </div>
           ) : null}
+          {(() => {
+            const templates = db.templates?.items.filter((t) => t.releaseId === release.id) ?? [];
+            return templates.length ? (
+              <div className="preview-strip">
+                <span className="small muted">
+                  Templates da comunidade (
+                  <a href="#/templates">ver todos</a>):
+                </span>
+                <TemplateGrid db={db} items={templates} />
+              </div>
+            ) : null;
+          })()}
           <p className="small muted img-status">
             {release.source ? (
               <>

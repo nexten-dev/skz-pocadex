@@ -5,6 +5,21 @@ Todas as mudanças relevantes do app. Segue [Versionamento Semântico](https://s
 
 A **base de dados** tem versionamento próprio (`dataVersion`, formato `AAAA.MM.DD.N`), independente da versão do app.
 
+## [Não lançado]
+
+Mudanças já publicadas no site, que entram na próxima versão (a versão está congelada em 0.6.0 até concluirmos as imagens).
+
+### Adicionado
+- **Templates da comunidade** (wiki de [r/skzcollection](https://www.reddit.com/r/skzcollection/wiki/templates/)): 149 folhas com vários cards juntos, para consulta, com crédito ao autor e link para o post original.
+  - Na página de cada álbum, uma faixa “Templates da comunidade” (25 lançamentos têm pelo menos um, inclusive THE SOUND, CIRCUS, Scars, ALL IN, TOP e SKZ2020, que ainda não têm fotos por card).
+  - Página nova **Templates** no menu, organizada como a wiki (álbuns, shows, fanclub, Season’s Greetings, colaborações, por membro…), com busca.
+- Automação “Wiki do Reddit” pela API oficial (aguardando credenciais do Reddit).
+
+### Corrigido
+- Na primeira visita, o app recarregava a página sozinho uma vez ao ativar o modo offline.
+- Menu do celular cabe inteiro em telas pequenas (“Minha coleção” vira “Coleção”).
+- Miniaturas do Imgur usam o tamanho reduzido do próprio Imgur.
+
 ## [0.6.0] — 2026-11-18
 
 ### Adicionado

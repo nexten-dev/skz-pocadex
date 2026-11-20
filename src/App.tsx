@@ -9,6 +9,7 @@ import { HomeView } from './views/HomeView';
 import { ReleaseView } from './views/ReleaseView';
 import { StatsView } from './views/StatsView';
 import { SettingsView } from './views/SettingsView';
+import { TemplatesView } from './views/TemplatesView';
 
 function useHashRoute() {
   const get = () => window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
@@ -138,6 +139,7 @@ export function App() {
     };
     if (page === 'release' && param) content = <ReleaseView {...props} releaseId={decodeURIComponent(param)} />;
     else if (page === 'stats') content = <StatsView {...props} />;
+    else if (page === 'templates') content = <TemplatesView {...props} />;
     else if (page === 'settings')
       content = (
         <SettingsView
@@ -167,7 +169,11 @@ export function App() {
             Lançamentos
           </a>
           <a href="#/stats" className={page === 'stats' ? 'active' : ''}>
-            Minha coleção
+            <span className="nav-long">Minha coleção</span>
+            <span className="nav-short">Coleção</span>
+          </a>
+          <a href="#/templates" className={page === 'templates' ? 'active' : ''}>
+            Templates
           </a>
           <a href="#/settings" className={page === 'settings' ? 'active' : ''} aria-label="Configurações">
             ⚙︎
