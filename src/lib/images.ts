@@ -71,6 +71,9 @@ export function resolveImage(value: string, hosts: Hosts | undefined, size: 'thu
   const host = m ? hosts?.imageHosts?.[m[1]] : undefined;
   const url = m && host ? encodeURI(host.base + m[2]) : value;
   if (host?.[size]) return url + host[size];
+  // Imgur bloqueia redimensionadores, mas tem miniaturas próprias (sufixo "l" = 640 px)
+  const imgur = size === 'thumb' && url.match(/^(https:\/\/i\.imgur\.com\/[A-Za-z0-9]{5,8})\.(png|jpe?g|gif|webp)$/);
+  if (imgur) return `${imgur[1]}l.${imgur[2]}`;
   if (size === 'thumb' && hosts?.imageProxy && /^https?:\/\//.test(url)) {
     return hosts.imageProxy.replace('{url}', encodeURIComponent(url)).replace('{w}', String(width));
   }

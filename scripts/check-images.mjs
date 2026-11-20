@@ -12,6 +12,8 @@ function resolve(v, size, width = 360) {
   const h = m && db.imageHosts?.[m[1]];
   const url = h ? encodeURI(h.base + m[2]) : v;
   if (h?.[size]) return url + h[size];
+  const imgur = size === 'thumb' && url.match(/^(https:\/\/i\.imgur\.com\/[A-Za-z0-9]{5,8})\.(png|jpe?g|gif|webp)$/);
+  if (imgur) return `${imgur[1]}l.${imgur[2]}`;
   if (size === 'thumb' && db.imageProxy) return db.imageProxy.replace('{url}', encodeURIComponent(url)).replace('{w}', String(width));
   return url;
 }
