@@ -198,6 +198,7 @@ for (const [file, page] of Object.entries(pages)) {
   const replaced = oldSets.filter((s) => !KEEP_OLD.has(s.category ?? 'photocard') && !s.id.startsWith('k-'));
   release.sets = [...newSets, ...kept];
   release.images = { ...Object.fromEntries(Object.entries(release.images ?? {}).filter(([k]) => !k.includes(':k-'))), ...images };
+  if (src.cover) release.cover = { url: compact(src.cover), source: 'SKZPD', page: SITE + file };
   release.verified = true;
   release.source = { name: 'SKZPD', url: SITE + file };
 

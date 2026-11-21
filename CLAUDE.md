@@ -38,7 +38,7 @@ npm run release        # gera os pacotes de release em releases/vX.Y.Z/
 - **Nunca renomeie IDs já publicados** (`release.id`, `set.id`, nomes de versão): a coleção do usuário é salva por ID de card `release:set:versão:membro:n`. Se for inevitável (ex.: reimportação), registre `id antigo → id novo` em `db.idMigrations`: o app move marcações e imagens escolhidas ao abrir.
 - Dev e preview usam **sempre a porta 4173** (a coleção no navegador é separada por endereço). O inicializador do pacote Dist também usa 4173.
 - Dados não confirmados: marque o lançamento com `verified: false` e itens extras com “(a confirmar)” na nota. Não invente dados; deixe claro o que é estimativa.
-- Não usar logos/arte oficiais. Prévias de imagens vêm das wikis com link de origem.
+- Imagens oficiais (capas, fotos de cards, prévias) só por **link para o endereço original** (wiki, SKZPD, Reddit…), com crédito/link de origem — nunca copiar arquivos para o repositório. Não usar logos oficiais na interface do app. Capas: `ReleaseCover` usa `release.media.cover` (wiki) → `release.cover` (SKZPD) → quadro com o título.
 
 ## Versionamento
 

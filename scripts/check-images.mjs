@@ -14,6 +14,8 @@ function resolve(v, size, width = 360) {
   if (h?.[size]) return url + h[size];
   const imgur = size === 'thumb' && url.match(/^(https:\/\/i\.imgur\.com\/[A-Za-z0-9]{5,8})\.(png|jpe?g|gif|webp)$/);
   if (imgur) return `${imgur[1]}l.${imgur[2]}`;
+  // Capas da Wikipédia já são pequenas e o redimensionador às vezes é recusado: usa a original
+  if (size === 'thumb' && /^https:\/\/upload\.wikimedia\.org\//.test(url)) return url;
   if (size === 'thumb' && db.imageProxy) return db.imageProxy.replace('{url}', encodeURIComponent(url)).replace('{w}', String(width));
   return url;
 }
@@ -27,6 +29,20 @@ for (const r of db.releases)
     if (!byHost.has(host)) byHost.set(host, []);
     byHost.get(host).push(url);
   }
+
+// Capas dos lançamentos (wiki e SKZPD)
+for (const r of db.releases) {
+  for (const [kind, c] of [
+    ['capa wiki', r.media?.cover],
+    ['capa skzpd', r.cover],
+  ]) {
+    if (!c) continue;
+    const url = c.thumb ?? resolve(c.url, 'thumb', 320);
+    const host = `${kind}: ${new URL(resolve(c.url, 'full')).host} → ${new URL(url).host}`;
+    if (!byHost.has(host)) byHost.set(host, []);
+    byHost.get(host).push(url);
+  }
+}
 
 // Templates da comunidade: miniatura (redimensionada) e original
 for (const t of db.templates?.items ?? []) {

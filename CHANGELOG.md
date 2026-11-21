@@ -13,6 +13,7 @@ Mudanças já publicadas no site, que entram na próxima versão (a versão est�
 - **Templates da comunidade** (wiki de [r/skzcollection](https://www.reddit.com/r/skzcollection/wiki/templates/)): 149 folhas com vários cards juntos, para consulta, com crédito ao autor e link para o post original.
   - Na página de cada álbum, uma faixa “Templates da comunidade” (25 lançamentos têm pelo menos um, inclusive THE SOUND, CIRCUS, Scars, ALL IN, TOP e SKZ2020, que ainda não têm fotos por card).
   - Página nova **Templates** no menu, organizada como a wiki (álbuns, shows, fanclub, Season’s Greetings, colaborações, por membro…), com busca.
+- **Capas na página inicial**: cada lançamento mostra a capa do álbum (capa digital da Stray Kids Wiki; se não houver, a do SKZPD; sem nenhuma, um quadro com o título). No celular, os lançamentos aparecem em duas colunas.
 - Automação “Wiki do Reddit” pela API oficial (aguardando credenciais do Reddit).
 
 ### Corrigido
