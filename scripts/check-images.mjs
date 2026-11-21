@@ -28,6 +28,20 @@ for (const r of db.releases)
     byHost.get(host).push(url);
   }
 
+// Capas dos lançamentos (wiki e SKZPD)
+for (const r of db.releases) {
+  for (const [kind, c] of [
+    ['capa wiki', r.media?.cover],
+    ['capa skzpd', r.cover],
+  ]) {
+    if (!c) continue;
+    const url = c.thumb ?? resolve(c.url, 'thumb', 320);
+    const host = `${kind}: ${new URL(resolve(c.url, 'full')).host} → ${new URL(url).host}`;
+    if (!byHost.has(host)) byHost.set(host, []);
+    byHost.get(host).push(url);
+  }
+}
+
 // Templates da comunidade: miniatura (redimensionada) e original
 for (const t of db.templates?.items ?? []) {
   if (!t.image) continue;

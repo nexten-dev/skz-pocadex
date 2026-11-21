@@ -88,6 +88,8 @@ export interface Release {
   wikiPage?: string;
   /** Imagens coletadas das wikis (scripts/fetch-images.mjs). */
   media?: ReleaseMedia;
+  /** Capa alternativa (ex.: do SKZPD), usada quando a wiki não tem a capa digital. */
+  cover?: MediaImage;
   /** Fonte da lista de cards e das fotos (ex.: SKZPD). */
   source?: { name: string; url: string };
 }

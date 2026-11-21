@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { countCards, Progress, type ViewProps } from '../components/common';
 import { formatDate, TYPE_LABEL } from '../lib/data';
 import { CategoryBar } from '../components/CategoryBar';
+import { ReleaseCover } from '../components/ReleaseCover';
 
 type MarketFilter = 'all' | 'KR' | 'JP' | 'TW';
 
@@ -72,6 +73,7 @@ export function HomeView({ db, index, collection, toggleCategory }: ViewProps) {
           const complete = counts.total > 0 && counts.owned === counts.total;
           return (
             <a key={r.id} href={`#/release/${encodeURIComponent(r.id)}`} className={`release-card ${complete ? 'complete' : ''}`}>
+              <ReleaseCover db={db} release={r} />
               <div className="release-head">
                 <span className={`tag ${r.market}`}>{r.market}</span>
                 <span className="tag">{TYPE_LABEL[r.type] ?? r.type}</span>
