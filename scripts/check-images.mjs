@@ -14,6 +14,8 @@ function resolve(v, size, width = 360) {
   if (h?.[size]) return url + h[size];
   const imgur = size === 'thumb' && url.match(/^(https:\/\/i\.imgur\.com\/[A-Za-z0-9]{5,8})\.(png|jpe?g|gif|webp)$/);
   if (imgur) return `${imgur[1]}l.${imgur[2]}`;
+  // Capas da Wikipédia já são pequenas e o redimensionador às vezes é recusado: usa a original
+  if (size === 'thumb' && /^https:\/\/upload\.wikimedia\.org\//.test(url)) return url;
   if (size === 'thumb' && db.imageProxy) return db.imageProxy.replace('{url}', encodeURIComponent(url)).replace('{w}', String(width));
   return url;
 }

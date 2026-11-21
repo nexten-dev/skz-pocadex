@@ -74,6 +74,8 @@ export function resolveImage(value: string, hosts: Hosts | undefined, size: 'thu
   // Imgur bloqueia redimensionadores, mas tem miniaturas próprias (sufixo "l" = 640 px)
   const imgur = size === 'thumb' && url.match(/^(https:\/\/i\.imgur\.com\/[A-Za-z0-9]{5,8})\.(png|jpe?g|gif|webp)$/);
   if (imgur) return `${imgur[1]}l.${imgur[2]}`;
+  // Capas da Wikipédia já são pequenas e o redimensionador às vezes é recusado: usa a original
+  if (size === 'thumb' && /^https:\/\/upload\.wikimedia\.org\//.test(url)) return url;
   if (size === 'thumb' && hosts?.imageProxy && /^https?:\/\//.test(url)) {
     return hosts.imageProxy.replace('{url}', encodeURIComponent(url)).replace('{w}', String(width));
   }
