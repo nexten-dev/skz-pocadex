@@ -1,5 +1,5 @@
-// Login e sincronização do arquivo pessoal na nuvem da própria pessoa.
-// Provedores: Google (Google Drive) e Microsoft (OneDrive). Cada pessoa usa um por vez.
+// Login e sincronização do arquivo pessoal na nuvem da própria pessoa (Google Drive).
+// A estrutura de "provedores" permite acrescentar outra nuvem no futuro, se for preciso.
 //
 // - Sem servidor nosso: o login acontece no navegador e o arquivo "pocadex.json"
 //   fica numa pasta do app na nuvem da pessoa (o app não acessa outros arquivos).
@@ -7,7 +7,7 @@
 import { useSyncExternalStore } from 'react';
 import { getProfile, mergeProfiles, normalizeProfile, profileFingerprint, setProfile, subscribeProfile } from './profile';
 
-export type ProviderId = 'google' | 'microsoft';
+export type ProviderId = 'google';
 export type SessionMode = 'guest' | ProviderId;
 
 export interface ProviderUser {
@@ -35,12 +35,10 @@ export interface CloudProvider {
 export class AuthRequired extends Error {}
 
 export const GOOGLE_CLIENT_ID: string = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '';
-export const MICROSOFT_CLIENT_ID: string = import.meta.env.VITE_MICROSOFT_CLIENT_ID ?? '';
 
 /** Lista para a interface (não carrega o código de nenhum provedor). */
 export const PROVIDERS: { id: ProviderId; label: string; button: string; storageName: string; configured: boolean }[] = [
   { id: 'google', label: 'Google', button: 'Entrar com Google', storageName: 'Google Drive', configured: !!GOOGLE_CLIENT_ID },
-  { id: 'microsoft', label: 'Microsoft', button: 'Entrar com Microsoft', storageName: 'OneDrive', configured: !!MICROSOFT_CLIENT_ID },
 ];
 export const providerInfo = (id?: SessionMode | null) => PROVIDERS.find((p) => p.id === id);
 
@@ -101,11 +99,9 @@ function writeSession(s: Session | null) {
 }
 
 // ---------- provedores ----------
-let microsoft: Promise<CloudProvider> | null = null;
 async function provider(id: ProviderId): Promise<CloudProvider> {
-  if (id === 'google') return googleProvider;
-  microsoft ??= import('./cloud-microsoft').then((m) => m.microsoftProvider as CloudProvider);
-  return microsoft;
+  void id;
+  return googleProvider;
 }
 function isAuthError(e: unknown): boolean {
   return e instanceof AuthRequired || (e as Error)?.constructor?.name === 'AuthRequired';
@@ -150,7 +146,7 @@ export function reconnect(): Promise<void> {
   return s && s.mode !== 'guest' ? signIn(s.mode) : Promise.resolve();
 }
 
-/** Tenta voltar a sincronizar sem janela (ex.: Microsoft renova o acesso sozinha). */
+/** Tenta voltar a sincronizar sem janela (se o acesso ainda for válido). */
 export async function tryResume(): Promise<boolean> {
   const s = cloud.session;
   if (!s || s.mode === 'guest') return false;

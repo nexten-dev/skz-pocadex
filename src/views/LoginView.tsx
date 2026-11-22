@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { continueAsGuest, PROVIDERS, providerInfo, signIn, tryResume, useCloud, type ProviderId } from '../lib/cloud';
 
-/** Tela inicial: entrar com Google/Microsoft (salva na nuvem da pessoa) ou como visitante. */
+/** Tela inicial: entrar com Google (salva no Google Drive da pessoa) ou como visitante. */
 export function LoginView({ onDone }: { onDone: () => void }) {
   const cloud = useCloud();
   const [busy, setBusy] = useState<ProviderId | null>(null);
@@ -11,9 +11,9 @@ export function LoginView({ onDone }: { onDone: () => void }) {
   const returning = cloud.session && cloud.session.mode !== 'guest' ? cloud.session : null;
   const returningInfo = providerInfo(returning?.mode);
 
-  // Microsoft consegue renovar o acesso sem janela: tenta em segundo plano
+  // Se o acesso ainda for válido nesta aba, entra sem janela
   useEffect(() => {
-    if (returning?.mode === 'microsoft') tryResume().then(setResumed).catch(() => {});
+    if (returning) tryResume().then(setResumed).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -67,11 +67,11 @@ export function LoginView({ onDone }: { onDone: () => void }) {
           ))
         ) : (
           <button className="btn login-google" disabled title="Login ainda não configurado">
-            Entrar com Google ou Microsoft (em breve)
+            Entrar com Google (em breve)
           </button>
         )}
         <p className="small muted">
-          Sua coleção, fotos e preferências ficam salvas na <strong>sua nuvem</strong> (Google Drive ou OneDrive), numa pasta do
+          Sua coleção, fotos e preferências ficam salvas no <strong>seu Google Drive</strong>, numa pasta privada do
           app, e aparecem em todos os seus aparelhos. O app não acessa nenhum outro arquivo seu.
         </p>
         {error && <p className="small login-error">{error}</p>}

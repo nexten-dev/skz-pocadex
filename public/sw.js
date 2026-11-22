@@ -38,8 +38,6 @@ self.addEventListener('fetch', (event) => {
   // Outros sites (wikis, imagens) e a base de dados passam direto:
   // a base sempre busca a versão mais nova e tem cópia própria no aparelho.
   if (url.origin !== self.location.origin || url.pathname.endsWith('/data/photocards.json')) return;
-  // Página de retorno do login da Microsoft: sempre direto da rede, nunca no cache
-  if (url.pathname.endsWith('/auth-redirect.html')) return;
 
   // Páginas: tenta a rede primeiro, cai para o cache offline
   if (req.mode === 'navigate') {
