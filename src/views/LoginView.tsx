@@ -1,26 +1,37 @@
-import { useState } from 'react';
-import { continueAsGuest, GOOGLE_CLIENT_ID, signInWithGoogle, useCloud } from '../lib/cloud';
+import { useEffect, useState } from 'react';
+import { continueAsGuest, PROVIDERS, providerInfo, signIn, tryResume, useCloud, type ProviderId } from '../lib/cloud';
 
-/** Tela inicial: entrar com Google (salva no Drive) ou continuar como visitante. */
+/** Tela inicial: entrar com Google/Microsoft (salva na nuvem da pessoa) ou como visitante. */
 export function LoginView({ onDone }: { onDone: () => void }) {
   const cloud = useCloud();
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<ProviderId | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [guestWarn, setGuestWarn] = useState(false);
-  const returning = cloud.session?.mode === 'google' ? cloud.session : null;
+  const [resumed, setResumed] = useState(false);
+  const returning = cloud.session && cloud.session.mode !== 'guest' ? cloud.session : null;
+  const returningInfo = providerInfo(returning?.mode);
 
-  const google = async () => {
-    setBusy(true);
+  // Microsoft consegue renovar o acesso sem janela: tenta em segundo plano
+  useEffect(() => {
+    if (returning?.mode === 'microsoft') tryResume().then(setResumed).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const go = async (id: ProviderId) => {
+    if (resumed && returning?.mode === id) return onDone();
+    setBusy(id);
     setError(null);
     try {
-      await signInWithGoogle();
+      await signIn(id);
       onDone();
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   };
+
+  const configured = PROVIDERS.filter((p) => p.configured);
 
   return (
     <div className="login">
@@ -31,18 +42,37 @@ export function LoginView({ onDone }: { onDone: () => void }) {
         </div>
         <p className="muted">Organize sua coleção de photocards do Stray Kids.</p>
 
-        {GOOGLE_CLIENT_ID ? (
-          <button className="btn primary login-google" onClick={google} disabled={busy}>
-            {busy ? 'Conectando…' : returning ? `Continuar como ${returning.email}` : 'Entrar com Google'}
-          </button>
+        {returning && returningInfo?.configured ? (
+          <>
+            <button className={`btn primary login-google provider-${returning.mode}`} onClick={() => go(returning.mode as ProviderId)} disabled={!!busy}>
+              {busy ? 'Conectando…' : `Continuar como ${returning.email}`}
+            </button>
+            <p className="small muted">
+              Conta {returningInfo.label} · {returningInfo.storageName}
+              {resumed && ' · conectado ✓'}
+            </p>
+            {configured
+              .filter((p) => p.id !== returning.mode)
+              .map((p) => (
+                <button key={p.id} className="btn" onClick={() => go(p.id)} disabled={!!busy}>
+                  {busy === p.id ? 'Conectando…' : `Usar ${p.label} (${p.storageName})`}
+                </button>
+              ))}
+          </>
+        ) : configured.length ? (
+          configured.map((p) => (
+            <button key={p.id} className={`btn primary login-google provider-${p.id}`} onClick={() => go(p.id)} disabled={!!busy}>
+              {busy === p.id ? 'Conectando…' : `${p.button} (${p.storageName})`}
+            </button>
+          ))
         ) : (
           <button className="btn login-google" disabled title="Login ainda não configurado">
-            Entrar com Google (em breve)
+            Entrar com Google ou Microsoft (em breve)
           </button>
         )}
         <p className="small muted">
-          Sua coleção, fotos e preferências ficam salvas no <strong>seu Google Drive</strong>, numa pasta privada do app, e
-          aparecem em todos os seus aparelhos. O app não vê nenhum outro arquivo seu.
+          Sua coleção, fotos e preferências ficam salvas na <strong>sua nuvem</strong> (Google Drive ou OneDrive), numa pasta do
+          app, e aparecem em todos os seus aparelhos. O app não acessa nenhum outro arquivo seu.
         </p>
         {error && <p className="small login-error">{error}</p>}
 
@@ -55,8 +85,10 @@ export function LoginView({ onDone }: { onDone: () => void }) {
         ) : (
           <div className="guest-warning">
             <p className="small">
-              <strong>⚠ Como visitante, nada é salvo na nuvem.</strong> Suas marcações ficam só neste navegador e podem ser
-              perdidas se você limpar os dados do navegador, usar uma janela anônima ou trocar de aparelho.
+              <strong>⚠ {returning ? 'Sem sincronizar, nada vai para a nuvem agora.' : 'Como visitante, nada é salvo na nuvem.'}</strong>{' '}
+              {returning
+                ? 'O que você marcar fica neste navegador e será enviado quando você reconectar.'
+                : 'Suas marcações ficam só neste navegador e podem ser perdidas se você limpar os dados do navegador, usar uma janela anônima ou trocar de aparelho.'}
             </p>
             <div className="row">
               <button

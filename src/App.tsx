@@ -4,7 +4,7 @@ import { useCollection } from './lib/collection';
 import { useCustomImages } from './lib/images';
 import type { Database, ItemCategory, Photocard } from './lib/types';
 import { useVisibleCategories, useVisibleMembers } from './lib/categories';
-import { signInWithGoogle, useCloud } from './lib/cloud';
+import { providerInfo, reconnect, useCloud } from './lib/cloud';
 import { getSaveError, useProfile } from './lib/profile';
 import { LoginView } from './views/LoginView';
 import { ItemsView } from './views/ItemsView';
@@ -158,13 +158,13 @@ export function App() {
   const saveError = getSaveError();
   return (
     <div className="app">
-      {cloud.session?.mode === 'google' && cloud.status === 'reconnect' && (
+      {cloud.session && cloud.session.mode !== 'guest' && cloud.status === 'reconnect' && (
         <div className="cloud-banner" role="status">
           <span>
             <span className="cloud-dot reconnect" />
-            Sincronização com o Google Drive pausada.
+            Sincronização com o {providerInfo(cloud.session.mode)?.storageName} pausada.
           </span>
-          <button className="btn small primary" onClick={() => signInWithGoogle().catch(() => {})}>
+          <button className="btn small primary" onClick={() => reconnect().catch(() => {})}>
             Reconectar
           </button>
         </div>
@@ -196,7 +196,7 @@ export function App() {
             Templates
           </a>
           <a href="#/settings" className={page === 'settings' ? 'active' : ''} aria-label="Configurações">
-            {cloud.session?.mode === 'google' && <span className={`cloud-dot ${cloud.status}`} />}⚙︎
+            {cloud.session && cloud.session.mode !== 'guest' && <span className={`cloud-dot ${cloud.status}`} />}⚙︎
           </a>
         </nav>
       </header>

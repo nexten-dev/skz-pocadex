@@ -102,7 +102,7 @@ Detalhes técnicos da base:
 - `release.images` guarda a foto de cada card de forma compacta (`inf:2024/07/31/abc.jpg`), expandida com `db.imageHosts`. Miniaturas de imagens grandes passam por `db.imageProxy` (wsrv.nl).
 - `db.idMigrations` mapeia IDs de cards antigos para novos. O app move as marcações sozinho ao abrir.
 
-## Login com Google e sincronização (Google Drive)
+## Login e sincronização (Google Drive ou OneDrive)
 
 O app guarda o "arquivo pessoal" (marcações, fotos, preferências, itens e templates próprios) em `localStorage` e, com login, num arquivo `pocadex.json` na **pasta privada do app no Google Drive** da pessoa (`appDataFolder` — só o app enxerga, não aparece no Drive e o app não acessa outros arquivos). Não há servidor nosso.
 
@@ -115,7 +115,18 @@ Para ativar o login é preciso um **ID do cliente OAuth** do Google (gratuito):
 5. Copie o **ID do cliente** (`….apps.googleusercontent.com`) e crie no GitHub a variável de repositório **`GOOGLE_CLIENT_ID`** (*Settings → Secrets and variables → Actions → aba Variables*). Não é segredo — o ID é público por natureza.
 6. Publique de novo o site (qualquer push na `main` ou *Actions → Deploy → Run workflow*).
 
-Localmente: `VITE_GOOGLE_CLIENT_ID=… npm run dev`. Sem o ID, o app funciona só como visitante.
+### Microsoft (OneDrive)
+
+O arquivo fica em **Aplicativos › SKZ Pocadex** no OneDrive da pessoa (permissão `Files.ReadWrite.AppFolder`: só essa pasta). Funciona com contas pessoais (Outlook/Hotmail/Live) e de trabalho/escola.
+
+1. Em [portal.azure.com](https://portal.azure.com) → **Microsoft Entra ID → Registros de aplicativo → Novo registro**.
+2. Nome “SKZ Pocadex”; tipos de conta: **“Contas em qualquer diretório organizacional e contas pessoais da Microsoft”**.
+3. **URI de redirecionamento**: plataforma **“Aplicativo de página única (SPA)”** com `https://nexten-dev.github.io/skz-pocadex/auth-redirect.html`. Depois, em *Autenticação*, adicione também `http://localhost:4173/auth-redirect.html`.
+4. *Permissões de API* → *Adicionar* → **Microsoft Graph → Permissões delegadas → `Files.ReadWrite.AppFolder`** (o `User.Read` padrão pode ficar).
+5. Copie o **ID do aplicativo (cliente)** (na *Visão geral*) e crie no GitHub a variável de repositório **`MICROSOFT_CLIENT_ID`**.
+6. Publique de novo o site.
+
+Localmente: `VITE_GOOGLE_CLIENT_ID=… VITE_MICROSOFT_CLIENT_ID=… npm run dev`. Sem os IDs, o app funciona só como visitante. Cada botão de login só aparece quando o respectivo ID está configurado.
 
 ## Publicar uma versão (3 pacotes)
 

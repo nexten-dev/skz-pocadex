@@ -69,6 +69,7 @@ jobs:
         if: steps.v.outputs.exists == 'false'
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          VITE_MICROSOFT_CLIENT_ID: ${{ vars.MICROSOFT_CLIENT_ID }}
         run: |
           npm ci
           npm run release

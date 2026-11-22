@@ -17,6 +17,7 @@ Mudanças já publicadas no site, que entram na próxima versão (a versão est�
 - Automação “Wiki do Reddit” pela API oficial (aguardando credenciais do Reddit).
 
 - **Tela de login ao abrir o app**: “Entrar com Google” (coleção salva no Google Drive da pessoa, numa pasta privada do app, e sincronizada entre aparelhos) ou “Entrar como visitante” (com aviso de que nada é salvo na nuvem).
+- **Login com Microsoft (OneDrive)**: alternativa ao Google, com o arquivo na pasta “Aplicativos › SKZ Pocadex” do OneDrive. A Microsoft renova o acesso sozinha, então quase não aparece “Reconectar”.
 - **Sincronização com o Google Drive**: marcações, fotos, preferências, itens e templates próprios. Mescla por item (vale a alteração mais recente) e remoções não “voltam” vindas de outro aparelho.
 - **Configurações → Membros**: escolha de quais membros aparecem (inclusive Woojin e cards de grupo/unit). Vale para o app todo e é salva na nuvem, junto com as categorias de itens.
 - **Meus itens** (nova aba): cadastro de itens não oficiais ou fora da base — nome, membro, tipo, origem, foto, observações e os mesmos status.

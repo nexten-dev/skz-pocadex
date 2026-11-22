@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { ViewProps } from '../components/common';
 import { exportBackup, importBackup, parseBackup } from '../lib/collection';
-import { GOOGLE_CLIENT_ID, signInWithGoogle, signOut, syncNow, useCloud } from '../lib/cloud';
+import { PROVIDERS, providerInfo, reconnect, signIn, signOut, syncNow, useCloud } from '../lib/cloud';
 import { useVisibleMembers } from '../lib/categories';
 import { useProfile } from '../lib/profile';
 import { DEFAULT_DATA_URL, getDataUrl, setDataUrl, type SyncResult } from '../lib/data';
@@ -44,23 +44,23 @@ export function SettingsView({
 
       <section className="panel">
         <h2>Conta e sincronização</h2>
-        {cloud.session?.mode === 'google' ? (
+        {cloud.session && cloud.session.mode !== 'guest' ? (
           <>
             <p className="small">
               <span className={`cloud-dot ${cloud.status}`} />
-              Conectado como <strong>{cloud.session.email}</strong>.{' '}
+              Conectado como <strong>{cloud.session.email}</strong> ({providerInfo(cloud.session.mode)?.storageName}).{' '}
               {cloud.status === 'synced' && cloud.lastSync && `Sincronizado às ${new Date(cloud.lastSync).toLocaleTimeString('pt-BR')}.`}
               {cloud.status === 'syncing' && 'Sincronizando…'}
               {cloud.status === 'reconnect' && 'Sincronização pausada — reconecte para continuar.'}
               {cloud.status === 'error' && `Erro: ${cloud.error}`}
             </p>
             <p className="small muted">
-              Sua coleção, fotos, preferências, itens e templates ficam no seu Google Drive (pasta privada do app) e em todos os
-              aparelhos em que você entrar.
+              Sua coleção, fotos, preferências, itens e templates ficam no seu {providerInfo(cloud.session.mode)?.storageName} (pasta
+              do app) e em todos os aparelhos em que você entrar.
             </p>
             <div className="row">
               {cloud.status === 'reconnect' ? (
-                <button className="btn primary" onClick={() => signInWithGoogle().catch(() => {})}>
+                <button className="btn primary" onClick={() => reconnect().catch(() => {})}>
                   Reconectar
                 </button>
               ) : (
@@ -71,7 +71,7 @@ export function SettingsView({
               <button
                 className="btn"
                 onClick={() => {
-                  if (confirm('Sair da conta? Seus dados continuam no Google Drive e neste aparelho.')) signOut();
+                  if (confirm('Sair da conta? Seus dados continuam na nuvem e neste aparelho.')) void signOut();
                 }}
               >
                 Sair
@@ -83,12 +83,20 @@ export function SettingsView({
             <p className="small">
               Você está como <strong>visitante</strong>: nada é salvo na nuvem. As marcações ficam só neste navegador.
             </p>
-            {GOOGLE_CLIENT_ID ? (
-              <button className="btn primary" onClick={() => signInWithGoogle().then(() => onToast('Conectado ao Google Drive')).catch(() => {})}>
-                Entrar com Google
-              </button>
+            {PROVIDERS.some((p) => p.configured) ? (
+              <div className="row">
+                {PROVIDERS.filter((p) => p.configured).map((p) => (
+                  <button
+                    key={p.id}
+                    className="btn primary"
+                    onClick={() => signIn(p.id).then(() => onToast(`Conectado ao ${p.storageName}`)).catch(() => {})}
+                  >
+                    {p.button} ({p.storageName})
+                  </button>
+                ))}
+              </div>
             ) : (
-              <p className="small muted">O login com Google ainda não foi configurado neste app.</p>
+              <p className="small muted">O login ainda não foi configurado neste app.</p>
             )}
           </>
         )}

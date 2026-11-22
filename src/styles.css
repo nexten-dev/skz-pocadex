@@ -1666,3 +1666,14 @@ main {
   flex-wrap: wrap;
   gap: 0.4rem;
 }
+.login-google.provider-microsoft {
+  background: #2f2f2f;
+  border-color: #2f2f2f;
+}
+@media (prefers-color-scheme: dark) {
+  .login-google.provider-microsoft {
+    background: #e6e6e6;
+    border-color: #e6e6e6;
+    color: #1b1a19;
+  }
+}
