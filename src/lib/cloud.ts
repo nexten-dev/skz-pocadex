@@ -165,11 +165,22 @@ class AuthError extends Error {}
 async function api<T>(url: string, init: RequestInit = {}): Promise<T> {
   if (!token || Date.now() > token.expires) throw new AuthError('Sessão do Google expirou.');
   const res = await fetch(url, { ...init, headers: { ...(init.headers ?? {}), Authorization: `Bearer ${token.value}` } });
-  if (res.status === 401 || res.status === 403) {
+  if (res.status === 401) {
     token = null;
     throw new AuthError('Sessão do Google expirou.');
   }
-  if (!res.ok) throw new Error(`Google Drive respondeu ${res.status}`);
+  if (!res.ok) {
+    // 403 costuma ser configuração (Drive API desativada) ou permissão não concedida no login
+    const body = (await res.json().catch(() => null)) as { error?: { message?: string; errors?: { reason?: string }[] } } | null;
+    const reason = body?.error?.errors?.[0]?.reason ?? '';
+    if (/accessNotConfigured|SERVICE_DISABLED/i.test(reason + (body?.error?.message ?? '')))
+      throw new Error('A Google Drive API não está ativada no projeto do Google Cloud.');
+    if (/insufficient/i.test(reason + (body?.error?.message ?? ''))) {
+      token = null;
+      throw new Error('O acesso à pasta do app no Drive não foi permitido. Entre de novo e marque a permissão do Google Drive.');
+    }
+    throw new Error(`Google Drive respondeu ${res.status}${body?.error?.message ? `: ${body.error.message}` : ''}`);
+  }
   const type = res.headers.get('content-type') ?? '';
   return (type.includes('json') ? res.json() : res.text()) as Promise<T>;
 }
