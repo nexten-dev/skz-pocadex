@@ -1435,3 +1435,234 @@ main {
     font-size: 0.6rem;
   }
 }
+
+/* ---------- Login ---------- */
+.login {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  gap: 1rem;
+}
+.login-card {
+  width: min(420px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.6rem 1.4rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  text-align: center;
+}
+.login-brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+.login-brand .logo {
+  font-size: 1rem;
+  padding: 0.15rem 0.5rem;
+}
+.login-google {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.login-card hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 0.4rem 0;
+}
+.login-error {
+  color: var(--accent);
+}
+.guest-warning {
+  text-align: left;
+  background: color-mix(in srgb, var(--transit) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--transit) 40%, transparent);
+  border-radius: 12px;
+  padding: 0.8rem;
+}
+.guest-warning .row {
+  margin-top: 0.5rem;
+}
+.login-foot {
+  text-align: center;
+}
+.cloud-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.5rem 16px;
+  font-size: 0.85rem;
+  background: color-mix(in srgb, var(--transit) 14%, var(--surface));
+  border-bottom: 1px solid var(--border);
+}
+.cloud-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+  background: var(--muted);
+}
+.cloud-dot.synced {
+  background: var(--owned);
+}
+.cloud-dot.syncing {
+  background: var(--transit);
+}
+.cloud-dot.reconnect,
+.cloud-dot.error {
+  background: var(--accent);
+}
+.mode-hint {
+  flex-basis: 100%;
+  margin: 0;
+}
+.photo-section {
+  border-top: 1px solid var(--border);
+  padding-top: 0.7rem;
+  margin-top: 0.4rem;
+}
+.photo-section h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+}
+.photo-section .row {
+  margin-top: 0.5rem;
+}
+.photo-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+.photo-picker > .btn.primary {
+  align-self: flex-start;
+}
+
+/* ---------- Meus itens ---------- */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.7rem;
+}
+.item-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.item-card.owned {
+  border-color: var(--owned);
+}
+.item-card.transit {
+  border-color: var(--transit);
+}
+.item-photo {
+  position: relative;
+  aspect-ratio: 55 / 85;
+  border: 0;
+  padding: 0;
+  background: var(--surface-2);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+}
+.item-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.6rem;
+}
+.item-body select {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.4rem;
+}
+.item-form {
+  padding: 1.2rem;
+  max-width: 520px;
+}
+.item-form h2 {
+  margin: 0 2.5rem 0.8rem 0;
+}
+.item-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.item-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  flex: 1 1 140px;
+}
+.item-form textarea {
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+}
+.item-form-photo {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.item-form-photo img {
+  width: 90px;
+  aspect-ratio: 55 / 85;
+  object-fit: cover;
+  border-radius: 8px;
+}
+@media (max-width: 600px) {
+  .items-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.mine-tag {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0 0.25rem;
+  vertical-align: middle;
+}
+.template-preview {
+  width: 140px !important;
+  aspect-ratio: auto !important;
+  max-height: 120px;
+  object-fit: contain !important;
+}
+.member-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}

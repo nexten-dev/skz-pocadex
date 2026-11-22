@@ -102,6 +102,21 @@ Detalhes técnicos da base:
 - `release.images` guarda a foto de cada card de forma compacta (`inf:2024/07/31/abc.jpg`), expandida com `db.imageHosts`. Miniaturas de imagens grandes passam por `db.imageProxy` (wsrv.nl).
 - `db.idMigrations` mapeia IDs de cards antigos para novos. O app move as marcações sozinho ao abrir.
 
+## Login com Google e sincronização (Google Drive)
+
+O app guarda o "arquivo pessoal" (marcações, fotos, preferências, itens e templates próprios) em `localStorage` e, com login, num arquivo `pocadex.json` na **pasta privada do app no Google Drive** da pessoa (`appDataFolder` — só o app enxerga, não aparece no Drive e o app não acessa outros arquivos). Não há servidor nosso.
+
+Para ativar o login é preciso um **ID do cliente OAuth** do Google (gratuito):
+
+1. Em [console.cloud.google.com](https://console.cloud.google.com), crie um projeto (ex.: “SKZ Pocadex”).
+2. *APIs e serviços → Biblioteca*: ative a **Google Drive API**.
+3. *Google Auth Platform* (tela de consentimento): tipo **Externo**, nome do app, e-mail de suporte; em *Acesso a dados* adicione o escopo `.../auth/drive.appdata`; em *Público*, enquanto estiver em **Teste**, adicione os e-mails que podem entrar (ou publique o app).
+4. *Clientes → Criar cliente*: tipo **Aplicativo da Web**; em **Origens JavaScript autorizadas** coloque `https://nexten-dev.github.io` e `http://localhost:4173`. Não precisa de URI de redirecionamento.
+5. Copie o **ID do cliente** (`….apps.googleusercontent.com`) e crie no GitHub a variável de repositório **`GOOGLE_CLIENT_ID`** (*Settings → Secrets and variables → Actions → aba Variables*). Não é segredo — o ID é público por natureza.
+6. Publique de novo o site (qualquer push na `main` ou *Actions → Deploy → Run workflow*).
+
+Localmente: `VITE_GOOGLE_CLIENT_ID=… npm run dev`. Sem o ID, o app funciona só como visitante.
+
 ## Publicar uma versão (3 pacotes)
 
 Toda versão publicada gera três pacotes:

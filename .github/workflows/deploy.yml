@@ -25,6 +25,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          # ID do cliente OAuth do Google (login + Drive). É público; fica em
+          # Settings → Secrets and variables → Actions → Variables → GOOGLE_CLIENT_ID
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

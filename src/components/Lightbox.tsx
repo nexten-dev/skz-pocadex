@@ -8,7 +8,10 @@ export function Lightbox({
   source,
   linkLabel,
   onClose,
+  action,
 }: {
+  /** Botão extra na legenda (ex.: Editar). */
+  action?: React.ReactNode;
   /** Texto do link de origem (padrão: "ver na <source>"). */
   linkLabel?: string;
   url: string;
@@ -36,6 +39,7 @@ export function Lightbox({
         <img src={url} alt={caption ?? ''} referrerPolicy="no-referrer" />
         <figcaption className="small">
           {caption}
+          {action && <> {action}</>}
           {page && (
             <>
               {' · '}

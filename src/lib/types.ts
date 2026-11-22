@@ -207,4 +207,6 @@ export interface TemplateItem {
   status?: string;
   releaseId?: string;
   member?: string;
+  /** Template adicionado pelo próprio usuário (arquivo pessoal). */
+  mine?: boolean;
 }

@@ -6,6 +6,8 @@ import type { CardStatus, Photocard, TransitStatus } from '../lib/types';
 import { groupKey, useReleaseImages } from '../lib/images';
 import { Lightbox } from '../components/Lightbox';
 import { TemplateGrid } from '../components/TemplateStrip';
+import { useAllTemplates } from '../lib/templates';
+import { useVisibleMembers } from '../lib/categories';
 import type { MediaImage } from '../lib/types';
 import { CardDetail } from '../components/CardDetail';
 import { CategoryBar } from '../components/CategoryBar';
@@ -47,6 +49,8 @@ export function ReleaseView({
   const cards = index.byRelease.get(releaseId) ?? [];
   const memberIds = useMemo(() => (release ? releaseMembers(db, release) : []), [db, release]);
   const { images, previews, previewByGroup, memberPhotos } = useReleaseImages(release, cards, customImages, db);
+  const allTemplates = useAllTemplates(db);
+  const { members: visibleMembers } = useVisibleMembers();
   const [zoom, setZoom] = useState<(MediaImage & { caption?: string }) | null>(null);
   const counts = useMemo(() => countCards(cards, collection), [cards, collection]);
 
@@ -112,7 +116,7 @@ export function ReleaseView({
     if (confirm(`Marcar ${list.length} itens como "${label}"?`)) setStatus(list.map((c) => c.id), target);
   };
 
-  const relMembers = memberIds;
+  const relMembers = visibleMembers ? memberIds.filter((m) => visibleMembers.includes(m)) : memberIds;
   const detailCard = openCard ? index.byId.get(openCard) : undefined;
   const candidates = [
     ...Object.entries(memberPhotos).map(([id, m]) => ({ ...m, label: `Divulgação · ${members.get(id)?.name ?? id}`, memberId: id })),
@@ -158,7 +162,7 @@ export function ReleaseView({
             </div>
           ) : null}
           {(() => {
-            const templates = db.templates?.items.filter((t) => t.releaseId === release.id) ?? [];
+            const templates = allTemplates.filter((t) => t.releaseId === release.id);
             return templates.length ? (
               <div className="preview-strip">
                 <span className="small muted">
@@ -180,9 +184,9 @@ export function ReleaseView({
               </>
             ) : release.media ? (
               Object.keys(memberPhotos).length > 0 ? (
-                'Ainda não temos as fotos dos photocards deste lançamento; os cards mostram a foto de divulgação de cada membro (📷). Você pode adicionar a foto real em “🔍 Ver” → “Escolher imagem”.'
+                'Ainda não temos as fotos dos photocards deste lançamento; os cards mostram a foto de divulgação de cada membro (📷). Para adicionar a foto real, toque em “🔍 Ver” e depois no card.'
               ) : (
-                'Ainda não temos as fotos dos photocards deste lançamento. Você pode adicionar a sua em “🔍 Ver” → “Escolher imagem”.'
+                'Ainda não temos as fotos dos photocards deste lançamento. Para adicionar a sua, toque em “🔍 Ver” e depois no card.'
               )
             ) : (
               'Ainda não temos imagens para este lançamento.'
@@ -212,6 +216,11 @@ export function ReleaseView({
             </button>
           ))}
         </div>
+        <p className="mode-hint small muted">
+          {mode === 'view'
+            ? 'Toque num card para ampliar, mudar o status ou adicionar/trocar a foto 📷.'
+            : 'Toque nos cards para marcar. Para ver ou adicionar a foto de um card, use “🔍 Ver”.'}
+        </p>
         {mode === 'transit' && (
           <label className="step-picker">
             <span className="small muted">Etapa:</span>

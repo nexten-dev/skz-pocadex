@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react';
 import type { ViewProps } from '../components/common';
-import { exportCollection, parseBackup } from '../lib/collection';
+import { exportBackup, importBackup, parseBackup } from '../lib/collection';
+import { GOOGLE_CLIENT_ID, signInWithGoogle, signOut, syncNow, useCloud } from '../lib/cloud';
+import { useVisibleMembers } from '../lib/categories';
+import { useProfile } from '../lib/profile';
 import { DEFAULT_DATA_URL, getDataUrl, setDataUrl, type SyncResult } from '../lib/data';
-import type { Collection } from '../lib/types';
-import { isConceptEnabled, setConceptEnabled } from '../lib/images';
+import { setConceptEnabled } from '../lib/images';
 import { CATEGORIES } from '../lib/categories';
 import { usePwa } from '../lib/pwa';
 
@@ -15,18 +17,110 @@ export function SettingsView({
   setVisibleCategories,
   sync,
   onSync,
-  onReplace,
-}: ViewProps & { sync: SyncResult; onSync: () => void; onReplace: (c: Collection, imgs: Record<string, { url: string; page?: string; source?: string }> | null) => void }) {
+  onToast,
+}: ViewProps & { sync: SyncResult; onSync: () => void; onToast: (msg: string) => void }) {
+  const cloud = useCloud();
+  const profile = useProfile();
+  const { members: visibleMembers, setMembers } = useVisibleMembers();
+  const memberOptions = [...db.members.map((m) => ({ id: m.id, name: m.former ? `${m.name} (ex-membro)` : m.name })), { id: 'group', name: 'Grupo / units' }];
+  const shownMembers = visibleMembers ?? memberOptions.map((m) => m.id);
+  const toggleMember = (id: string) => {
+    const next = shownMembers.includes(id) ? shownMembers.filter((m) => m !== id) : [...shownMembers, id];
+    setMembers(next.length === memberOptions.length ? null : next.length ? next : shownMembers);
+  };
+  const photosKb = Math.round(
+    Object.values(profile.images).reduce((n, i) => n + (i.url.startsWith('data:') ? i.url.length * 0.75 : 0), 0) / 1024,
+  );
   const fileRef = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState(getDataUrl());
   const pwa = usePwa();
-  const [concept, setConcept] = useState(isConceptEnabled());
+  const concept = profile.prefs.showConcept;
   const marked = Object.keys(collection.cards).length;
   const orphans = Object.keys(collection.cards).filter((id) => !index.byId.has(id)).length;
 
   return (
     <>
       <h1>Configurações</h1>
+
+      <section className="panel">
+        <h2>Conta e sincronização</h2>
+        {cloud.session?.mode === 'google' ? (
+          <>
+            <p className="small">
+              <span className={`cloud-dot ${cloud.status}`} />
+              Conectado como <strong>{cloud.session.email}</strong>.{' '}
+              {cloud.status === 'synced' && cloud.lastSync && `Sincronizado às ${new Date(cloud.lastSync).toLocaleTimeString('pt-BR')}.`}
+              {cloud.status === 'syncing' && 'Sincronizando…'}
+              {cloud.status === 'reconnect' && 'Sincronização pausada — reconecte para continuar.'}
+              {cloud.status === 'error' && `Erro: ${cloud.error}`}
+            </p>
+            <p className="small muted">
+              Sua coleção, fotos, preferências, itens e templates ficam no seu Google Drive (pasta privada do app) e em todos os
+              aparelhos em que você entrar.
+            </p>
+            <div className="row">
+              {cloud.status === 'reconnect' ? (
+                <button className="btn primary" onClick={() => signInWithGoogle().catch(() => {})}>
+                  Reconectar
+                </button>
+              ) : (
+                <button className="btn primary" onClick={() => syncNow()}>
+                  Sincronizar agora
+                </button>
+              )}
+              <button
+                className="btn"
+                onClick={() => {
+                  if (confirm('Sair da conta? Seus dados continuam no Google Drive e neste aparelho.')) signOut();
+                }}
+              >
+                Sair
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="small">
+              Você está como <strong>visitante</strong>: nada é salvo na nuvem. As marcações ficam só neste navegador.
+            </p>
+            {GOOGLE_CLIENT_ID ? (
+              <button className="btn primary" onClick={() => signInWithGoogle().then(() => onToast('Conectado ao Google Drive')).catch(() => {})}>
+                Entrar com Google
+              </button>
+            ) : (
+              <p className="small muted">O login com Google ainda não foi configurado neste app.</p>
+            )}
+          </>
+        )}
+      </section>
+
+      <section className="panel">
+        <h2>Membros</h2>
+        <p className="muted small">Escolha de quais membros os cards aparecem no app, no progresso e na sua coleção.</p>
+        <div className="member-toggles">
+          {memberOptions.map((m) => {
+            const color = db.members.find((x) => x.id === m.id)?.color ?? 'var(--accent)';
+            const on = shownMembers.includes(m.id);
+            return (
+              <button
+                key={m.id}
+                className={on ? 'chip on' : 'chip'}
+                style={{ ['--mc' as string]: color }}
+                aria-pressed={on}
+                onClick={() => toggleMember(m.id)}
+              >
+                {on ? '✓ ' : ''}
+                {m.name}
+              </button>
+            );
+          })}
+        </div>
+        <div className="row" style={{ marginTop: '0.6rem' }}>
+          <button className="btn small" onClick={() => setMembers(null)}>
+            Mostrar todos
+          </button>
+        </div>
+      </section>
 
       <section className="panel">
         <h2>Base de dados</h2>
@@ -179,7 +273,8 @@ export function SettingsView({
           As imagens vêm da Stray Kids Wiki e são atualizadas toda semana na base do app. As wikis não têm fotos
           individuais dos photocards; o app mostra a <strong>prévia oficial de cada versão</strong> do álbum e, nos cards,
           a <strong>foto de divulgação do membro</strong> naquela era (marcada com 📷). Você pode trocar a imagem de
-          qualquer card no modo “🔍 Ver”. {Object.keys(customImages).length} imagens escolhidas por você.
+          qualquer card no modo “🔍 Ver”. {Object.keys(customImages).length} fotos escolhidas ou enviadas por você
+          {photosKb > 0 && ` (${photosKb} KB de fotos enviadas do aparelho)`}.
         </p>
         <label className="toggle">
           <input
@@ -187,7 +282,6 @@ export function SettingsView({
             checked={concept}
             onChange={(e) => {
               setConceptEnabled(e.target.checked);
-              setConcept(e.target.checked);
             }}
           />
           Mostrar as fotos de divulgação dos membros nos cards
@@ -197,12 +291,15 @@ export function SettingsView({
       <section className="panel">
         <h2>Backup da coleção</h2>
         <p className="muted small">
-          Sua coleção fica salva apenas neste navegador ({marked} photocards marcados). Exporte um backup para levar
-          para outro aparelho.
+          {cloud.session?.mode === 'google'
+            ? 'Sua coleção já fica salva no Google Drive. O backup é uma cópia extra em arquivo.'
+            : 'Como visitante, sua coleção fica só neste navegador. Exporte um backup de vez em quando para não perder nada.'}{' '}
+          ({marked} itens marcados, {Object.values(profile.items).filter((i) => !i.deleted).length} itens próprios,{' '}
+          {Object.values(profile.templates).filter((t) => !t.deleted).length} templates seus.)
           {orphans > 0 && ` ${orphans} marcações se referem a cards que não existem mais na base atual e foram mantidas.`}
         </p>
         <div className="row">
-          <button className="btn primary" onClick={() => exportCollection(collection, customImages)}>
+          <button className="btn primary" onClick={() => exportBackup()}>
             Exportar backup
           </button>
           <button className="btn" onClick={() => fileRef.current?.click()}>
@@ -218,9 +315,15 @@ export function SettingsView({
               e.target.value = '';
               if (!f) return;
               try {
-                const { collection: c, customImages: imgs } = await parseBackup(f);
-                if (confirm(`Substituir a coleção atual por ${Object.keys(c.cards).length} marcações do backup?`))
-                  onReplace(c, imgs);
+                const backup = await parseBackup(f);
+                const n = Object.keys(backup.cards).length;
+                if (confirm(`Juntar as ${n} marcações do backup com a sua coleção atual?\n\nOK = juntar (mantém o mais recente de cada card)\nCancelar = escolher substituir`)) {
+                  importBackup(backup, 'merge');
+                  onToast('Backup juntado à sua coleção');
+                } else if (confirm(`Substituir TODA a coleção atual pelo backup (${n} marcações)?`)) {
+                  importBackup(backup, 'replace');
+                  onToast('Coleção substituída pelo backup');
+                }
               } catch (err) {
                 alert(err instanceof Error ? err.message : 'Erro ao importar');
               }

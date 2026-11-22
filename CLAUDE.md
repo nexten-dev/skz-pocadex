@@ -7,7 +7,10 @@ Web app (PWA) para organizar a coleção de photocards do **Stray Kids**: lista 
 
 ## Stack e estrutura
 
-- Vite + React 19 + TypeScript, sem backend. Dados do usuário em `localStorage`.
+- Vite + React 19 + TypeScript, sem backend.
+- **Arquivo pessoal** (`src/lib/profile.ts`): um documento com `cards` (+ lápides `removed`), `images` (+ `imagesRemoved`; fotos enviadas viram `data:` JPEG reduzido por `src/lib/photo.ts`), `prefs` (membros, categorias, fotos de divulgação), `items` (Meus itens) e `templates` (templates próprios). Cada alteração tem horário `t`; `mergeProfiles` mescla por item (mais recente vence). Fica em `localStorage` (`pocadex:profile`; migra as chaves antigas na primeira vez). Hooks `useCollection`, `useCustomImages`, `useVisibleCategories`, `useVisibleMembers` são fachadas sobre ele.
+- **Login e nuvem** (`src/lib/cloud.ts`): Google Identity Services (token no navegador, sem servidor) + Drive `appDataFolder` (`pocadex.json`). Sincroniza ao entrar, 3 s após cada mudança e ao voltar para o app; token expira em ~1 h → banner “Reconectar”. Precisa de `VITE_GOOGLE_CLIENT_ID` (variável de repositório `GOOGLE_CLIENT_ID`, usada no `deploy.yml`/`release.yml`; sem ela o app só oferece visitante). Tela de login (`src/views/LoginView.tsx`) aparece a cada abertura; visitante continua salvando no navegador, com aviso de que nada vai para a nuvem.
+- Páginas: `#/` (lançamentos), `#/release/:id`, `#/stats` (coleção), `#/itens` (Meus itens), `#/templates`, `#/settings` (conta, membros, categorias, imagens, backup, instalação). “Sugerir para todos” abre issue pré-preenchida no GitHub (`suggestUrl` em `src/lib/photo.ts`).
 - `public/data/photocards.json` — **a base de dados** (catálogo). O app baixa esse arquivo a cada abertura (sem cache) e guarda uma cópia para uso offline.
 - `src/lib/expand.js` — gera os cards a partir das regras de cada set (JS puro, compartilhado com os scripts).
 - `src/lib/status.ts` — status dos itens: `owned`, etapas a caminho (`bought`→`secured`→`proxy`→`intl`→`tax`→`homeready`→`shipped`), `wish`, `notwant`. “Não quero” não conta no progresso. O antigo `transit` é migrado para `bought`.
@@ -63,9 +66,10 @@ No GitHub (`nexten-dev/skz-pocadex`), o workflow `.github/workflows/release.yml`
 
 - Nome “SKZ Pocadex” (poca = 포카, photocard; dex = Pokédex) — aprovado pelo usuário.
 - **Publicação**: repositório público `nexten-dev/skz-pocadex`, site no GitHub Pages (`https://nexten-dev.github.io/skz-pocadex/`) via workflow `deploy.yml`. Pages **ativo** (Source: GitHub Actions) e repositório **público** desde a v0.4.2. Configurações do repositório (visibilidade, Pages) só podem ser alteradas pelo usuário — a API de settings não é acessível da sessão. Para republicar o site sem commit: `gh api repos/nexten-dev/skz-pocadex/actions/workflows/deploy.yml/dispatches -X POST -f ref=main`.
-- **Sincronização entre aparelhos**: decidido usar a **nuvem pessoal do usuário** (Google Drive primeiro; OneDrive/Dropbox depois), arquivo da coleção numa pasta do app, mesclagem por card usando o timestamp `t`. **Não** usar Supabase por enquanto.
+- **Sincronização entre aparelhos**: **implementada com Google Drive** (`src/lib/cloud.ts`); OneDrive/Dropbox talvez depois. **Não** usar Supabase. Pendente: o usuário criar o cliente OAuth no Google Cloud e a variável `GOOGLE_CLIENT_ID` no GitHub (passo a passo no README).
 - Pastas do Google Drive indicadas pelo usuário (`data/drive-sources.json`) têm só **templates** (folhas com vários cards); foram trocadas pelo SKZPD, que tem uma foto por card. Os scripts `drive*.mjs`/`drive.yml` ficaram como diagnóstico.
-- Próximos passos sugeridos: sync com Google Drive da coleção do usuário, conferir dados “(a confirmar)”, importar novas páginas do SKZPD quando forem publicadas (DO IT, GIANT, THE SOUND… ainda vazias lá).
+- Limitação conhecida: fotos enviadas do aparelho ficam dentro do arquivo pessoal (base64); muitas fotos podem encher o `localStorage` (~5 MB) — o app avisa. Se virar problema, mover fotos para arquivos separados no Drive/IndexedDB.
+- Próximos passos sugeridos: conferir dados “(a confirmar)”, importar novas páginas do SKZPD quando forem publicadas (DO IT, GIANT, THE SOUND… ainda vazias lá).
 
 ## Limitações do ambiente de nuvem do Claude
 

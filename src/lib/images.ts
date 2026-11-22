@@ -1,30 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { slug } from './expand';
-import { migrateKeys } from './collection';
+import { getProfile, updateProfile, useProfile } from './profile';
 import type { CardImage, Database, DbImage, MediaImage, Photocard, Release } from './types';
-
-const CUSTOM_KEY = 'pocadex:customImages';
-const CONCEPT_KEY = 'pocadex:conceptPhotos';
 
 type CustomImages = Record<string, { url: string; page?: string; source?: string }>;
 
-function readJSON<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-function writeJSON(key: string, value: unknown) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    /* ignore */
-  }
-}
-
-// Limpa o cache da busca antiga pelo navegador (versões ≤ 0.4.x).
+// Limpa chaves de versões antigas (busca de imagens pelo navegador, ≤ 0.4.x).
 try {
   for (const k of Object.keys(localStorage)) {
     if (k.startsWith('pocadex:wiki:') || k === 'pocadex:wikiImages') localStorage.removeItem(k);
@@ -35,29 +16,29 @@ try {
 
 /** Mostrar a foto de divulgação do membro no fundo dos cards sem imagem própria. */
 export function isConceptEnabled(): boolean {
-  return readJSON(CONCEPT_KEY, true);
+  return getProfile().prefs.showConcept;
 }
 export function setConceptEnabled(v: boolean) {
-  writeJSON(CONCEPT_KEY, v);
+  updateProfile((p, now) => {
+    p.prefs = { ...p.prefs, showConcept: v, t: now };
+  });
 }
 
-/** Imagens escolhidas pelo próprio usuário (ficam só neste aparelho e vão no backup). */
+/** Imagens escolhidas/enviadas pelo usuário (ficam no arquivo pessoal). */
 export function useCustomImages() {
-  const [custom, setCustom] = useState<CustomImages>(() => readJSON(CUSTOM_KEY, {}));
-  useEffect(() => writeJSON(CUSTOM_KEY, custom), [custom]);
+  const profile = useProfile();
   const setImage = useCallback((cardId: string, img: CustomImages[string] | null) => {
-    setCustom((prev) => {
-      const next = { ...prev };
-      if (img) next[cardId] = img;
-      else delete next[cardId];
-      return next;
+    updateProfile((p, now) => {
+      if (img) {
+        p.images[cardId] = { ...img, t: now };
+        delete p.imagesRemoved[cardId];
+      } else if (p.images[cardId]) {
+        delete p.images[cardId];
+        p.imagesRemoved[cardId] = now;
+      }
     });
   }, []);
-  const migrateIds = useCallback((map: Record<string, string> | undefined) => {
-    if (!map) return;
-    setCustom((prev) => migrateKeys(prev, map));
-  }, []);
-  return { custom, setImage, replaceAll: setCustom, migrateIds };
+  return { custom: profile.images as CustomImages, setImage };
 }
 
 type Hosts = Pick<Database, 'imageHosts' | 'imageProxy'>;
@@ -67,6 +48,7 @@ type Hosts = Pick<Database, 'imageHosts' | 'imageProxy'>;
  * Para miniaturas sem tamanho próprio no servidor, usa db.imageProxy (redimensiona).
  */
 export function resolveImage(value: string, hosts: Hosts | undefined, size: 'thumb' | 'full', width = 360): string {
+  if (value.startsWith('data:')) return value; // foto enviada pelo usuário
   const m = value.match(/^([a-z0-9]+):(?!\/\/)(.+)$/i);
   const host = m ? hosts?.imageHosts?.[m[1]] : undefined;
   const url = m && host ? encodeURI(host.base + m[2]) : value;
@@ -110,7 +92,7 @@ export function groupKey(card: Pick<Photocard, 'setId' | 'version'>): string {
  * 3. foto de divulgação do membro na era (se ativado)
  */
 export function useReleaseImages(release: Release | undefined, cards: Photocard[], custom: CustomImages, hosts?: Hosts) {
-  const concept = isConceptEnabled();
+  const concept = useProfile().prefs.showConcept;
   return useMemo(() => {
     const images = new Map<string, CardImage>();
     const previews = release?.media?.previews ?? [];

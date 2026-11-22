@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import type { CardImage, CardStatus, Member, Photocard, Release } from '../lib/types';
 import { isTransit, nextStatus, STATUS_INFO, TRANSIT_STEPS } from '../lib/status';
 import { CATEGORY_BY_ID } from '../lib/categories';
+import { PhotoPicker } from './PhotoPicker';
+import { suggestUrl } from '../lib/photo';
 
 interface Props {
   card: Photocard;
@@ -23,7 +25,6 @@ const MAIN: CardStatus[] = ['owned', 'wish', 'notwant'];
 
 export function CardDetail({ card, release, member, image, candidates, status, qty, setNote, onStatus, onQty, onImage, onClose }: Props) {
   const [picking, setPicking] = useState(false);
-  const [customUrl, setCustomUrl] = useState('');
   const [broken, setBroken] = useState(false);
 
   useEffect(() => {
@@ -39,8 +40,6 @@ export function CardDetail({ card, release, member, image, candidates, status, q
   useEffect(() => setBroken(false), [image?.url]);
 
   const name = member?.name ?? (card.label || 'Grupo');
-  const forMember = candidates.filter((c) => c.memberId === card.memberId);
-  const others = candidates.filter((c) => c.memberId !== card.memberId);
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -167,67 +166,67 @@ export function CardDetail({ card, release, member, image, candidates, status, q
               )}
             </div>
 
-            <div className="row">
-              <button className="btn small" onClick={() => setPicking((v) => !v)}>
-                {picking ? 'Fechar seleção' : 'Escolher imagem'}
-              </button>
-              {image?.kind === 'custom' && (
-                <button className="btn small" onClick={() => onImage(null)}>
-                  Usar imagem padrão
-                </button>
+            <section className="photo-section">
+              <h3>📷 Foto do card</h3>
+              {image?.kind === 'custom' ? (
+                <p className="small muted">Você está usando a sua foto neste card.</p>
+              ) : image?.kind === 'db' ? (
+                <p className="small muted">Já existe uma foto. Se quiser, troque pela sua (ex.: foto do seu card).</p>
+              ) : (
+                <p className="small">
+                  <strong>Este card ainda não tem foto.</strong> Envie uma do seu celular ou cole um link — ela fica salva na
+                  sua coleção.
+                </p>
               )}
-            </div>
-
-            {picking && (
-              <div className="picker">
-                {candidates.length > 0 ? (
-                  <>
-                    <p className="small muted">
-                      Imagens deste lançamento na wiki (fotos de divulgação e prévias das versões). Para a foto real do
-                      photocard, cole um link abaixo.
-                    </p>
-                    <div className="picker-grid">
-                      {[...forMember, ...others].map((c) => (
-                        <button
-                          key={c.url}
-                          className={image?.url === c.url ? 'pick on' : 'pick'}
-                          title={c.label}
-                          onClick={() => {
-                            onImage({ url: c.url, page: c.page, source: c.source });
-                            setPicking(false);
-                          }}
-                        >
-                          <img src={c.thumb ?? c.url} alt={c.label} loading="lazy" referrerPolicy="no-referrer" />
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="small muted">Ainda não há imagens da wiki para este lançamento.</p>
-                )}
-                <form
-                  className="row"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const url = customUrl.trim();
-                    if (!/^https?:\/\//i.test(url)) return;
-                    onImage({ url, source: 'Link adicionado por você' });
-                    setCustomUrl('');
-                    setPicking(false);
-                  }}
-                >
-                  <input
-                    type="url"
-                    placeholder="Ou cole o link de uma imagem (https://…)"
-                    value={customUrl}
-                    onChange={(e) => setCustomUrl(e.target.value)}
-                  />
-                  <button className="btn small primary" type="submit">
-                    Usar
+              <PhotoPicker onPick={(url) => onImage({ url, source: url.startsWith('data:') ? 'Foto enviada por você' : 'Link adicionado por você' })} />
+              <div className="row">
+                {image?.kind === 'custom' && (
+                  <button className="btn small" onClick={() => onImage(null)}>
+                    Remover minha foto
                   </button>
-                </form>
+                )}
+                {candidates.length > 0 && (
+                  <button className="btn small" onClick={() => setPicking((v) => !v)}>
+                    {picking ? 'Fechar imagens da wiki' : 'Escolher entre imagens da wiki'}
+                  </button>
+                )}
+                {image?.kind === 'custom' && /^https?:/.test(image.url) && (
+                  <a
+                    className="btn small"
+                    target="_blank"
+                    rel="noreferrer"
+                    href={suggestUrl(`Foto do card: ${release.title} · ${card.setName}${card.version ? ' · ' + card.version : ''} · ${name}`, [
+                      `**Card:** \`${card.id}\``,
+                      `**Lançamento:** ${release.title}`,
+                      `**Grupo:** ${card.setName}${card.version ? ' · ' + card.version : ''}`,
+                      `**Membro:** ${name}`,
+                      `**Imagem:** ${image.url}`,
+                    ])}
+                  >
+                    Sugerir esta foto para todos
+                  </a>
+                )}
               </div>
-            )}
+              {picking && (
+                <div className="picker">
+                  <div className="picker-grid">
+                    {[...candidates.filter((c) => c.memberId === card.memberId), ...candidates.filter((c) => c.memberId !== card.memberId)].map((c) => (
+                      <button
+                        key={c.url}
+                        className={image?.url === c.url ? 'pick on' : 'pick'}
+                        title={c.label}
+                        onClick={() => {
+                          onImage({ url: c.url, page: c.page, source: c.source });
+                          setPicking(false);
+                        }}
+                      >
+                        <img src={c.thumb ?? c.url} alt={c.label} loading="lazy" referrerPolicy="no-referrer" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
           </div>
         </div>
       </div>

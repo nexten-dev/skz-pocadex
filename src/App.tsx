@@ -3,7 +3,11 @@ import { expandRelease, syncDatabase, type SyncResult } from './lib/data';
 import { useCollection } from './lib/collection';
 import { useCustomImages } from './lib/images';
 import type { Database, ItemCategory, Photocard } from './lib/types';
-import { useVisibleCategories } from './lib/categories';
+import { useVisibleCategories, useVisibleMembers } from './lib/categories';
+import { signInWithGoogle, useCloud } from './lib/cloud';
+import { getSaveError, useProfile } from './lib/profile';
+import { LoginView } from './views/LoginView';
+import { ItemsView } from './views/ItemsView';
 import { usePwa } from './lib/pwa';
 import { HomeView } from './views/HomeView';
 import { ReleaseView } from './views/ReleaseView';
@@ -48,12 +52,13 @@ function buildFullIndex(db: Database) {
   return { byReleaseAll, byId };
 }
 
-function filterIndex(full: ReturnType<typeof buildFullIndex>, visible: ItemCategory[]): CardIndex {
+function filterIndex(full: ReturnType<typeof buildFullIndex>, visible: ItemCategory[], members: string[] | null): CardIndex {
   const show = new Set(visible);
+  const who = members ? new Set(members) : null;
   const byRelease = new Map<string, Photocard[]>();
   const all: Photocard[] = [];
   for (const [id, cards] of full.byReleaseAll) {
-    const list = cards.filter((c) => show.has(c.category));
+    const list = cards.filter((c) => show.has(c.category) && (!who || who.has(c.memberId)));
     byRelease.set(id, list);
     all.push(...list);
   }
@@ -65,13 +70,12 @@ export function App() {
   const pwa = usePwa();
   const [sync, setSync] = useState<SyncResult | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const { collection, setStatus, setQty, replace, migrateIds } = useCollection();
-  const {
-    custom: customImages,
-    setImage: setCustomImage,
-    replaceAll: replaceImages,
-    migrateIds: migrateImageIds,
-  } = useCustomImages();
+  const { collection, setStatus, setQty, migrateIds } = useCollection();
+  const { custom: customImages, setImage: setCustomImage } = useCustomImages();
+  const cloud = useCloud();
+  useProfile(); // re-renderiza quando o arquivo pessoal muda
+  // A tela de login aparece a cada abertura do app (até a pessoa entrar ou escolher visitante)
+  const [entered, setEntered] = useState(false);
 
   const runSync = useCallback(async (manual = false) => {
     const result = await syncDatabase();
@@ -105,11 +109,14 @@ export function App() {
   useEffect(() => {
     if (!db?.idMigrations) return;
     migrateIds(db.idMigrations);
-    migrateImageIds(db.idMigrations);
-  }, [db, migrateIds, migrateImageIds]);
+  }, [db, migrateIds]);
   const { visible, toggle: toggleCategory, setVisible: setVisibleCategories } = useVisibleCategories();
   const fullIndex = useMemo(() => (db ? buildFullIndex(db) : null), [db]);
-  const index = useMemo(() => (fullIndex ? filterIndex(fullIndex, visible) : null), [fullIndex, visible]);
+  const { members: visibleMembers } = useVisibleMembers();
+  const index = useMemo(
+    () => (fullIndex ? filterIndex(fullIndex, visible, visibleMembers) : null),
+    [fullIndex, visible, visibleMembers],
+  );
 
   let content: React.ReactNode;
   if (!sync) {
@@ -140,25 +147,33 @@ export function App() {
     if (page === 'release' && param) content = <ReleaseView {...props} releaseId={decodeURIComponent(param)} />;
     else if (page === 'stats') content = <StatsView {...props} />;
     else if (page === 'templates') content = <TemplatesView {...props} />;
+    else if (page === 'itens') content = <ItemsView {...props} />;
     else if (page === 'settings')
-      content = (
-        <SettingsView
-          {...props}
-          sync={sync}
-          onSync={() => runSync(true)}
-          onReplace={(c, imgs) => {
-            replace(c);
-            if (imgs) replaceImages(imgs);
-            setToast('Backup importado');
-          }}
-        />
-      );
+      content = <SettingsView {...props} sync={sync} onSync={() => runSync(true)} onToast={setToast} />;
     else content = <HomeView {...props} />;
   }
 
   const page = route[0] ?? '';
+  if (!entered) return <LoginView onDone={() => setEntered(true)} />;
+  const saveError = getSaveError();
   return (
     <div className="app">
+      {cloud.session?.mode === 'google' && cloud.status === 'reconnect' && (
+        <div className="cloud-banner" role="status">
+          <span>
+            <span className="cloud-dot reconnect" />
+            Sincronização com o Google Drive pausada.
+          </span>
+          <button className="btn small primary" onClick={() => signInWithGoogle().catch(() => {})}>
+            Reconectar
+          </button>
+        </div>
+      )}
+      {saveError && (
+        <div className="cloud-banner" role="alert">
+          <span>⚠ {saveError}</span>
+        </div>
+      )}
       <header className="topbar">
         <a href="#/" className="brand">
           <span className="logo">SKZ</span>
@@ -166,17 +181,22 @@ export function App() {
         </a>
         <nav>
           <a href="#/" className={page === '' || page === 'release' ? 'active' : ''}>
-            Lançamentos
+            <span className="nav-long">Lançamentos</span>
+            <span className="nav-short">Álbuns</span>
           </a>
           <a href="#/stats" className={page === 'stats' ? 'active' : ''}>
             <span className="nav-long">Minha coleção</span>
             <span className="nav-short">Coleção</span>
           </a>
+          <a href="#/itens" className={page === 'itens' ? 'active' : ''}>
+            <span className="nav-long">Meus itens</span>
+            <span className="nav-short">Itens</span>
+          </a>
           <a href="#/templates" className={page === 'templates' ? 'active' : ''}>
             Templates
           </a>
           <a href="#/settings" className={page === 'settings' ? 'active' : ''} aria-label="Configurações">
-            ⚙︎
+            {cloud.session?.mode === 'google' && <span className={`cloud-dot ${cloud.status}`} />}⚙︎
           </a>
         </nav>
       </header>

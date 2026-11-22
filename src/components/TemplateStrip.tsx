@@ -9,7 +9,18 @@ export function templateCredit(t: TemplateItem): string {
 }
 
 /** Miniaturas de templates com zoom; usado na página do álbum e na página Templates. */
-export function TemplateGrid({ db, items, layout = 'row' }: { db: Database; items: TemplateItem[]; layout?: 'row' | 'grid' }) {
+export function TemplateGrid({
+  db,
+  items,
+  layout = 'row',
+  onEdit,
+}: {
+  db: Database;
+  items: TemplateItem[];
+  layout?: 'row' | 'grid';
+  /** Para templates do usuário: abre a edição. */
+  onEdit?: (id: string) => void;
+}) {
   const [zoom, setZoom] = useState<TemplateItem | null>(null);
   return (
     <>
@@ -24,13 +35,16 @@ export function TemplateGrid({ db, items, layout = 'row' }: { db: Database; item
                 referrerPolicy="no-referrer"
                 onError={(e) => {
                   const img = e.currentTarget;
+                  if (t.image?.startsWith('data:')) return;
                   if (img.dataset.fallback !== '1' && t.image) {
                     img.dataset.fallback = '1';
                     img.src = t.image;
                   }
                 }}
               />
-              <span>{t.title}</span>
+              <span>
+                {t.mine && <span className="mine-tag">seu</span>} {t.title}
+              </span>
               {t.author && <small>{t.author}</small>}
             </button>
           ) : (
@@ -43,7 +57,26 @@ export function TemplateGrid({ db, items, layout = 'row' }: { db: Database; item
         )}
       </div>
       {zoom?.image && (
-        <Lightbox url={zoom.image} caption={templateCredit(zoom)} page={zoom.post} linkLabel="ver post original no Reddit" onClose={() => setZoom(null)} />
+        <Lightbox
+          url={zoom.image}
+          caption={templateCredit(zoom)}
+          page={zoom.post}
+          linkLabel={zoom.mine ? 'ver post original' : 'ver post original no Reddit'}
+          onClose={() => setZoom(null)}
+          action={
+            zoom.mine && onEdit ? (
+              <button
+                className="btn small"
+                onClick={() => {
+                  onEdit(zoom.id);
+                  setZoom(null);
+                }}
+              >
+                Editar
+              </button>
+            ) : undefined
+          }
+        />
       )}
     </>
   );

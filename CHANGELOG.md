@@ -16,6 +16,15 @@ Mudanças já publicadas no site, que entram na próxima versão (a versão est�
 - **Capas na página inicial**: cada lançamento mostra a capa do álbum (capa digital da Stray Kids Wiki; se não houver, a do SKZPD; sem nenhuma, um quadro com o título). No celular, os lançamentos aparecem em duas colunas.
 - Automação “Wiki do Reddit” pela API oficial (aguardando credenciais do Reddit).
 
+- **Tela de login ao abrir o app**: “Entrar com Google” (coleção salva no Google Drive da pessoa, numa pasta privada do app, e sincronizada entre aparelhos) ou “Entrar como visitante” (com aviso de que nada é salvo na nuvem).
+- **Sincronização com o Google Drive**: marcações, fotos, preferências, itens e templates próprios. Mescla por item (vale a alteração mais recente) e remoções não “voltam” vindas de outro aparelho.
+- **Configurações → Membros**: escolha de quais membros aparecem (inclusive Woojin e cards de grupo/unit). Vale para o app todo e é salva na nuvem, junto com as categorias de itens.
+- **Meus itens** (nova aba): cadastro de itens não oficiais ou fora da base — nome, membro, tipo, origem, foto, observações e os mesmos status.
+- **Templates próprios**: botão “+ Adicionar template” na página Templates (link ou imagem do aparelho, seção, lançamento, crédito). Aparecem marcados como “seu”, também na página do álbum, e podem ser sugeridos para todos.
+- **Foto do card bem visível**: no detalhe do card (🔍 Ver), a seção “📷 Foto do card” permite enviar foto do celular (reduzida automaticamente) ou colar um link, remover a sua foto e sugerir a foto para todos.
+- “Sugerir para todos” abre uma sugestão pronta no GitHub do projeto.
+- Backup: importar agora pode **juntar** com a coleção atual (ou substituir).
+
 ### Corrigido
 - Na primeira visita, o app recarregava a página sozinho uma vez ao ativar o modo offline.
 - Menu do celular cabe inteiro em telas pequenas (“Minha coleção” vira “Coleção”).
