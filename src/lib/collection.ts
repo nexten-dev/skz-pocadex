@@ -35,11 +35,12 @@ export function useCollection() {
   const migrateIds = useCallback((map: Record<string, string> | undefined) => {
     if (!map) return;
     const p = getProfile();
-    const hasOld = Object.keys(p.cards).some((k) => map[k]) || Object.keys(p.images).some((k) => map[k]);
+    const hasOld = [p.cards, p.images, p.notes].some((rec) => Object.keys(rec).some((k) => map[k]));
     if (!hasOld) return;
     updateProfile((d) => {
       d.cards = migrateKeys(d.cards, map);
       d.images = migrateKeys(d.images, map);
+      d.notes = migrateKeys(d.notes, map);
     });
   }, []);
 

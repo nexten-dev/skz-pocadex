@@ -3,6 +3,7 @@ import type { CardImage, CardStatus, Member, Photocard, Release } from '../lib/t
 import { isTransit, nextStatus, STATUS_INFO, TRANSIT_STEPS } from '../lib/status';
 import { CATEGORY_BY_ID } from '../lib/categories';
 import { PhotoPicker } from './PhotoPicker';
+import { PurchaseFields } from './PurchaseFields';
 import { suggestUrl } from '../lib/photo';
 
 interface Props {
@@ -128,6 +129,8 @@ export function CardDetail({ card, release, member, image, candidates, status, q
                 })}
               </ol>
             </div>
+
+            <PurchaseFields cardId={card.id} />
 
             {status === 'owned' && (
               <div className="qty">

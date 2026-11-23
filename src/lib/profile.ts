@@ -41,6 +41,15 @@ export interface CustomTemplate {
   deleted?: boolean;
 }
 
+/** Anotações de compra de um card (independem do status). */
+export interface CardNote {
+  /** CEG / dealer (nome de quem organiza a compra). */
+  ceg?: string;
+  /** Link da planilha de pagamento. */
+  sheet?: string;
+  t: number;
+}
+
 export interface Prefs {
   /** Membros exibidos (null = todos). Inclui "group" para cards de grupo/unit. */
   members: string[] | null;
@@ -58,6 +67,8 @@ export interface Profile {
   prefs: Prefs;
   items: Record<string, CustomItem>;
   templates: Record<string, CustomTemplate>;
+  /** Anotações de compra por card (CEG/dealer, planilha de pagamento). */
+  notes: Record<string, CardNote>;
   /** Última alteração local (qualquer campo). */
   updatedAt: number;
 }
@@ -66,7 +77,7 @@ const KEY = 'pocadex:profile';
 const DEFAULT_PREFS: Prefs = { members: null, categories: ['photocard'], showConcept: true, t: 0 };
 
 export function emptyProfile(): Profile {
-  return { version: 2, cards: {}, removed: {}, images: {}, imagesRemoved: {}, prefs: { ...DEFAULT_PREFS }, items: {}, templates: {}, updatedAt: 0 };
+  return { version: 2, cards: {}, removed: {}, images: {}, imagesRemoved: {}, prefs: { ...DEFAULT_PREFS }, items: {}, templates: {}, notes: {}, updatedAt: 0 };
 }
 
 function readJSON<T>(key: string): T | null {
@@ -95,6 +106,7 @@ export function normalizeProfile(raw: unknown): Profile {
   if (r.prefs) p.prefs = { ...DEFAULT_PREFS, ...r.prefs };
   Object.assign(p.items, r.items ?? {});
   Object.assign(p.templates, r.templates ?? {});
+  Object.assign(p.notes, r.notes ?? {});
   p.updatedAt = r.updatedAt ?? 0;
   return p;
 }
@@ -229,6 +241,7 @@ export function mergeProfiles(a: Profile, b: Profile): Profile {
     prefs: (b.prefs?.t ?? 0) > (a.prefs?.t ?? 0) ? b.prefs : a.prefs,
     items: mergeById(a.items, b.items),
     templates: mergeById(a.templates, b.templates),
+    notes: mergeById(a.notes ?? {}, b.notes ?? {}),
     updatedAt: Math.max(a.updatedAt, b.updatedAt),
   };
 }
@@ -238,4 +251,14 @@ export function profileFingerprint(p: Profile): string {
   const { updatedAt: _u, ...rest } = p;
   void _u;
   return JSON.stringify(rest);
+}
+
+/** Salva as anotações de compra de um card (campos vazios são removidos). */
+export function setCardNote(cardId: string, note: { ceg?: string; sheet?: string }) {
+  const clean = { ceg: note.ceg?.trim() || undefined, sheet: note.sheet?.trim() || undefined };
+  const prev = state.notes[cardId];
+  if ((prev?.ceg ?? undefined) === clean.ceg && (prev?.sheet ?? undefined) === clean.sheet) return;
+  updateProfile((p, now) => {
+    p.notes[cardId] = { ...clean, t: now };
+  });
 }

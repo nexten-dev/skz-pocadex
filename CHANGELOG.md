@@ -22,6 +22,7 @@ Mudanças já publicadas no site, que entram na próxima versão (a versão est�
 - **Meus itens** (nova aba): cadastro de itens não oficiais ou fora da base — nome, membro, tipo, origem, foto, observações e os mesmos status.
 - **Templates próprios**: botão “+ Adicionar template” na página Templates (link ou imagem do aparelho, seção, lançamento, crédito). Aparecem marcados como “seu”, também na página do álbum, e podem ser sugeridos para todos.
 - **Foto do card bem visível**: no detalhe do card (🔍 Ver), a seção “📷 Foto do card” permite enviar foto do celular (reduzida automaticamente) ou colar um link, remover a sua foto e sugerir a foto para todos.
+- **Dados da compra no card** (🔍 Ver → “🧾 Compra”): campo **CEG** (nome da dealer) e **link da planilha de pagamento**, com botão “Abrir”. Ficam guardados mesmo se o card for desmarcado, sincronizam com o Google Drive e o nome da dealer aparece nos cards a caminho em “Minha coleção”.
 - “Sugerir para todos” abre uma sugestão pronta no GitHub do projeto.
 - Backup: importar agora pode **juntar** com a coleção atual (ou substituir).
 

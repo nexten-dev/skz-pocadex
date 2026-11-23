@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { countCards, memberMap, PhotocardTile, Progress, type ViewProps } from '../components/common';
 import { CATEGORIES } from '../lib/categories';
+import { useProfile } from '../lib/profile';
 import { isTransit, nextStatus, STATUS_INFO, TRANSIT_STEPS } from '../lib/status';
 import type { Photocard, TransitStatus } from '../lib/types';
 
@@ -27,7 +28,9 @@ export function StatsView({ db, index, collection, setStatus }: ViewProps) {
   const byStep = new Map<TransitStatus, Photocard[]>(TRANSIT_STEPS.map((t) => [t.id as TransitStatus, []]));
   for (const c of transit) byStep.get(collection.cards[c.id].s as TransitStatus)?.push(c);
   const [stepFilter, setStepFilter] = useState<TransitStatus | 'all'>('all');
+  const notes = useProfile().notes;
   const label = (c: Photocard) => `${releaseTitle.get(c.releaseId)}${c.version ? ` · ${c.version}` : ''}`;
+  const transitLabel = (c: Photocard) => (notes[c.id]?.ceg ? `${notes[c.id].ceg} · ${label(c)}` : label(c));
 
   return (
     <>
@@ -171,7 +174,7 @@ export function StatsView({ db, index, collection, setStatus }: ViewProps) {
                       card={c}
                       member={members.get(c.memberId)}
                       status={t.id as TransitStatus}
-                      showRelease={label(c)}
+                      showRelease={transitLabel(c)}
                       onClick={() => setStatus([c.id], next)}
                     />
                   ))}
