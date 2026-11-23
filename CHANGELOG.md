@@ -22,7 +22,10 @@ Mudanças já publicadas no site, que entram na próxima versão (a versão est�
 - **Meus itens** (nova aba): cadastro de itens não oficiais ou fora da base — nome, membro, tipo, origem, foto, observações e os mesmos status.
 - **Templates próprios**: botão “+ Adicionar template” na página Templates (link ou imagem do aparelho, seção, lançamento, crédito). Aparecem marcados como “seu”, também na página do álbum, e podem ser sugeridos para todos.
 - **Foto do card bem visível**: no detalhe do card (🔍 Ver), a seção “📷 Foto do card” permite enviar foto do celular (reduzida automaticamente) ou colar um link, remover a sua foto e sugerir a foto para todos.
-- **Dados da compra no card** (🔍 Ver → “🧾 Compra”): campo **CEG** (nome da dealer) e **link da planilha de pagamento**, com botão “Abrir”. Ficam guardados mesmo se o card for desmarcado, sincronizam com o Google Drive e o nome da dealer aparece nos cards a caminho em “Minha coleção”.
+- **Dados da compra no card** (🔍 Ver → “🧾 Compra”): **CEG**, **Dealer**, **Item/SET** e **Planilha CEG** (link, com botão “Abrir”). Os campos sugerem nomes já usados, ficam guardados mesmo se o card for desmarcado e sincronizam com o Google Drive. CEG e dealer aparecem nos cards a caminho em “Minha coleção”.
+- **Filtros por CEG e por Dealer na página inicial**: mostram os itens daquela compra (com álbum e Item/SET) e só os álbuns onde eles estão.
+- **Novo álbum**: botão “+ Novo álbum” na página inicial para criar álbuns/lançamentos que não estão no app (nome, tipo, mercado, data, capa, observações). Aparecem com a etiqueta “seu” e podem ser editados ou apagados.
+- **Meus itens ligados a álbuns**: cada item pode ser ligado a um álbum (oficial ou seu) e a uma categoria — inclusive a nova **“Variados”**, para itens diversos. O item aparece na página do álbum, no grupo “⭐ Meus itens”, e funciona como qualquer card (status, etapas de compra, foto, dados da CEG).
 - **Colar foto da área de transferência**: botão “📋 Colar foto” (celular e computador) e Ctrl+V/⌘+V com a janela aberta. Vale para fotos de cards, Meus itens e templates; se o copiado for um link, usa o link.
 - “Sugerir para todos” abre uma sugestão pronta no GitHub do projeto.
 - Backup: importar agora pode **juntar** com a coleção atual (ou substituir).

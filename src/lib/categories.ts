@@ -9,6 +9,7 @@ export const CATEGORIES: { id: ItemCategory; label: string; short: string; icon:
   { id: 'luckydraw', label: 'Lucky draws', short: 'Lucky draw', icon: '🍀', description: 'Sorteios de lojas e eventos de vídeo-call/fansign' },
   { id: 'popup', label: 'Pop-up stores', short: 'Pop-up', icon: '🏪', description: 'Itens das pop-up stores oficiais' },
   { id: 'event', label: 'Eventos e merch', short: 'Eventos', icon: '🎤', description: 'Fanmeeting, turnê, fanclub e merch oficial' },
+  { id: 'misc', label: 'Variados', short: 'Variados', icon: '🎲', description: 'Itens diversos que não se encaixam nas outras categorias' },
 ];
 
 export const CATEGORY_BY_ID = new Map(CATEGORIES.map((c) => [c.id, c]));

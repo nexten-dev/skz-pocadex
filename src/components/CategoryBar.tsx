@@ -15,7 +15,8 @@ export function CategoryBar({
   onToggle: (c: ItemCategory) => void;
 }) {
   const counts = new Map<ItemCategory, number>();
-  for (const it of items) counts.set(it.category, (counts.get(it.category) ?? 0) + 1);
+  // Itens criados pelo usuário sempre aparecem: não entram nos botões "Mostrar"
+  for (const it of items) if (!it.custom) counts.set(it.category, (counts.get(it.category) ?? 0) + 1);
   const present = CATEGORIES.filter((c) => counts.has(c.id));
   if (present.length <= 1 && visible.length <= 1) return null;
   const hidden = present.filter((c) => !visible.includes(c.id)).reduce((n, c) => n + (counts.get(c.id) ?? 0), 0);

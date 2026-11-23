@@ -1703,3 +1703,25 @@ main {
 .paste-hint {
   margin: 0;
 }
+
+/* ---------- Álbuns próprios e filtros de compra ---------- */
+.new-album {
+  margin-top: 0.6rem;
+  width: 100%;
+}
+.tag.mine {
+  background: var(--accent);
+  color: #fff;
+}
+.purchase-filter select {
+  flex: 1 1 160px;
+}
+.purchase-results {
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+.album-cover-preview {
+  width: 110px !important;
+  aspect-ratio: 1 !important;
+}

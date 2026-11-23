@@ -106,6 +106,10 @@ export function useReleaseImages(release: Release | undefined, cards: Photocard[
         images.set(card.id, { url: c.url, thumb: c.url, page: c.page, source: c.source ?? 'Sua escolha', kind: 'custom' });
         continue;
       }
+      if (card.image) {
+        images.set(card.id, { url: card.image, thumb: card.image, source: 'Foto do seu item', kind: 'custom' });
+        continue;
+      }
       const d = dbImage(release, card.id, hosts);
       if (d) {
         images.set(card.id, d);

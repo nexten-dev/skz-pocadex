@@ -31,7 +31,7 @@ export type Market = 'KR' | 'JP' | 'TW';
  * inclusion = outros itens do álbum (postcards, pôsteres, ID photo, film…)
  * event     = fanmeeting, turnê, fanclub e afins
  */
-export type ItemCategory = 'photocard' | 'pob' | 'luckydraw' | 'popup' | 'inclusion' | 'event';
+export type ItemCategory = 'photocard' | 'pob' | 'luckydraw' | 'popup' | 'inclusion' | 'event' | 'misc';
 
 /** Formato do item, para a proporção da miniatura. */
 export type ItemFormat = 'card' | 'wide' | 'tall' | 'square';
@@ -90,6 +90,8 @@ export interface Release {
   media?: ReleaseMedia;
   /** Capa alternativa (ex.: do SKZPD), usada quando a wiki não tem a capa digital. */
   cover?: MediaImage;
+  /** Álbum criado pelo usuário. */
+  mine?: boolean;
   /** Fonte da lista de cards e das fotos (ex.: SKZPD). */
   source?: { name: string; url: string };
 }
@@ -161,6 +163,12 @@ export interface Photocard {
   itemType?: string;
   store?: string;
   format: ItemFormat;
+  /** Item criado pelo usuário (Meus itens). */
+  custom?: boolean;
+  /** Nome do item criado pelo usuário. */
+  title?: string;
+  /** Foto do item criado pelo usuário. */
+  image?: string;
 }
 
 export interface CardImage {

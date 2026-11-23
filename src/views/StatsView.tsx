@@ -30,7 +30,7 @@ export function StatsView({ db, index, collection, setStatus }: ViewProps) {
   const [stepFilter, setStepFilter] = useState<TransitStatus | 'all'>('all');
   const notes = useProfile().notes;
   const label = (c: Photocard) => `${releaseTitle.get(c.releaseId)}${c.version ? ` · ${c.version}` : ''}`;
-  const transitLabel = (c: Photocard) => (notes[c.id]?.ceg ? `${notes[c.id].ceg} · ${label(c)}` : label(c));
+  const transitLabel = (c: Photocard) => [notes[c.id]?.ceg, notes[c.id]?.dealer, label(c)].filter(Boolean).join(' · ');
 
   return (
     <>

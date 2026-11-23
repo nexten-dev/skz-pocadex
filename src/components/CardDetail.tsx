@@ -40,7 +40,7 @@ export function CardDetail({ card, release, member, image, candidates, status, q
 
   useEffect(() => setBroken(false), [image?.url]);
 
-  const name = member?.name ?? (card.label || 'Grupo');
+  const name = card.custom ? card.title ?? 'Meu item' : member?.name ?? (card.label || 'Grupo');
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -85,6 +85,15 @@ export function CardDetail({ card, release, member, image, candidates, status, q
               </p>
             )}
             {setNote && <p className="small muted">{setNote}</p>}
+            {card.custom && (
+              <p className="small">
+                ⭐ Item seu{member ? ` · ${member.name}` : ''}
+                {card.itemType ? ` · ${card.itemType}` : ''} ·{' '}
+                <a href={`#/itens?editar=${encodeURIComponent(card.id.slice(2))}`} onClick={onClose}>
+                  editar item
+                </a>
+              </p>
+            )}
 
             <div className="status-buttons">
               {MAIN.map((s) => (

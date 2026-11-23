@@ -23,11 +23,35 @@ export interface CustomItem {
   origin?: string; // de onde é (evento, loja, fanmade…)
   image?: string;
   notes?: string;
+  /** Álbum ao qual o item pertence (oficial ou criado pelo usuário). */
+  releaseId?: string;
+  category?: ItemCategory;
+  /** @deprecated status antigo — agora fica em cards["u:<id>"]. */
   s?: CardStatus | null;
+  /** @deprecated quantidade antiga — agora fica em cards["u:<id>"]. */
   q?: number;
   t: number;
   deleted?: boolean;
 }
+
+/** ID do card de um item criado pelo usuário. */
+export const itemCardId = (itemId: string) => `u:${itemId}`;
+
+/** Álbum/lançamento criado pelo usuário. */
+export interface CustomAlbum {
+  id: string;
+  title: string;
+  type: string;
+  market: 'KR' | 'JP' | 'TW';
+  date: string;
+  cover?: string;
+  notes?: string;
+  t: number;
+  deleted?: boolean;
+}
+
+/** ID do lançamento de um álbum criado pelo usuário. */
+export const albumReleaseId = (albumId: string) => `u:${albumId}`;
 
 export interface CustomTemplate {
   id: string;
@@ -43,12 +67,18 @@ export interface CustomTemplate {
 
 /** Anotações de compra de um card (independem do status). */
 export interface CardNote {
-  /** CEG / dealer (nome de quem organiza a compra). */
+  /** CEG (compra em grupo). */
   ceg?: string;
-  /** Link da planilha de pagamento. */
+  /** Dealer (quem vende/organiza). */
+  dealer?: string;
+  /** Item/SET comprado. */
+  itemset?: string;
+  /** Link da planilha da CEG. */
   sheet?: string;
   t: number;
 }
+
+export const NOTE_FIELDS = ['ceg', 'dealer', 'itemset', 'sheet'] as const;
 
 export interface Prefs {
   /** Membros exibidos (null = todos). Inclui "group" para cards de grupo/unit. */
@@ -67,8 +97,10 @@ export interface Profile {
   prefs: Prefs;
   items: Record<string, CustomItem>;
   templates: Record<string, CustomTemplate>;
-  /** Anotações de compra por card (CEG/dealer, planilha de pagamento). */
+  /** Anotações de compra por card (CEG, dealer, item/set, planilha). */
   notes: Record<string, CardNote>;
+  /** Álbuns criados pelo usuário. */
+  albums: Record<string, CustomAlbum>;
   /** Última alteração local (qualquer campo). */
   updatedAt: number;
 }
@@ -77,7 +109,7 @@ const KEY = 'pocadex:profile';
 const DEFAULT_PREFS: Prefs = { members: null, categories: ['photocard'], showConcept: true, t: 0 };
 
 export function emptyProfile(): Profile {
-  return { version: 2, cards: {}, removed: {}, images: {}, imagesRemoved: {}, prefs: { ...DEFAULT_PREFS }, items: {}, templates: {}, notes: {}, updatedAt: 0 };
+  return { version: 2, cards: {}, removed: {}, images: {}, imagesRemoved: {}, prefs: { ...DEFAULT_PREFS }, items: {}, templates: {}, notes: {}, albums: {}, updatedAt: 0 };
 }
 
 function readJSON<T>(key: string): T | null {
@@ -107,6 +139,18 @@ export function normalizeProfile(raw: unknown): Profile {
   Object.assign(p.items, r.items ?? {});
   Object.assign(p.templates, r.templates ?? {});
   Object.assign(p.notes, r.notes ?? {});
+  Object.assign(p.albums, r.albums ?? {});
+  // Itens antigos guardavam o status no próprio item: passa para cards["u:<id>"]
+  for (const item of Object.values(p.items)) {
+    if (item.s && !p.cards[itemCardId(item.id)] && !p.removed[itemCardId(item.id)]) {
+      p.cards[itemCardId(item.id)] = { s: item.s, t: item.t || 1, ...(item.q ? { q: item.q } : {}) };
+    }
+    if ('s' in item || 'q' in item) {
+      p.items[item.id] = { ...item };
+      delete p.items[item.id].s;
+      delete p.items[item.id].q;
+    }
+  }
   p.updatedAt = r.updatedAt ?? 0;
   return p;
 }
@@ -242,6 +286,7 @@ export function mergeProfiles(a: Profile, b: Profile): Profile {
     items: mergeById(a.items, b.items),
     templates: mergeById(a.templates, b.templates),
     notes: mergeById(a.notes ?? {}, b.notes ?? {}),
+    albums: mergeById(a.albums ?? {}, b.albums ?? {}),
     updatedAt: Math.max(a.updatedAt, b.updatedAt),
   };
 }
@@ -254,10 +299,14 @@ export function profileFingerprint(p: Profile): string {
 }
 
 /** Salva as anotações de compra de um card (campos vazios são removidos). */
-export function setCardNote(cardId: string, note: { ceg?: string; sheet?: string }) {
-  const clean = { ceg: note.ceg?.trim() || undefined, sheet: note.sheet?.trim() || undefined };
+export function setCardNote(cardId: string, note: Partial<Record<(typeof NOTE_FIELDS)[number], string>>) {
+  const clean: Partial<CardNote> = {};
+  for (const f of NOTE_FIELDS) {
+    const v = note[f]?.trim();
+    if (v) clean[f] = v;
+  }
   const prev = state.notes[cardId];
-  if ((prev?.ceg ?? undefined) === clean.ceg && (prev?.sheet ?? undefined) === clean.sheet) return;
+  if (NOTE_FIELDS.every((f) => (prev?.[f] ?? undefined) === clean[f])) return;
   updateProfile((p, now) => {
     p.notes[cardId] = { ...clean, t: now };
   });

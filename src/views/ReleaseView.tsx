@@ -8,6 +8,8 @@ import { Lightbox } from '../components/Lightbox';
 import { TemplateGrid } from '../components/TemplateStrip';
 import { useAllTemplates } from '../lib/templates';
 import { useVisibleMembers } from '../lib/categories';
+import { AlbumForm } from '../components/AlbumForm';
+import { useProfile } from '../lib/profile';
 import type { MediaImage } from '../lib/types';
 import { CardDetail } from '../components/CardDetail';
 import { CategoryBar } from '../components/CategoryBar';
@@ -51,6 +53,8 @@ export function ReleaseView({
   const { images, previews, previewByGroup, memberPhotos } = useReleaseImages(release, cards, customImages, db);
   const allTemplates = useAllTemplates(db);
   const { members: visibleMembers } = useVisibleMembers();
+  const profileAlbums = useProfile().albums;
+  const [editingAlbum, setEditingAlbum] = useState(false);
   const [zoom, setZoom] = useState<(MediaImage & { caption?: string }) | null>(null);
   const counts = useMemo(() => countCards(cards, collection), [cards, collection]);
 
@@ -80,10 +84,13 @@ export function ReleaseView({
         const cat = CATEGORY_BY_ID.get(c.category);
         map.set(key, {
           key: groupKey(c),
-          title: [c.setName, c.version].filter(Boolean).join(' · '),
-          icon: c.category !== 'photocard' ? cat?.icon : undefined,
-          note: [c.category !== 'photocard' ? cat?.short : null, c.itemType, set?.note].filter(Boolean).join(' · '),
-          order: CATEGORY_ORDER.get(c.category) ?? 99,
+          title: c.custom ? `Meus itens · ${cat?.short ?? 'Variados'}` : [c.setName, c.version].filter(Boolean).join(' · '),
+          icon: c.custom ? '⭐' : c.category !== 'photocard' ? cat?.icon : undefined,
+          note: c.custom
+            ? 'Itens que você cadastrou neste álbum (editar em Meus itens)'
+            : [c.category !== 'photocard' ? cat?.short : null, c.itemType, set?.note].filter(Boolean).join(' · '),
+          // Meus itens ficam depois dos oficiais
+          order: (CATEGORY_ORDER.get(c.category) ?? 99) + (c.custom ? 100 : 0),
           cards: [],
         });
       }
@@ -143,6 +150,15 @@ export function ReleaseView({
             <p className="small muted">Versões do álbum: {release.albumVersions.join(', ')}</p>
           )}
           {release.notes && <p className="small">{release.notes}</p>}
+          {release.mine && (
+            <p className="small">
+              ⭐ Álbum criado por você.{' '}
+              <button className="linklike" onClick={() => setEditingAlbum(true)}>
+                Editar ou apagar
+              </button>{' '}
+              · <a href="#/itens">adicionar itens a ele em Meus itens</a>
+            </p>
+          )}
           {previews.length > 0 ? (
             <div className="preview-strip">
               <span className="small muted">Conteúdo de cada versão (prévia oficial):</span>
@@ -348,6 +364,9 @@ export function ReleaseView({
           onImage={(img) => setCustomImage(detailCard.id, img)}
           onClose={() => setOpenCard(null)}
         />
+      )}
+      {editingAlbum && release.mine && profileAlbums[release.id.slice(2)] && (
+        <AlbumForm album={profileAlbums[release.id.slice(2)]} onClose={() => setEditingAlbum(false)} />
       )}
       {zoom && (
         <Lightbox url={zoom.url} caption={zoom.caption} page={zoom.page} source={zoom.source} onClose={() => setZoom(null)} />

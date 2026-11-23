@@ -127,8 +127,10 @@ export function PhotocardTile({
         {qty && qty > 1 ? <span className="pc-qty">×{qty}</span> : null}
       </div>
       <div className="pc-meta">
-        <span className="pc-name">{m.id === 'group' ? card.label || 'Grupo' : m.name}</span>
-        <span className="pc-sub muted">{showRelease ?? card.version ?? card.store ?? card.setName}</span>
+        <span className="pc-name">{card.custom ? card.title : m.id === 'group' ? card.label || 'Grupo' : m.name}</span>
+        <span className="pc-sub muted">
+          {showRelease ?? (card.custom ? [m.id === 'group' ? null : m.name, card.itemType].filter(Boolean).join(' · ') || 'Meu item' : card.version ?? card.store ?? card.setName)}
+        </span>
       </div>
     </button>
   );

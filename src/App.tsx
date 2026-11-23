@@ -5,7 +5,8 @@ import { useCustomImages } from './lib/images';
 import type { Database, ItemCategory, Photocard } from './lib/types';
 import { useVisibleCategories, useVisibleMembers } from './lib/categories';
 import { providerInfo, reconnect, useCloud } from './lib/cloud';
-import { getSaveError, useProfile } from './lib/profile';
+import { getSaveError, useProfile, type CustomItem } from './lib/profile';
+import { customCards, withCustomAlbums } from './lib/custom';
 import { LoginView } from './views/LoginView';
 import { ItemsView } from './views/ItemsView';
 import { usePwa } from './lib/pwa';
@@ -16,7 +17,8 @@ import { SettingsView } from './views/SettingsView';
 import { TemplatesView } from './views/TemplatesView';
 
 function useHashRoute() {
-  const get = () => window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  // "#/itens?editar=abc" → ["itens"] (o que vem depois de "?" fica para a página ler)
+  const get = () => window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/').filter(Boolean);
   const [route, setRoute] = useState<string[]>(get);
   useEffect(() => {
     const on = () => {
@@ -41,13 +43,18 @@ export interface CardIndex {
   visible: ItemCategory[];
 }
 
-function buildFullIndex(db: Database) {
+function buildFullIndex(db: Database, items: Record<string, CustomItem>) {
   const byReleaseAll = new Map<string, Photocard[]>();
   const byId = new Map<string, Photocard>();
   for (const r of db.releases) {
     const cards = expandRelease(db, r);
     byReleaseAll.set(r.id, cards);
     for (const c of cards) byId.set(c.id, c);
+  }
+  // Itens criados pelo usuário entram no fim do álbum ao qual foram ligados
+  for (const c of customCards(items, new Set(byReleaseAll.keys()))) {
+    byReleaseAll.get(c.releaseId)!.push(c);
+    byId.set(c.id, c);
   }
   return { byReleaseAll, byId };
 }
@@ -58,7 +65,8 @@ function filterIndex(full: ReturnType<typeof buildFullIndex>, visible: ItemCateg
   const byRelease = new Map<string, Photocard[]>();
   const all: Photocard[] = [];
   for (const [id, cards] of full.byReleaseAll) {
-    const list = cards.filter((c) => show.has(c.category) && (!who || who.has(c.memberId)));
+    // Itens criados pelo usuário sempre aparecem (ele os cadastrou de propósito)
+    const list = cards.filter((c) => c.custom || (show.has(c.category) && (!who || who.has(c.memberId))));
     byRelease.set(id, list);
     all.push(...list);
   }
@@ -73,7 +81,7 @@ export function App() {
   const { collection, setStatus, setQty, migrateIds } = useCollection();
   const { custom: customImages, setImage: setCustomImage } = useCustomImages();
   const cloud = useCloud();
-  useProfile(); // re-renderiza quando o arquivo pessoal muda
+  const profile = useProfile();
   // A tela de login aparece a cada abertura do app (até a pessoa entrar ou escolher visitante)
   const [entered, setEntered] = useState(false);
 
@@ -103,7 +111,9 @@ export function App() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  const db = sync?.db ?? null;
+  const baseDb = sync?.db ?? null;
+  // Catálogo oficial + álbuns criados pelo usuário
+  const db = useMemo(() => (baseDb ? withCustomAlbums(baseDb, profile.albums) : null), [baseDb, profile.albums]);
 
   // Cards que mudaram de ID na base: leva junto as marcações e imagens escolhidas
   useEffect(() => {
@@ -111,7 +121,7 @@ export function App() {
     migrateIds(db.idMigrations);
   }, [db, migrateIds]);
   const { visible, toggle: toggleCategory, setVisible: setVisibleCategories } = useVisibleCategories();
-  const fullIndex = useMemo(() => (db ? buildFullIndex(db) : null), [db]);
+  const fullIndex = useMemo(() => (db ? buildFullIndex(db, profile.items) : null), [db, profile.items]);
   const { members: visibleMembers } = useVisibleMembers();
   const index = useMemo(
     () => (fullIndex ? filterIndex(fullIndex, visible, visibleMembers) : null),
